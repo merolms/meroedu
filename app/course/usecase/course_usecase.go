@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/meroedu/course-api/app/domain"
@@ -28,11 +27,11 @@ func NewCourseUseCase(c domain.CourseRepository, timeout time.Duration) domain.C
 }
 
 // GetAll ...
-func (usecase *CourseUseCase) GetAll(c context.Context, skip int, limit int) (res []domain.Course, err error) {
+func (usecase *CourseUseCase) GetAll(c context.Context, start int, limit int) (res []domain.Course, err error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 
-	res, err = usecase.courseRepo.GetAll(ctx, skip, limit)
+	res, err = usecase.courseRepo.GetAll(ctx, start, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -68,12 +67,17 @@ func (usecase *CourseUseCase) GetByTitle(c context.Context, title string) (res d
 func (usecase *CourseUseCase) CreateCourse(c context.Context, course *domain.Course) (err error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
-	existedCourse, err := usecase.GetByTitle(ctx, course.Title)
-	fmt.Printf("%v, %T\n", existedCourse, existedCourse)
+	// existedCourse, err := usecase.GetByTitle(ctx, course.Title)
+	// fmt.Printf("%v, %T\n", existedCourse, existedCourse)
 	// if existedCourse != (domain.Course{}) {
 	// 	return domain.ErrConflict
 	// }
-	usecase.courseRepo.CreateCourse(ctx, course)
+	course.UpdatedAt = time.Now()
+	course.CreatedAt = time.Now()
+	err = usecase.courseRepo.CreateCourse(ctx, course)
+	if err != nil {
+		return 
+	}
 	return
 
 }

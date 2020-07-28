@@ -21,7 +21,7 @@ services:
     ports:
       - 3306:3306
     environment:
-      - MYSQL_DATABASE=course
+      - MYSQL_DATABASE=course_api
       - MYSQL_USER=user
       - MYSQL_PASSWORD=password
       - MYSQL_ROOT_PASSWORD=root
