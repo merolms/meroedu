@@ -11,7 +11,7 @@ database:
   port: 3306
   user: user
   password: password
-  dbname: course
+  dbname: course_api
   allowNativePasswords: true
   max_open_connections: 25
   max_idle_connections: 25

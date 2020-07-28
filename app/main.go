@@ -11,7 +11,6 @@ import (
 	_courseHttpDeliveryMiddleware "github.com/meroedu/course-api/app/course/delivery/http/middleware"
 	_courseRepo "github.com/meroedu/course-api/app/course/repository/mysql"
 	_courseUcase "github.com/meroedu/course-api/app/course/usecase"
-	"github.com/meroedu/course-api/app/domain"
 	"github.com/meroedu/course-api/app/infrastructure/datastore"
 	"github.com/spf13/viper"
 )
@@ -19,10 +18,7 @@ import (
 func main() {
 	config.ReadConfig()
 	db := datastore.NewDB()
-	db.LogMode(true)
-	defer db.Close()
-
-	db.AutoMigrate(domain.Course{}, domain.Category{})
+	// db.AutoMigrate(domain.Course{}, domain.Category{})
 	e := echo.New()
 	middL := _courseHttpDeliveryMiddleware.InitMiddleware()
 	e.Use(middL.CORS)

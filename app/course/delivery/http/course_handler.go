@@ -35,19 +35,19 @@ func NewCourseHandler(e *echo.Echo, us domain.CourseUseCase) {
 // GetAll ...
 func (c *CourseHandler) GetAll(echoContext echo.Context) error {
 	ctx := echoContext.Request().Context()
-	skip := 0
+	start := 0
 	limit := 10
 	var err error
 	fmt.Println(echoContext.QueryParams())
 	if len(echoContext.QueryParams()) > 0 {
-		if skip, err = strconv.Atoi(echoContext.QueryParam("skip")); err != nil {
+		if start, err = strconv.Atoi(echoContext.QueryParam("start")); err != nil {
 			return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 		}
 		if limit, err = strconv.Atoi(echoContext.QueryParam("limit")); err != nil {
 			return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 		}
 	}
-	listCourse, err := c.CourseUseCase.GetAll(ctx, skip, limit)
+	listCourse, err := c.CourseUseCase.GetAll(ctx, start, limit)
 	if err != nil {
 		return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
