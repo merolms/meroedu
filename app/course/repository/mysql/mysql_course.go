@@ -2,58 +2,173 @@ package mysql
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 
-	"github.com/jinzhu/gorm"
 	"github.com/meroedu/course-api/app/domain"
 	"github.com/sirupsen/logrus"
 )
 
 type mysqlRepository struct {
-	Conn *gorm.DB
+	Conn *sql.DB
 }
 
 // InitMysqlRepository will create an object that represent the course's Repository interface
-func InitMysqlRepository(Conn *gorm.DB) domain.CourseRepository {
-	return &mysqlRepository{Conn}
+func InitMysqlRepository(db *sql.DB) domain.CourseRepository {
+	return &mysqlRepository{
+		Conn: db,
+	}
+}
+func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...interface{}) (result []domain.Course, err error) {
+	rows, err := m.Conn.QueryContext(ctx, query, args...)
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+
+	defer func() {
+		errRow := rows.Close()
+		if errRow != nil {
+			logrus.Error(errRow)
+		}
+	}()
+
+	result = make([]domain.Course, 0)
+	for rows.Next() {
+		t := domain.Course{}
+		authorID := int64(0)
+		err = rows.Scan(
+			&t.ID,
+			&t.Title,
+			&t.Author.ID,
+			&t.UpdatedAt,
+			&t.CreatedAt,
+		)
+
+		if err != nil {
+			logrus.Error(err)
+			return nil, err
+		}
+		t.Author = domain.User{
+			ID: authorID,
+		}
+		result = append(result, t)
+	}
+
+	return result, nil
 }
 
-func (mysqlRepo *mysqlRepository) GetAll(ctx context.Context, skip int, limit int) (res []domain.Course, err error) {
-	var courses []domain.Course
-	fmt.Println("Start and limit", skip, limit)
-	if err := mysqlRepo.Conn.Limit(limit).Offset(skip).Find(&courses).Error; err != nil {
-		logrus.Error(err)
-		return []domain.Course{}, err
+func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res []domain.Course, err error) {
+	query := `SELECT id,title, author_id, updated_at, created_at FROM courses ORDER BY created_at LIMIT ?,? `
+
+	res, err = m.fetch(ctx, query, start, limit)
+	if err != nil {
+		return nil, err
 	}
-	return courses, nil
+	return res, nil
+}
+func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (res domain.Course, err error) {
+	query := `SELECT id,title, author_id, updated_at, created_at
+  						FROM courses WHERE ID = ?`
+
+	list, err := m.fetch(ctx, query, id)
+	if err != nil {
+		return domain.Course{}, err
+	}
+
+	if len(list) > 0 {
+		res = list[0]
+	} else {
+		return res, domain.ErrNotFound
+	}
+
+	return
 }
 
-func (mysqlRepo *mysqlRepository) GetByID(ctx context.Context, id int64) (res domain.Course, err error) {
-	course := domain.Course{}
+func (m *mysqlRepository) GetByTitle(ctx context.Context, title string) (res domain.Course, err error) {
+	query := `SELECT id,title, author_id, updated_at, created_at
+  						FROM courses WHERE title = ?`
 
-	if err := mysqlRepo.Conn.Where("id=?", id).Find(&course).Error; err != nil {
-		logrus.Error(err)
+	list, err := m.fetch(ctx, query, title)
+	if err != nil {
+		return
 	}
-	if course.ID <= 0 {
-		return domain.Course{}, domain.ErrNotFound
+
+	if len(list) > 0 {
+		res = list[0]
+	} else {
+		return res, domain.ErrNotFound
 	}
-	return course, nil
+	return
 }
 
-func (mysqlRepo *mysqlRepository) GetByTitle(ctx context.Context, title string) (res domain.Course, err error) {
-	course := domain.Course{}
-	if err := mysqlRepo.Conn.Find(&course).Where("title=?", title); err != nil {
-		logrus.Error(err)
+func (m *mysqlRepository) CreateCourse(ctx context.Context, a *domain.Course) (err error) {
+	query := `INSERT  courses SET title=?, author_id=?, updated_at=? , created_at=?`
+	stmt, err := m.Conn.PrepareContext(ctx, query)
+	if err != nil {
+		logrus.Error("Error while preparing statement ", err)
+		return 
 	}
-	if course.ID <= 0 {
-		return course, domain.ErrNotFound
+
+	res, err := stmt.ExecContext(ctx, a.Title, a.Author.ID, a.UpdatedAt, a.CreatedAt)
+	if err != nil {
+		logrus.Error("Error while executing statement ", err)
+		return 
 	}
-	return course, nil
+	lastID, err := res.LastInsertId()
+	if err != nil {
+		logrus.Error("Got Error from LastInsertId method: ", err)
+		return 
+	}
+	a.ID = lastID
+	return 
 }
-func (mysqlRepo *mysqlRepository) CreateCourse(ctx context.Context, course *domain.Course) (int64, error) {
-	if err := mysqlRepo.Conn.Save(&course).Error; err != nil {
-		logrus.Error(err)
-		return 0, err
+
+func (m *mysqlRepository) DeleteCourse(ctx context.Context, id int64) (err error) {
+	query := "DELETE FROM courses WHERE id = ?"
+
+	stmt, err := m.Conn.PrepareContext(ctx, query)
+	if err != nil {
+		return
 	}
-	return course.ID, nil
+
+	res, err := stmt.ExecContext(ctx, id)
+	if err != nil {
+		return
+	}
+
+	rowsAfected, err := res.RowsAffected()
+	if err != nil {
+		return
+	}
+
+	if rowsAfected != 1 {
+		err = fmt.Errorf("Weird  Behavior. Total Affected: %d", rowsAfected)
+		return
+	}
+
+	return
+}
+func (m *mysqlRepository) UpdateCourse(ctx context.Context, ar *domain.Course) (err error) {
+	query := `UPDATE course set title=?, author_id=?, updated_at=? WHERE ID = ?`
+
+	stmt, err := m.Conn.PrepareContext(ctx, query)
+	if err != nil {
+		return
+	}
+
+	res, err := stmt.ExecContext(ctx, ar.Title, ar.Author.ID, ar.UpdatedAt, ar.ID)
+	if err != nil {
+		return
+	}
+	affect, err := res.RowsAffected()
+	if err != nil {
+		return
+	}
+	if affect != 1 {
+		err = fmt.Errorf("Weird  Behavior. Total Affected: %d", affect)
+		return
+	}
+
+	return
 }
