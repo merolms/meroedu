@@ -1,0 +1,8 @@
+engine
+main
+README.MD
+.golangci.yaml
+docker-compose-development.yaml
+docker-compose.yaml
+Dockerfile
+Dockerfile.development

@@ -1,0 +1,18 @@
+---
+debug: true
+server:
+  address: ":9090"
+context:
+  timeout: 2
+database:
+  params:
+    parseTime: "true"
+  host: localhost
+  port: 3306
+  user: user
+  password: password
+  dbname: course
+  allowNativePasswords: true
+  max_open_connections: 25
+  max_idle_connections: 25
+  max_connections_lifetime: 5
