@@ -35,23 +35,25 @@ func NewCourseHandler(e *echo.Echo, us domain.CourseUseCase) {
 // GetAll ...
 func (c *CourseHandler) GetAll(echoContext echo.Context) error {
 	ctx := echoContext.Request().Context()
-	start := 0
-	limit := 10
+	start, limit := 0, 10
 	var err error
-	fmt.Println(echoContext.QueryParams())
-	if len(echoContext.QueryParams()) > 0 {
-		if start, err = strconv.Atoi(echoContext.QueryParam("start")); err != nil {
-			return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
-		}
-		if limit, err = strconv.Atoi(echoContext.QueryParam("limit")); err != nil {
-			return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+	for k, v := range echoContext.QueryParams() {
+		switch k {
+		case "start":
+			if start, err = strconv.Atoi(v[0]); err != nil {
+				return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+			}
+		case "limit":
+			if limit, err = strconv.Atoi(v[0]); err != nil {
+				return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+			}
 		}
 	}
+
 	listCourse, err := c.CourseUseCase.GetAll(ctx, start, limit)
 	if err != nil {
 		return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
-	// echoContext.Response().Header().Set(`X-Cursor`, nextCursor)
 	return echoContext.JSON(http.StatusOK, listCourse)
 }
 
