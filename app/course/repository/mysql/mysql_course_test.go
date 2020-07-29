@@ -26,7 +26,7 @@ func TestGetAll(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "title", "author_id", "updated_at", "created_at"}).
 		AddRow(mockCourses[0].ID, mockCourses[0].Title, mockCourses[0].Author.ID, mockCourses[0].UpdatedAt, mockCourses[0].CreatedAt)
 
-	query := `SELECT id,title, author_id, updated_at, created_at FROM courses ORDER BY created_at LIMIT \?,\?`
+	query := `SELECT id,title, author_id, updated_at, created_at FROM courses ORDER BY created_at DESC LIMIT \?,\?`
 	mock.ExpectQuery(query).WillReturnRows(rows)
 	c := courseMysqlRepo.InitMysqlRepository(db)
 	start, limit := 0, 10
