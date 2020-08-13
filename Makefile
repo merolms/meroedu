@@ -46,14 +46,16 @@ migrate-build:
 	cd migrator/ && docker build -t migrator .
 
 migrate: migrate-build
-	docker run --network host migrator -path=/migrations/ -database "mysql://user:password@tcp(127.0.0.1:3306)/course_api" up 1
+	docker run --network host migrator -path=/migrations/ -database "mysql://user:password@tcp(127.0.0.1:3306)/course_api" up
 
 migrate-down:
-	docker run --network host migrator -path=/migrations/ -database "mysql://user:password@tcp(127.0.0.1:3306)/course_api" down 1
+	docker run --network host migrator -path=/migrations/ -database "mysql://user:password@tcp(127.0.0.1:3306)/course_api" down -all
 	
 #############################################################################
 # Utility
 #############################################################################
+db-diagram:
+	java -jar ~/Downloads/schema-gui/schemaspy-6.1.0.jar -dp ~/Downloads/mysql-connector-java-6.0.6.jar -t mysql -db course_api -host localhost -u root -p "root" -o ~/Downloads/schema-gui/course_api -s course_api
 engine:
 	go build -o ${BINARY} app/*.go
 
