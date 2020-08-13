@@ -6,3 +6,15 @@ docker-compose-development.yaml
 docker-compose.yaml
 Dockerfile
 Dockerfile.development
+vendor/
+_*
+*.test
+.DS_Store
+engine
+bin/
+.idea/
+tmp/
+other-lms/
+learning/
+.vscode/
+**/archive

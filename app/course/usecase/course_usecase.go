@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/meroedu/course-api/app/domain"
@@ -13,7 +14,6 @@ type CourseUseCase struct {
 	userRepo       domain.UserRepository
 	lessonRepo     domain.LessonRepository
 	attachmentRepo domain.AttachmentRepository
-	tagRepo        domain.TagRepository
 	categoryRepo   domain.CategoryRepository
 	contextTimeOut time.Duration
 }
@@ -67,8 +67,9 @@ func (usecase *CourseUseCase) GetByTitle(c context.Context, title string) (res d
 func (usecase *CourseUseCase) CreateCourse(c context.Context, course *domain.Course) (err error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
-	// existedCourse, err := usecase.GetByTitle(ctx, course.Title)
-	// fmt.Printf("%v, %T\n", existedCourse, existedCourse)
+	existedCourse, err := usecase.GetByTitle(ctx, course.Title)
+	fmt.Println(existedCourse)
+	fmt.Println(domain.Course{})
 	// if existedCourse != (domain.Course{}) {
 	// 	return domain.ErrConflict
 	// }
@@ -76,7 +77,7 @@ func (usecase *CourseUseCase) CreateCourse(c context.Context, course *domain.Cou
 	course.CreatedAt = time.Now()
 	err = usecase.courseRepo.CreateCourse(ctx, course)
 	if err != nil {
-		return 
+		return
 	}
 	return
 

@@ -109,6 +109,7 @@ func (m *mysqlRepository) CreateCourse(ctx context.Context, a *domain.Course) (e
 		logrus.Error("Error while preparing statement ", err)
 		return
 	}
+	fmt.Println(a.Author.ID)
 	res, err := stmt.ExecContext(ctx, a.Title, a.Author.ID, a.UpdatedAt, a.CreatedAt)
 	if err != nil {
 		logrus.Error("Error while executing statement ", err)
