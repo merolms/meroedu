@@ -3,7 +3,6 @@ package usecase_test
 import (
 	"context"
 	"errors"
-	"fmt"
 	"testing"
 	"time"
 
@@ -54,7 +53,34 @@ func TestGetAll(t *testing.T) {
 	})
 }
 func TestGetByID(t *testing.T) {
+	mockCourseRepo := new(mocks.CourseRepository)
+	mockCourse := domain.Course{
+		Title:  "title-1",
+		Author: domain.User{ID: 1}, UpdatedAt: time.Now(), CreatedAt: time.Now(),
+	}
+	t.Run("success", func(t *testing.T) {
+		mockCourseRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(mockCourse, nil).Once()
+		u := ucase.NewCourseUseCase(mockCourseRepo, time.Second*2)
 
+		a, err := u.GetByID(context.TODO(), mockCourse.ID)
+
+		assert.NoError(t, err)
+		assert.NotNil(t, a)
+
+		mockCourseRepo.AssertExpectations(t)
+	})
+	t.Run("error-failed", func(t *testing.T) {
+		mockCourseRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(domain.Course{}, errors.New("Unexpected")).Once()
+
+		u := ucase.NewCourseUseCase(mockCourseRepo, time.Second*2)
+
+		a, err := u.GetByID(context.TODO(), mockCourse.ID)
+
+		assert.Error(t, err)
+		assert.Equal(t, domain.Course{}, a)
+
+		mockCourseRepo.AssertExpectations(t)
+	})
 }
 func TestGetByTitle(t *testing.T) {
 
