@@ -8,14 +8,13 @@ services:
     ports:
       - 9090:8080
     depends_on:
-      mysql:
+      mariadb:
         condition: service_healthy
     volumes:
       - ./config.json:/app/config.json
-  mysql:
-    image: mysql:5.7 
-    container_name: mysql
-    command: mysqld --user=root
+  mariadb:
+    image: mariadb:10.5.5 
+    container_name: mariadb
     volumes:
       - ./course.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
@@ -29,3 +28,8 @@ services:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
       timeout: 5s
       retries: 10
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080

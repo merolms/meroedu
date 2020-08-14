@@ -30,7 +30,7 @@ lint:
 # Test
 ###############################################################################
 
-test-with-richgo: 
+test-richgo: 
 	richgo test -v -cover -covermode=atomic ./...
 
 test: 
