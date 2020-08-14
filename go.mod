@@ -3,7 +3,7 @@ module github.com/meroedu/course-api
 go 1.12
 
 require (
-	github.com/DATA-DOG/go-sqlmock v1.4.1
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/bxcodec/go-clean-arch v2.0.1+incompatible // indirect
 	github.com/davecgh/go-spew v1.1.1
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
@@ -14,8 +14,8 @@ require (
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/pelletier/go-toml v1.8.0 // indirect
-	github.com/spf13/viper v1.7.1
 	github.com/sirupsen/logrus v1.6.0
+	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.6.1
 	golang.org/x/crypto v0.0.0-20191219195013-becbf705a915 // indirect
 	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e // indirect
