@@ -3,8 +3,6 @@ module github.com/meroedu/course-api
 go 1.12
 
 require (
-	github.com/DATA-DOG/go-sqlmock v1.4.1
-	github.com/bxcodec/go-clean-arch v2.0.1+incompatible // indirect
 	github.com/davecgh/go-spew v1.1.1
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect

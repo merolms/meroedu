@@ -5,12 +5,14 @@ import (
 	"time"
 )
 
-// const (
-// 	_            = iota
-// 	Publish uint8
-// 	Draft uint8
-// 	Archive uint8
-// )
+// Status ...
+type Status uint8
+
+const (
+	Publish Status = iota + 1
+	Draft
+	Archive
+)
 
 // Course ...
 type Course struct {
@@ -26,7 +28,7 @@ type Course struct {
 	Users       []User       `json:"users,omitempty"`
 	Lessons     []Lesson     `json:"lessons,omitempty"`
 	Attachments []Attachment `json:"attachments,omitempty"`
-	Status      uint8        `json:"status,omitempty"`
+	Status      Status       `json:"status,omitempty"`
 	UpdatedAt   time.Time    `json:"updated_at,omitempty"`
 	CreatedAt   time.Time    `json:"created_at,omitempty"`
 }

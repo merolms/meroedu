@@ -103,14 +103,13 @@ func (m *mysqlRepository) GetByTitle(ctx context.Context, title string) (res dom
 }
 
 func (m *mysqlRepository) CreateCourse(ctx context.Context, a *domain.Course) (err error) {
-	query := `INSERT  courses SET title=?, author_id=?, updated_at=? , created_at=?`
+	query := `INSERT  courses SET title=?, author_id=?, category_id=?, updated_at=? , created_at=?`
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
 		logrus.Error("Error while preparing statement ", err)
 		return
 	}
-	fmt.Println(a.Author.ID)
-	res, err := stmt.ExecContext(ctx, a.Title, a.Author.ID, a.UpdatedAt, a.CreatedAt)
+	res, err := stmt.ExecContext(ctx, a.Title, a.Author.ID, a.Category.ID, a.UpdatedAt, a.CreatedAt)
 	if err != nil {
 		logrus.Error("Error while executing statement ", err)
 		return
@@ -150,14 +149,14 @@ func (m *mysqlRepository) DeleteCourse(ctx context.Context, id int64) (err error
 	return
 }
 func (m *mysqlRepository) UpdateCourse(ctx context.Context, ar *domain.Course) (err error) {
-	query := `UPDATE course set title=?, author_id=?, updated_at=? WHERE ID = ?`
+	query := `UPDATE course set title=?, author_id=?, category_id=?, updated_at=? WHERE ID = ?`
 
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
 
-	res, err := stmt.ExecContext(ctx, ar.Title, ar.Author.ID, ar.UpdatedAt, ar.ID)
+	res, err := stmt.ExecContext(ctx, ar.Title, ar.Author.ID, ar.Category.ID, ar.UpdatedAt, ar.ID)
 	if err != nil {
 		return
 	}
