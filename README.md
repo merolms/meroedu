@@ -1,3 +1,5 @@
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=meroedu_meroedu&metric=alert_status)](https://sonarcloud.io/dashboard?id=meroedu_meroedu)
+
 # Introduction
 Mero Edu is a software application for the administration, documentation, tracking, reporting, automation and delivery of educational courses, training programs, or learning and development programs.
 
