@@ -1,9 +1,7 @@
 package config
 
 import (
-	"fmt"
 	"log"
-	"os"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/spf13/viper"
@@ -37,13 +35,11 @@ func ReadConfig() {
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
-		fmt.Println(err)
-		log.Fatalln(err)
+		log.Fatalf("Error Reading Config %s\n", err)
 	}
 
 	if err := viper.Unmarshal(&Config); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatalf("Error unmarshal config '%s'\n", err)
 	}
 
 	spew.Dump(C)

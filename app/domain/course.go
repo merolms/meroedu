@@ -5,12 +5,14 @@ import (
 	"time"
 )
 
-// const (
-// 	_            = iota
-// 	Publish uint8
-// 	Draft uint8
-// 	Archive uint8
-// )
+// Status ...
+type Status uint8
+
+const (
+	Publish Status = iota + 1
+	Draft
+	Archive
+)
 
 // Course ...
 type Course struct {
@@ -19,16 +21,21 @@ type Course struct {
 	Description string       `json:"descrition,omitempty"`
 	ImageURL    string       `json:"image_url,omitempty"`
 	Duration    uint16       `json:"duration,omitempty"`
-	CategoryID  int64        `json:"category_id,omitempty"`
+	Category    Category     `json:"categories,omitempty"`
 	LessonCount int16        `json:"lesson_count,omitempty"`
-	Tags        []Tag        `json:"tags,omitempty" gorm:"many2many:course_tag;"`
-	Author      User         `json:"authors,omitempty" gorm:"many2many:course_author;"`
-	Users       []User       `json:"users,omitempty" gorm:"many2many:assign_to_users;"`
+	Tags        []Tag        `json:"tags,omitempty"`
+	Author      User         `json:"author,omitempty"`
+	Users       []User       `json:"users,omitempty"`
 	Lessons     []Lesson     `json:"lessons,omitempty"`
 	Attachments []Attachment `json:"attachments,omitempty"`
-	Status      uint8        `json:"status,omitempty"`
+	Status      Status       `json:"status,omitempty"`
 	UpdatedAt   time.Time    `json:"updated_at,omitempty"`
 	CreatedAt   time.Time    `json:"created_at,omitempty"`
+}
+
+// Tags ...
+type Tags struct {
+	Tag Tag `json:"tag"`
 }
 
 // CourseUseCase represent the course's usecases
