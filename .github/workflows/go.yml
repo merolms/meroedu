@@ -24,14 +24,10 @@ jobs:
 
     - name: Get dependencies
       run: |
-        go get -v -t -d ./...
-        if [ -f Gopkg.toml ]; then
-            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-            dep ensure
-        fi
+        go mod download
 
     - name: Build
-      run: go build -v .
+      run: go engine
 
     - name: Test
-      run: go test -v .
+      run: make test-rickgo
