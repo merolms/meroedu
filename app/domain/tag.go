@@ -8,9 +8,9 @@ import (
 // Tag ...
 type Tag struct {
 	ID        int64     `json:"id"`
-	Name      string    `json:"name,omitempty" validator:"required"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	Name      string    `json:"name,omitempty"`
+	UpdatedAt time.Time `json:"-,omitempty"`
+	CreatedAt time.Time `json:"-,omitempty"`
 }
 
 // TagRepository represent the Tag's repository contract

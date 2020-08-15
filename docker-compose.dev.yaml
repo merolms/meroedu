@@ -37,7 +37,7 @@ services:
       - MYSQL_DATABASE=course
       - MYSQL_USER=user
       - MYSQL_PASSWORD=password
-      - MYSQL_ALLOW_EMPTY_PASSWORD=root
+      - MYSQL_ROOT_PASSWORD=root
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-uroot",  "--password=root"]
       timeout: 5s

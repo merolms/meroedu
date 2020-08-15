@@ -8,9 +8,9 @@ import (
 // Category represent Course Category
 type Category struct {
 	ID        int64     `json:"id"`
-	Name      string    `json:"name" validate:"required"`
-	UpdatedAt time.Time `json:"updated_at"`
-	CreatedAt time.Time `json:"created_at"`
+	Name      string    `json:"name,omitempty"`
+	UpdatedAt time.Time `json:"-"`
+	CreatedAt time.Time `json:"-"`
 }
 
 // CategoryRepository represent the Category's repository contract

@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"strings"
+
 	"github.com/labstack/echo"
 	"github.com/meroedu/course-api/app/domain"
 	"github.com/sirupsen/logrus"
@@ -26,32 +28,55 @@ func NewCourseHandler(e *echo.Echo, us domain.CourseUseCase) {
 	handler := &CourseHandler{
 		CourseUseCase: us,
 	}
+	// Get Operation
 	e.GET("/courses", handler.GetAll)
-	e.POST("/courses", handler.CreateCourse)
 	e.GET("/courses/:id", handler.GetByID)
+	e.GET("/courses/:id/stats", handler.GetByID)
+	e.GET("/courses/:id/lessons", handler.GetByID)
+	e.GET("/courses/:id/users", handler.GetByID)
+	e.GET("/courses/:id/teams", handler.GetByID)
 
+	// Create/Add Operation
+	e.POST("/courses", handler.CreateCourse)
+	e.POST("/courses/import", handler.GetByID)
+	e.POST("/courses/:id/lessons", handler.GetByID)
+	e.POST("/courses/:id/users", handler.GetByID)
+	e.POST("/courses/:id/teams", handler.GetByID)
+
+	// Update Operation
+	e.PUT("/courses/:id", handler.GetByID)
+	e.PUT("/courses/:id/lessons/:id", handler.GetByID)
+	e.PUT("/courses/actions", handler.GetByID)
+
+	// Remove/Delete Operation
+	e.DELETE("/courses/:id", handler.GetByID)
+	e.DELETE("/courses/:id/lessons/:id", handler.GetByID)
 }
 
 // GetAll ...
 func (c *CourseHandler) GetAll(echoContext echo.Context) error {
 	ctx := echoContext.Request().Context()
-	start := 0
-	limit := 10
+	start, limit := 0, 10
 	var err error
-	fmt.Println(echoContext.QueryParams())
-	if len(echoContext.QueryParams()) > 0 {
-		if start, err = strconv.Atoi(echoContext.QueryParam("start")); err != nil {
-			return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
-		}
-		if limit, err = strconv.Atoi(echoContext.QueryParam("limit")); err != nil {
-			return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+	for k, v := range echoContext.QueryParams() {
+		switch k {
+		case "start":
+			val := strings.TrimSpace(v[0])
+			if start, err = strconv.Atoi(val); err != nil {
+				return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+			}
+		case "limit":
+			val := strings.TrimSpace(v[0])
+			if limit, err = strconv.Atoi(val); err != nil {
+				return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+			}
 		}
 	}
+
 	listCourse, err := c.CourseUseCase.GetAll(ctx, start, limit)
 	if err != nil {
 		return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}
-	// echoContext.Response().Header().Set(`X-Cursor`, nextCursor)
 	return echoContext.JSON(http.StatusOK, listCourse)
 }
 
@@ -90,6 +115,7 @@ func (c *CourseHandler) CreateCourse(echoContext echo.Context) error {
 	return echoContext.JSON(http.StatusCreated, course)
 
 }
+
 func getStatusCode(err error) int {
 	if err == nil {
 		return http.StatusOK

@@ -6,3 +6,7 @@ engine
 bin/
 .idea/
 tmp/
+other-lms/
+learning/
+.vscode/
+**/archive
