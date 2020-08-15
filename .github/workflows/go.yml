@@ -27,7 +27,7 @@ jobs:
         go mod download
 
     - name: Build
-      run: go engine
+      run: make engine
 
     - name: Test
       run: make test-rickgo
