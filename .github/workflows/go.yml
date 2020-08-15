@@ -30,4 +30,4 @@ jobs:
       run: make engine
 
     - name: Test
-      run: make test-rickgo
+      run: make test
