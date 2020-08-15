@@ -1,10 +1,34 @@
-# Mero Edu 
+# Introduction
+Mero Edu is a software application for the administration, documentation, tracking, reporting, automation and delivery of educational courses, training programs, or learning and development programs.
 
-## Running development
-`make run-dev`
+## Getting Started
 
-## Stoping development
-`make stop-dev`
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+
+### Prerequisites
+
+1. NodeJS       => Frontend
+2. Golang >1.14 => Backend
+
+### Installing
+
+`make prepare`
+
+## Running the tests
+
+`make test`
+
+## Development Stack
+1. Golang
+2. ReactJS
+3. Mysql
+
+## Start/Stop Application
+```
+make run-dev
+make stop-dev
+```
+
 
 ## Code Folder Structure
 
@@ -31,3 +55,7 @@ course
 │   └── course_usecase.go
 └── usecase.go // Usecase Interface.
 ```
+
+
+## License
+[View License](https://github.com/meroedu/meroedu/blob/master/LICENSE)
