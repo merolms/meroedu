@@ -39,6 +39,15 @@ test:
 unittest:
 	go test -short  ./...
 
+test-coverage: engine
+	go test -coverprofile=coverage.out ./...
+	go tool cover -func=coverage.out
+
+sonar: test
+	sonar-scanner -Dsonar.projectVersion="$(version)"
+
+start-sonar:
+	docker run --name sonarqube -p 9000:9000 sonarqube
 #############################################################################
 # Migration
 #############################################################################
