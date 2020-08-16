@@ -27,7 +27,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: code-coverage-report
-        path: ./coverage.out
+        path: ././out/
   sonarCloudTrigger:
     needs: build
     name: SonarCloud Trigger
@@ -39,7 +39,7 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: code-coverage-report
-          path: ./coverage.out
+          path: ./out/
       - name: Analyze with SonarCloud
         uses: sonarsource/sonarcloud-github-action@master
         env:

@@ -40,8 +40,8 @@ unittest:
 	go test -short  ./...
 
 test-coverage: engine
-	go test -coverprofile=coverage.out ./...
-	go tool cover -func=coverage.out
+	go test -coverprofile=./out/coverage.out ./...
+	go tool cover -func=./out/coverage.out
 
 sonar: test
 	sonar-scanner -Dsonar.projectVersion="$(version)"
