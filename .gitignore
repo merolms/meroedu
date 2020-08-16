@@ -12,3 +12,4 @@ learning/
 **/archive
 coverage.out
 ./out
+.scannerwork/
