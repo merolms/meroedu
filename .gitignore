@@ -10,3 +10,4 @@ other-lms/
 learning/
 .vscode/
 **/archive
+coverage.out
