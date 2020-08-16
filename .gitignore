@@ -11,3 +11,4 @@ learning/
 .vscode/
 **/archive
 coverage.out
+./out
