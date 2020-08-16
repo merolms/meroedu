@@ -22,7 +22,7 @@ jobs:
     - name: Build
       run: make engine
     - name: Test
-      run: make test
+      run: make test-coverage
     - name: Archive code coverage results
       uses: actions/upload-artifact@v1
       with:
