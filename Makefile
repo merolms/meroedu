@@ -40,6 +40,7 @@ unittest:
 	go test -short  ./...
 
 test-coverage: engine
+	mkdir -p ./out
 	go test -coverprofile=./out/coverage.out ./...
 	go tool cover -func=./out/coverage.out
 
