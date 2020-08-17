@@ -8,6 +8,7 @@ import (
 // Status ...
 type Status uint8
 
+// Publish ...
 const (
 	Publish Status = iota + 1
 	Draft
