@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo"
-	"github.com/meroedu/course-api/app/domain"
+	"github.com/meroedu/meroedu/app/domain"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/go-playground/validator.v9"
 )

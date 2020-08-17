@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/meroedu/course-api/app/domain"
+	"github.com/meroedu/meroedu/app/domain"
 )
 
 // CourseUseCase ...

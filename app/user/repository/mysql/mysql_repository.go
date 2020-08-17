@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/meroedu/course-api/app/domain"
+	"github.com/meroedu/meroedu/app/domain"
 )
 
 type mysqlUserRepo struct {
