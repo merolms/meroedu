@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	courseMysqlRepo "github.com/meroedu/course-api/app/course/repository/mysql"
-	"github.com/meroedu/course-api/app/domain"
+	courseMysqlRepo "github.com/meroedu/meroedu/app/course/repository/mysql"
+	"github.com/meroedu/meroedu/app/domain"
 	"github.com/stretchr/testify/assert"
 	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
 )

@@ -12,19 +12,6 @@ services:
     volumes:
       - ./:/app
       - ./config.json:/app/config.json
-
-  # live-reloader:
-  #       image: apogiatzis/livereloading
-  #       container_name: livereloader
-  #       privileged: true
-  #       depends_on:
-  #         - mysql
-  #       environment:
-  #         - RELOAD_DELAY=1.5              # seconds
-  #         - RELOAD_CONTAINER=meroedu-backend
-  #       volumes:
-  #         - /var/run/docker.sock:/var/run/docker.sock
-  #         - ./:/app
   mysql:
     image: mysql:5.7 
     container_name: meroedu-mysql
