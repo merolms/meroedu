@@ -58,7 +58,7 @@ func (usecase *CourseUseCase) GetByTitle(c context.Context, title string) (res d
 	defer cancel()
 	res, err = usecase.courseRepo.GetByTitle(ctx, title)
 	if err != nil {
-		return domain.Course{}, nil
+		return domain.Course{}, err
 	}
 	return res, nil
 }

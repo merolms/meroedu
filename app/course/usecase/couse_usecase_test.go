@@ -104,7 +104,7 @@ func TestGetByTitle(t *testing.T) {
 
 		u := ucase.NewCourseUseCase(mockCourseRepo, time.Second*2)
 
-		a, err := u.GetByTitle(context.TODO(), mockCourse.Title)
+		a, err := u.GetByTitle(context.TODO(), "random")
 
 		assert.Error(t, err)
 		assert.Equal(t, domain.Course{}, a)
