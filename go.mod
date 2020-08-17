@@ -3,6 +3,7 @@ module github.com/meroedu/meroedu
 go 1.15
 
 require (
+	github.com/bxcodec/faker v2.0.1+incompatible
 	github.com/davecgh/go-spew v1.1.1
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
