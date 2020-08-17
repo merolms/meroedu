@@ -43,7 +43,7 @@ type CourseUseCase interface {
 	GetAll(ctx context.Context, start int, limit int) ([]Course, error)
 	GetByID(ctx context.Context, id int64) (Course, error)
 	GetByTitle(ctx context.Context, title string) (Course, error)
-	// Update(ctx context.Context, course *Course) error
+	UpdateCourse(ctx context.Context, course *Course, id int64) error
 	CreateCourse(ctx context.Context, course *Course) error
 	// Archive(ctx context.Context, course *Course) error
 	// AssignToUser(ctx context.Context, course *Course, user *User)
