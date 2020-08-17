@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// Category represent Course Category
+// Category represent Category Category
 type Category struct {
 	ID        int64     `json:"id"`
 	Name      string    `json:"name,omitempty"`
@@ -13,7 +13,19 @@ type Category struct {
 	CreatedAt time.Time `json:"-"`
 }
 
-// CategoryRepository represent the Category's repository contract
-type CategoryRepository interface {
+// CategoryUseCase represent the Category's repository contract
+type CategoryUseCase interface {
+	GetAll(ctx context.Context, start int, limit int) ([]Category, error)
 	GetByID(ctx context.Context, id int64) (Category, error)
+	UpdateCategory(ctx context.Context, Category *Category, id int64) error
+	CreateCategory(ctx context.Context, Category *Category) error
+}
+
+// CategoryRepository represent the Category's repository
+type CategoryRepository interface {
+	GetAll(ctx context.Context, start int, limit int) ([]Category, error)
+	GetByID(ctx context.Context, id int64) (Category, error)
+	UpdateCategory(ctx context.Context, Category *Category) error
+	CreateCategory(ctx context.Context, Category *Category) error
+	DeleteCategory(ctx context.Context, id int64) error
 }
