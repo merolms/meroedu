@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo"
-	"github.com/meroedu/course-api/app/domain"
+	"github.com/meroedu/meroedu/app/domain"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/go-playground/validator.v9"
 )
@@ -55,6 +55,7 @@ func NewCourseHandler(e *echo.Echo, us domain.CourseUseCase) {
 
 // GetAll ...
 func (c *CourseHandler) GetAll(echoContext echo.Context) error {
+	fmt.Println("Calling GetAll Courses")
 	ctx := echoContext.Request().Context()
 	start, limit := 0, 10
 	var err error
@@ -82,7 +83,7 @@ func (c *CourseHandler) GetAll(echoContext echo.Context) error {
 
 // GetByID ...
 func (c *CourseHandler) GetByID(echoContext echo.Context) error {
-	fmt.Println("Caling course handler get by id")
+	fmt.Println("Calling GetByID Courses")
 	idParam, err := strconv.Atoi(echoContext.Param("id"))
 	if err != nil {
 		return echoContext.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
@@ -109,6 +110,30 @@ func (c *CourseHandler) CreateCourse(echoContext echo.Context) error {
 	}
 	ctx := echoContext.Request().Context()
 	err = c.CourseUseCase.CreateCourse(ctx, &course)
+	if err != nil {
+		return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+	}
+	return echoContext.JSON(http.StatusCreated, course)
+
+}
+
+// UpdateCourse ...
+func (c *CourseHandler) UpdateCourse(echoContext echo.Context) error {
+	idParam, err := strconv.Atoi(echoContext.Param("id"))
+	if err != nil {
+		return echoContext.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
+	}
+	var course domain.Course
+	err = echoContext.Bind(&course)
+	if err != nil {
+		return echoContext.JSON(http.StatusUnprocessableEntity, err.Error())
+	}
+	var ok bool
+	if ok, err = isRequestValid(&course); !ok {
+		return echoContext.JSON(http.StatusBadRequest, err.Error())
+	}
+	ctx := echoContext.Request().Context()
+	err = c.CourseUseCase.UpdateCourse(ctx, &course, int64(idParam))
 	if err != nil {
 		return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}

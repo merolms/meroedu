@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/meroedu/course-api/app/domain"
+	"github.com/meroedu/meroedu/app/domain"
 	"github.com/sirupsen/logrus"
 )
 

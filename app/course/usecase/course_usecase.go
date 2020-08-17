@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/meroedu/course-api/app/domain"
+	"github.com/meroedu/meroedu/app/domain"
 )
 
 // CourseUseCase ...
@@ -58,7 +58,7 @@ func (usecase *CourseUseCase) GetByTitle(c context.Context, title string) (res d
 	defer cancel()
 	res, err = usecase.courseRepo.GetByTitle(ctx, title)
 	if err != nil {
-		return domain.Course{}, nil
+		return domain.Course{}, err
 	}
 	return res, nil
 }
@@ -76,6 +76,26 @@ func (usecase *CourseUseCase) CreateCourse(c context.Context, course *domain.Cou
 	course.UpdatedAt = time.Now()
 	course.CreatedAt = time.Now()
 	err = usecase.courseRepo.CreateCourse(ctx, course)
+	if err != nil {
+		return
+	}
+	return
+
+}
+
+// UpdateCourse ..
+func (usecase *CourseUseCase) UpdateCourse(c context.Context, course *domain.Course, id int64) (err error) {
+	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
+	defer cancel()
+	existedCourse, err := usecase.GetByID(ctx, id)
+	fmt.Println(existedCourse)
+	fmt.Println(domain.Course{})
+	// if existedCourse != (domain.Course{}) {
+	// 	return domain.ErrConflict
+	// }
+	course.ID = id
+	course.UpdatedAt = time.Now()
+	err = usecase.courseRepo.UpdateCourse(ctx, course)
 	if err != nil {
 		return
 	}

@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/meroedu/course-api/app/course/delivery/http/middleware"
+	"github.com/meroedu/meroedu/app/course/delivery/http/middleware"
 )
 
 func TestCORS(t *testing.T) {

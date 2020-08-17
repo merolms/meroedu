@@ -19,4 +19,9 @@ learning/
 .vscode/
 **/archive
 coverage.out
+<<<<<<< HEAD
 ./out
+.scannerwork/
+=======
+./out
+>>>>>>> ef2666750a6a7fbc8d1881694239884f50dc4bc1
