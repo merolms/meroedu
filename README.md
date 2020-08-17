@@ -1,10 +1,7 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=meroedu_meroedu&metric=alert_status)](https://sonarcloud.io/dashboard?id=meroedu_meroedu)
 ![Go](https://github.com/meroedu/meroedu/workflows/Go/badge.svg?branch=master)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=meroedu_meroedu&metric=coverage)](https://sonarcloud.io/dashboard?id=meroedu_meroedu)
-<<<<<<< HEAD
 [![Go Report Card](https://goreportcard.com/badge/github.com/meroedu/meroedu)](https://goreportcard.com/report/github.com/meroedu/meroedu)
-=======
->>>>>>> ef2666750a6a7fbc8d1881694239884f50dc4bc1
 # Introduction
 Mero Edu is a software application for the administration, documentation, tracking, reporting, automation and delivery of educational courses, training programs, or learning and development programs.
 
