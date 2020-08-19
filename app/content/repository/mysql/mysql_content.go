@@ -13,13 +13,13 @@ type mysqlRepository struct {
 	Conn *sql.DB
 }
 
-// InitMysqlRepository will create an object that represent the category's Repository interface
-func InitMysqlRepository(db *sql.DB) domain.CategoryRepository {
+// InitMysqlRepository will create an object that represent the tag's Repository interface
+func InitMysqlRepository(db *sql.DB) domain.ContentRepository {
 	return &mysqlRepository{
 		Conn: db,
 	}
 }
-func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...interface{}) (result []domain.Category, err error) {
+func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...interface{}) (result []domain.Content, err error) {
 	rows, err := m.Conn.QueryContext(ctx, query, args...)
 	if err != nil {
 		logrus.Error(err)
@@ -33,12 +33,12 @@ func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...inter
 		}
 	}()
 
-	result = make([]domain.Category, 0)
+	result = make([]domain.Content, 0)
 	for rows.Next() {
-		t := domain.Category{}
+		t := domain.Content{}
 		err = rows.Scan(
 			&t.ID,
-			&t.Name,
+			&t.Title,
 			&t.UpdatedAt,
 			&t.CreatedAt,
 		)
@@ -53,8 +53,9 @@ func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...inter
 	return result, nil
 }
 
-func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res []domain.Category, err error) {
-	query := `SELECT id,name, updated_at, created_at FROM categories ORDER BY created_at DESC LIMIT ?,?`
+func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res []domain.Content, err error) {
+	fmt.Println("Called GetAll Contents")
+	query := `SELECT id,title, updated_at, created_at FROM contents ORDER BY created_at DESC LIMIT ?,?`
 
 	res, err = m.fetch(ctx, query, start, limit)
 	if err != nil {
@@ -62,12 +63,12 @@ func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res
 	}
 	return res, nil
 }
-func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (res domain.Category, err error) {
-	query := `SELECT id,name,updated_at,created_at FROM categories WHERE ID = ?`
+func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (res domain.Content, err error) {
+	query := `SELECT id,title,updated_at,created_at FROM contents WHERE ID = ?`
 
 	list, err := m.fetch(ctx, query, id)
 	if err != nil {
-		return domain.Category{}, err
+		return domain.Content{}, err
 	}
 
 	if len(list) > 0 {
@@ -79,14 +80,14 @@ func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (res domain.Cat
 	return
 }
 
-func (m *mysqlRepository) CreateCategory(ctx context.Context, a *domain.Category) (err error) {
-	query := `INSERT  categories SET name=?, updated_at=? , created_at=?`
+func (m *mysqlRepository) CreateContent(ctx context.Context, a *domain.Content) (err error) {
+	query := `INSERT  contents SET title=?, updated_at=? , created_at=?`
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
 		logrus.Error("Error while preparing statement ", err)
 		return
 	}
-	res, err := stmt.ExecContext(ctx, a.Name, a.UpdatedAt, a.CreatedAt)
+	res, err := stmt.ExecContext(ctx, a.Title, a.UpdatedAt, a.CreatedAt)
 	if err != nil {
 		logrus.Error("Error while executing statement ", err)
 		return
@@ -100,8 +101,8 @@ func (m *mysqlRepository) CreateCategory(ctx context.Context, a *domain.Category
 	return
 }
 
-func (m *mysqlRepository) DeleteCategory(ctx context.Context, id int64) (err error) {
-	query := "DELETE FROM categories WHERE id = ?"
+func (m *mysqlRepository) DeleteContent(ctx context.Context, id int64) (err error) {
+	query := "DELETE FROM contents WHERE id = ?"
 
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
@@ -125,15 +126,15 @@ func (m *mysqlRepository) DeleteCategory(ctx context.Context, id int64) (err err
 
 	return
 }
-func (m *mysqlRepository) UpdateCategory(ctx context.Context, ar *domain.Category) (err error) {
-	query := `UPDATE categories set name=?, updated_at=? WHERE ID = ?`
+func (m *mysqlRepository) UpdateContent(ctx context.Context, ar *domain.Content) (err error) {
+	query := `UPDATE contents set title=?, updated_at=? WHERE ID = ?`
 
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
 
-	res, err := stmt.ExecContext(ctx, ar.Name, ar.UpdatedAt, ar.ID)
+	res, err := stmt.ExecContext(ctx, ar.Title, ar.UpdatedAt, ar.ID)
 	if err != nil {
 		return
 	}
