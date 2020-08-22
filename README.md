@@ -12,7 +12,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 1. NodeJS       => Frontend
-2. Golang >1.14 => Backend
+2. Golang       => Backend
 
 ### Installing
 
@@ -25,14 +25,19 @@ These instructions will get you a copy of the project up and running on your loc
 ## Development Stack
 1. Golang
 2. ReactJS
-3. Mysql
+3. Mysql/Mariadb
 
-## Start/Stop Application
+## Start/Stop Backend Application
 ```
 make run-dev
 make stop-dev
 ```
-
+## Start/Stop Frontend Application
+```
+cd ui/
+yarn start
+(CTRL+C) to stop
+```
 
 ## Code Folder Structure
 
