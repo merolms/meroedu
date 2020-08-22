@@ -11,7 +11,7 @@ const ExtraItem = styled.div `
 const CourseGridItem = (props) => {
     return (
         <Card fluid={true} style={{width:'328px'}}>
-            <Image src='https://react.semantic-ui.com/images/avatar/large/daniel.jpg' wrapped ui={false} />
+            <Image src='https://react.semantic-ui.com/images/avatar/large/daniel.jpg' wrapped />
             <Card.Content>
                 <Card.Header>Graphic Design Work Work Lorem Lipsd UI Lorem Lipsonasdfad</Card.Header>
                 {/* <Card.Meta>

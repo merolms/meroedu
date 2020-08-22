@@ -11,7 +11,7 @@ class CourseContainer extends React.Component {
             rows.push(<Grid.Column key={i} style={{margin: '0px', marginBottom: '25px'}}> <CourseGridItem {...this.props} /></Grid.Column>)
         }
         return (
-                <Grid stackable>
+                <Grid stackable style={{margin: '0px'}}>
                     <GridRow columns={1} only="mobile">{rows}</GridRow>
                     <GridRow columns={2} only="tablet">{rows}</GridRow>
                     <GridRow columns={4} only="computer">{rows}</GridRow>
