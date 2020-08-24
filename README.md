@@ -37,6 +37,7 @@ make stop-dev
 ## Start/Stop Frontend Application
 ```
 cd ui/
+yarn add react-scripts
 yarn start
 (CTRL+C) to stop
 ```
