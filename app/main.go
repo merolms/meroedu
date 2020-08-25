@@ -13,6 +13,10 @@ import (
 	_ "github.com/meroedu/meroedu/api_docs"
 	"github.com/meroedu/meroedu/app/config"
 	_courseHttpDelivery "github.com/meroedu/meroedu/app/course/delivery/http"
+
+	_categoryHttpDelivery "github.com/meroedu/meroedu/app/category/delivery/http"
+	_categoryRepo "github.com/meroedu/meroedu/app/category/repository/mysql"
+	_categoryUcase "github.com/meroedu/meroedu/app/category/usecase"
 	_courseHttpDeliveryMiddleware "github.com/meroedu/meroedu/app/course/delivery/http/middleware"
 	_courseRepo "github.com/meroedu/meroedu/app/course/repository/mysql"
 	_courseUcase "github.com/meroedu/meroedu/app/course/usecase"
@@ -47,12 +51,15 @@ func main() {
 	e.Use(middL.CORS)
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-
-	courseRepositry := _courseRepo.InitMysqlRepository(db)
-
 	timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
-	au := _courseUcase.NewCourseUseCase(courseRepositry, timeoutContext)
-	_courseHttpDelivery.NewCourseHandler(e, au)
+
+	// Courses
+	courseRepositry := _courseRepo.InitMysqlRepository(db)
+	_courseHttpDelivery.NewCourseHandler(e, _courseUcase.NewCourseUseCase(courseRepositry, timeoutContext))
+
+	// Categories
+	categoryRepository := _categoryRepo.InitMysqlRepository(db)
+	_categoryHttpDelivery.NewCategroyHandler(e, _categoryUcase.NewCategoryUseCase(categoryRepository, timeoutContext))
 
 	// Start HTTP Server
 	go func() {
