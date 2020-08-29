@@ -24,5 +24,6 @@ require (
 	golang.org/x/sys v0.0.0-20200814200057-3d37ad5750ed // indirect
 	golang.org/x/text v0.3.3 // indirect
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0
+	gopkg.in/go-playground/assert.v1 v1.2.1
 	gopkg.in/go-playground/validator.v9 v9.31.0
 )

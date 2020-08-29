@@ -9,8 +9,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/meroedu/meroedu/app/domain"
-	"github.com/sirupsen/logrus"
-	"gopkg.in/go-playground/validator.v9"
+	"github.com/meroedu/meroedu/app/util"
 )
 
 // ResponseError represents the response error struct
@@ -55,19 +54,19 @@ func (c *CategoryHandler) GetAll(echoContext echo.Context) error {
 		case "start":
 			val := strings.TrimSpace(v[0])
 			if start, err = strconv.Atoi(val); err != nil {
-				return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+				return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 			}
 		case "limit":
 			val := strings.TrimSpace(v[0])
 			if limit, err = strconv.Atoi(val); err != nil {
-				return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+				return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 			}
 		}
 	}
 
 	list, err := c.CategoryUseCase.GetAll(ctx, start, limit)
 	if err != nil {
-		return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
 	return echoContext.JSON(http.StatusOK, list)
 }
@@ -83,7 +82,7 @@ func (c *CategoryHandler) GetByID(echoContext echo.Context) error {
 
 	list, err := c.CategoryUseCase.GetByID(ctx, int64(idParam))
 	if err != nil {
-		return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
 	return echoContext.JSON(http.StatusOK, list)
 }
@@ -96,13 +95,13 @@ func (c *CategoryHandler) CreateCategory(echoContext echo.Context) error {
 		return echoContext.JSON(http.StatusUnprocessableEntity, err.Error())
 	}
 	var ok bool
-	if ok, err = isRequestValid(&category); !ok {
+	if ok, err = util.IsRequestValid(&category); !ok {
 		return echoContext.JSON(http.StatusBadRequest, err.Error())
 	}
 	ctx := echoContext.Request().Context()
 	err = c.CategoryUseCase.CreateCategory(ctx, &category)
 	if err != nil {
-		return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
 	return echoContext.JSON(http.StatusCreated, category)
 
@@ -120,40 +119,14 @@ func (c *CategoryHandler) UpdateCategory(echoContext echo.Context) error {
 		return echoContext.JSON(http.StatusUnprocessableEntity, err.Error())
 	}
 	var ok bool
-	if ok, err = isRequestValid(&category); !ok {
+	if ok, err = util.IsRequestValid(&category); !ok {
 		return echoContext.JSON(http.StatusBadRequest, err.Error())
 	}
 	ctx := echoContext.Request().Context()
 	err = c.CategoryUseCase.UpdateCategory(ctx, &category, int64(idParam))
 	if err != nil {
-		return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
 	return echoContext.JSON(http.StatusCreated, category)
 
-}
-
-func getStatusCode(err error) int {
-	if err == nil {
-		return http.StatusOK
-	}
-	logrus.Error(err)
-	switch err {
-	case domain.ErrInternalServerError:
-		return http.StatusInternalServerError
-	case domain.ErrNotFound:
-		return http.StatusNotFound
-	case domain.ErrConflict:
-		return http.StatusConflict
-	default:
-		return http.StatusInternalServerError
-	}
-}
-
-func isRequestValid(m *domain.Category) (bool, error) {
-	validate := validator.New()
-	err := validate.Struct(m)
-	if err != nil {
-		return false, err
-	}
-	return true, nil
 }

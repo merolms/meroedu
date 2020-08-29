@@ -9,8 +9,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/meroedu/meroedu/app/domain"
-	"github.com/sirupsen/logrus"
-	"gopkg.in/go-playground/validator.v9"
+	"github.com/meroedu/meroedu/app/util"
 )
 
 // ResponseError represents the response error struct
@@ -64,19 +63,19 @@ func (c *CourseHandler) GetAll(echoContext echo.Context) error {
 		case "start":
 			val := strings.TrimSpace(v[0])
 			if start, err = strconv.Atoi(val); err != nil {
-				return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+				return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 			}
 		case "limit":
 			val := strings.TrimSpace(v[0])
 			if limit, err = strconv.Atoi(val); err != nil {
-				return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+				return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 			}
 		}
 	}
 
 	listCourse, err := c.CourseUseCase.GetAll(ctx, start, limit)
 	if err != nil {
-		return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
 	return echoContext.JSON(http.StatusOK, listCourse)
 }
@@ -92,7 +91,7 @@ func (c *CourseHandler) GetByID(echoContext echo.Context) error {
 
 	listCourse, err := c.CourseUseCase.GetByID(ctx, int64(idParam))
 	if err != nil {
-		return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
 	return echoContext.JSON(http.StatusOK, listCourse)
 }
@@ -105,13 +104,13 @@ func (c *CourseHandler) CreateCourse(echoContext echo.Context) error {
 		return echoContext.JSON(http.StatusUnprocessableEntity, err.Error())
 	}
 	var ok bool
-	if ok, err = isRequestValid(&course); !ok {
+	if ok, err = util.IsRequestValid(&course); !ok {
 		return echoContext.JSON(http.StatusBadRequest, err.Error())
 	}
 	ctx := echoContext.Request().Context()
 	err = c.CourseUseCase.CreateCourse(ctx, &course)
 	if err != nil {
-		return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
 	return echoContext.JSON(http.StatusCreated, course)
 
@@ -129,40 +128,14 @@ func (c *CourseHandler) UpdateCourse(echoContext echo.Context) error {
 		return echoContext.JSON(http.StatusUnprocessableEntity, err.Error())
 	}
 	var ok bool
-	if ok, err = isRequestValid(&course); !ok {
+	if ok, err = util.IsRequestValid(&course); !ok {
 		return echoContext.JSON(http.StatusBadRequest, err.Error())
 	}
 	ctx := echoContext.Request().Context()
 	err = c.CourseUseCase.UpdateCourse(ctx, &course, int64(idParam))
 	if err != nil {
-		return echoContext.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
 	return echoContext.JSON(http.StatusCreated, course)
 
-}
-
-func getStatusCode(err error) int {
-	if err == nil {
-		return http.StatusOK
-	}
-	logrus.Error(err)
-	switch err {
-	case domain.ErrInternalServerError:
-		return http.StatusInternalServerError
-	case domain.ErrNotFound:
-		return http.StatusNotFound
-	case domain.ErrConflict:
-		return http.StatusConflict
-	default:
-		return http.StatusInternalServerError
-	}
-}
-
-func isRequestValid(m *domain.Course) (bool, error) {
-	validate := validator.New()
-	err := validate.Struct(m)
-	if err != nil {
-		return false, err
-	}
-	return true, nil
 }
