@@ -3,6 +3,8 @@ package domain
 import (
 	"context"
 	"time"
+
+	"github.com/labstack/echo/v4"
 )
 
 // Attachment ...
@@ -13,7 +15,12 @@ type Attachment struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+// AttachmentUserCase represents attachments usecase contract
+type AttachmentUserCase interface {
+	Upload(echoContext echo.Context) error
+}
+
 // AttachmentRepository represent the attachment's repository contract
 type AttachmentRepository interface {
-	GetByID(ctx context.Context, id int64) (Attachment, error)
+	Upload(ctx context.Context, a *Attachment)
 }

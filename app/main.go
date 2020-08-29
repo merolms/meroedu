@@ -11,6 +11,9 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/meroedu/meroedu/api_docs"
+	_attachmentHttpDelivery "github.com/meroedu/meroedu/app/attachment/delivery/http"
+	_uploadRepo "github.com/meroedu/meroedu/app/attachment/repository/mysql"
+	_attachmentUcase "github.com/meroedu/meroedu/app/attachment/usecase"
 	"github.com/meroedu/meroedu/app/config"
 	_courseHttpDelivery "github.com/meroedu/meroedu/app/course/delivery/http"
 	_courseHttpDeliveryMiddleware "github.com/meroedu/meroedu/app/course/delivery/http/middleware"
@@ -48,10 +51,16 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	courseRepositry := _courseRepo.InitMysqlRepository(db)
-
 	timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
-	au := _courseUcase.NewCourseUseCase(courseRepositry, timeoutContext)
+
+	uploadRepo := _uploadRepo.InitMysqlRepository(db)
+	attachmentUcase := _attachmentUcase.NewCourseUseCase(uploadRepo, timeoutContext)
+	_attachmentHttpDelivery.NewAttachmentHandler(e, attachmentUcase)
+
+	courseRepository := _courseRepo.InitMysqlRepository(db)
+
+	// timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
+	au := _courseUcase.NewCourseUseCase(courseRepository, timeoutContext)
 	_courseHttpDelivery.NewCourseHandler(e, au)
 
 	// Start HTTP Server
