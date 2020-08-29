@@ -1,9 +1,6 @@
 package config
 
 import (
-	"log"
-
-	"github.com/davecgh/go-spew/spew"
 	"github.com/spf13/viper"
 )
 
@@ -28,19 +25,19 @@ type config struct {
 var C config
 
 // ReadConfig ...
-func ReadConfig() {
+func ReadConfig(filepath string) error {
 	Config := &C
-	viper.SetConfigFile(`config.yml`)
+	viper.SetConfigFile(filepath)
 	viper.SetConfigType("yml")
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
-		log.Fatalf("Error Reading Config %s\n", err)
+		return err
+		// log.Fatalf("Error Reading Config %s\n", err)
 	}
 
 	if err := viper.Unmarshal(&Config); err != nil {
-		log.Fatalf("Error unmarshal config '%s'\n", err)
+		return err
 	}
-
-	spew.Dump(C)
+	return nil
 }

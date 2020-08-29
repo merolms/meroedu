@@ -13,6 +13,7 @@ import (
 	_ "github.com/meroedu/meroedu/api_docs"
 	"github.com/meroedu/meroedu/app/config"
 	_courseHttpDelivery "github.com/meroedu/meroedu/app/course/delivery/http"
+	"gopkg.in/alecthomas/kingpin.v2"
 
 	_categoryHttpDelivery "github.com/meroedu/meroedu/app/category/delivery/http"
 	_categoryRepo "github.com/meroedu/meroedu/app/category/repository/mysql"
@@ -23,6 +24,10 @@ import (
 	"github.com/meroedu/meroedu/app/infrastructure/datastore"
 	"github.com/spf13/viper"
 	echoSwagger "github.com/swaggo/echo-swagger"
+)
+
+var (
+	configPath = kingpin.Flag("config", "Location of config.yml").Default("./config.yml").String()
 )
 
 // @title Mero Edu API
@@ -36,7 +41,13 @@ import (
 // @license.url https://github.com/meroedu/meroedu/blob/master/LICENSE
 // @BasePath /
 func main() {
-	config.ReadConfig()
+
+	// Parse the CLI flags and load the config
+	kingpin.CommandLine.HelpFlag.Short('h')
+	kingpin.Parse()
+
+	// Load the config
+	config.ReadConfig(*configPath)
 	db := datastore.NewDB()
 	// db.AutoMigrate(domain.Course{}, domain.Category{})
 	e := echo.New()
