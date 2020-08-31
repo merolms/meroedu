@@ -11,8 +11,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/meroedu/meroedu/api_docs"
-	"github.com/meroedu/meroedu/app/config"
 	_courseHttpDelivery "github.com/meroedu/meroedu/app/course/delivery/http"
+	"github.com/meroedu/meroedu/config"
 	"gopkg.in/alecthomas/kingpin.v2"
 
 	_categoryHttpDelivery "github.com/meroedu/meroedu/app/category/delivery/http"
@@ -21,7 +21,7 @@ import (
 	_courseHttpDeliveryMiddleware "github.com/meroedu/meroedu/app/course/delivery/http/middleware"
 	_courseRepo "github.com/meroedu/meroedu/app/course/repository/mysql"
 	_courseUcase "github.com/meroedu/meroedu/app/course/usecase"
-	"github.com/meroedu/meroedu/app/infrastructure/datastore"
+	"github.com/meroedu/meroedu/infrastructure/datastore"
 	"github.com/spf13/viper"
 	echoSwagger "github.com/swaggo/echo-swagger"
 )

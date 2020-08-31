@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/url"
 
-	"github.com/meroedu/meroedu/app/config"
+	"github.com/meroedu/meroedu/config"
 )
 
 // NewDB ...
