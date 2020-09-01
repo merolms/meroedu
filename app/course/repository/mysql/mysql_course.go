@@ -69,8 +69,7 @@ func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res
 	return res, nil
 }
 func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (res domain.Course, err error) {
-	query := `SELECT id,title, author_id, updated_at, created_at
-  						FROM courses WHERE ID = ?`
+	query := `SELECT id,title, description, author_id, category_id,updated_at, created_at FROM courses WHERE ID = ?`
 
 	list, err := m.fetch(ctx, query, id)
 	if err != nil {
@@ -87,8 +86,7 @@ func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (res domain.Cou
 }
 
 func (m *mysqlRepository) GetByTitle(ctx context.Context, title string) (res domain.Course, err error) {
-	query := `SELECT id,title, author_id, updated_at, created_at
-  						FROM courses WHERE title = ?`
+	query := `SELECT id,title, description, author_id, category_id,updated_at, created_at FROM courses WHERE title = ?`
 
 	list, err := m.fetch(ctx, query, title)
 	if err != nil {
