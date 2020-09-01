@@ -18,14 +18,18 @@ func TestGetAll(t *testing.T) {
 	}
 	mockCourses := []domain.Course{
 		domain.Course{
-			ID: 1, Title: "title-1",
-			Author: domain.User{ID: 1}, UpdatedAt: time.Now(), CreatedAt: time.Now(),
+			ID:          1,
+			Title:       "title-1",
+			Description: "tell me nah",
+			Author:      domain.User{ID: 1},
+			Category:    domain.Category{ID: 1},
+			UpdatedAt:   time.Now(), CreatedAt: time.Now(),
 		},
 	}
-	rows := sqlmock.NewRows([]string{"id", "title", "author_id", "updated_at", "created_at"}).
-		AddRow(mockCourses[0].ID, mockCourses[0].Title, mockCourses[0].Author.ID, mockCourses[0].UpdatedAt, mockCourses[0].CreatedAt)
+	rows := sqlmock.NewRows([]string{"id", "title", "description", "author_id", "category_id", "updated_at", "created_at"}).
+		AddRow(mockCourses[0].ID, mockCourses[0].Title, mockCourses[0].Description, mockCourses[0].Author.ID, mockCourses[0].Category.ID, mockCourses[0].UpdatedAt, mockCourses[0].CreatedAt)
 
-	query := `SELECT id,title, author_id, updated_at, created_at FROM courses ORDER BY created_at DESC LIMIT \?,\?`
+	query := `SELECT id,title, description, author_id, category_id, updated_at, created_at FROM courses ORDER BY created_at DESC LIMIT \?,\?`
 	mock.ExpectQuery(query).WillReturnRows(rows)
 	c := courseMysqlRepo.InitMysqlRepository(db)
 	start, limit := 0, 10
@@ -68,9 +72,8 @@ func TestGetByTitle(t *testing.T) {
 }
 func TestCreateCourse(t *testing.T) {
 	c := &domain.Course{
-		Title:     "Java Programming",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		Title:       "Java Programming",
+		Description: "Testing",
 		Category: domain.Category{
 			ID: 1,
 		},
@@ -83,9 +86,9 @@ func TestCreateCourse(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error %s was not expected when opening stub database connection", err)
 	}
-	query := `INSERT  courses SET title=\?, author_id=\?, category_id=\?, updated_at=\? , created_at=\?`
+	query := `INSERT  courses SET title=\?, description=\?, author_id=\?, category_id=\?`
 	prep := mock.ExpectPrepare(query)
-	prep.ExpectExec().WithArgs(c.Title, c.Author.ID, c.Category.ID, c.UpdatedAt, c.CreatedAt).WillReturnResult(sqlmock.NewResult(12, 1))
+	prep.ExpectExec().WithArgs(c.Title, c.Description, c.Author.ID, c.Category.ID).WillReturnResult(sqlmock.NewResult(12, 1))
 
 	repo := courseMysqlRepo.InitMysqlRepository(db)
 	err = repo.CreateCourse(context.TODO(), c)

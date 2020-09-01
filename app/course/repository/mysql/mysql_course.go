@@ -40,11 +40,12 @@ func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...inter
 		err = rows.Scan(
 			&t.ID,
 			&t.Title,
+			&t.Description,
 			&t.Author.ID,
+			&t.Category.ID,
 			&t.UpdatedAt,
 			&t.CreatedAt,
 		)
-
 		if err != nil {
 			logrus.Error(err)
 			return nil, err
@@ -59,7 +60,7 @@ func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...inter
 }
 
 func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res []domain.Course, err error) {
-	query := `SELECT id,title, author_id, updated_at, created_at FROM courses ORDER BY created_at DESC LIMIT ?,? `
+	query := `SELECT id,title, description, author_id, category_id, updated_at, created_at FROM courses ORDER BY created_at DESC LIMIT ?,? `
 
 	res, err = m.fetch(ctx, query, start, limit)
 	if err != nil {
@@ -103,13 +104,27 @@ func (m *mysqlRepository) GetByTitle(ctx context.Context, title string) (res dom
 }
 
 func (m *mysqlRepository) CreateCourse(ctx context.Context, a *domain.Course) (err error) {
-	query := `INSERT  courses SET title=?, author_id=?, category_id=?, updated_at=? , created_at=?`
+	query := `INSERT  courses SET title=?, description=?, author_id=?, category_id=?`
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
 		logrus.Error("Error while preparing statement ", err)
 		return
 	}
-	res, err := stmt.ExecContext(ctx, a.Title, a.Author.ID, a.Category.ID, a.UpdatedAt, a.CreatedAt)
+	var fields []interface{}
+	fields = append(fields, a.Title)
+	fields = append(fields, a.Description)
+	if a.Author.ID == 0 {
+		fields = append(fields, nil)
+	} else {
+		fields = append(fields, a.Author.ID)
+	}
+	if a.Category.ID == 0 {
+		fields = append(fields, nil)
+	} else {
+		fields = append(fields, a.Category.ID)
+	}
+	fmt.Println(fields...)
+	res, err := stmt.ExecContext(ctx, fields...)
 	if err != nil {
 		logrus.Error("Error while executing statement ", err)
 		return

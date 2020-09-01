@@ -19,7 +19,7 @@ const (
 type Course struct {
 	ID          int64        `json:"id" `
 	Title       string       `json:"title" validate:"required"`
-	Description string       `json:"descrition,omitempty"`
+	Description string       `json:"description,omitempty"`
 	ImageURL    string       `json:"image_url,omitempty"`
 	Duration    uint16       `json:"duration,omitempty"`
 	Category    Category     `json:"categories,omitempty"`
