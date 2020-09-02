@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"net/http"
 	"os"
 	"os/signal"
 	"time"
@@ -11,20 +10,20 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/meroedu/meroedu/api_docs"
-	_courseHttpDelivery "github.com/meroedu/meroedu/app/course/delivery/http"
-	"github.com/meroedu/meroedu/config"
-	"gopkg.in/alecthomas/kingpin.v2"
-
-	_categoryHttpDelivery "github.com/meroedu/meroedu/app/category/delivery/http"
-	_categoryRepo "github.com/meroedu/meroedu/app/category/repository/mysql"
-	_categoryUcase "github.com/meroedu/meroedu/app/category/usecase"
-	_courseHttpDeliveryMiddleware "github.com/meroedu/meroedu/app/course/delivery/http/middleware"
-	_courseRepo "github.com/meroedu/meroedu/app/course/repository/mysql"
-	_courseUcase "github.com/meroedu/meroedu/app/course/usecase"
-	"github.com/meroedu/meroedu/infrastructure/datastore"
-	log "github.com/meroedu/meroedu/logger"
+	_categoryHttpDelivery "github.com/meroedu/meroedu/internal/category/delivery/http"
+	_categoryRepo "github.com/meroedu/meroedu/internal/category/repository/mysql"
+	_categoryUcase "github.com/meroedu/meroedu/internal/category/usecase"
+	"github.com/meroedu/meroedu/internal/config"
+	_courseHttpDelivery "github.com/meroedu/meroedu/internal/course/delivery/http"
+	_courseHttpDeliveryMiddleware "github.com/meroedu/meroedu/internal/course/delivery/http/middleware"
+	_courseRepo "github.com/meroedu/meroedu/internal/course/repository/mysql"
+	_courseUcase "github.com/meroedu/meroedu/internal/course/usecase"
+	_healthHttpDelivery "github.com/meroedu/meroedu/internal/healthcheck/delivery/http"
+	datastore "github.com/meroedu/meroedu/pkg/database"
+	log "github.com/meroedu/meroedu/pkg/log"
 	"github.com/spf13/viper"
 	echoSwagger "github.com/swaggo/echo-swagger"
+	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 var (
@@ -53,11 +52,7 @@ func main() {
 	if err != nil {
 		log.Error(err)
 	}
-	// db.AutoMigrate(domain.Course{}, domain.Category{})
 	e := echo.New()
-
-	// Init HealthCheck
-	e.GET("/", HealthCheck)
 
 	// Init Swagger
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
@@ -68,6 +63,8 @@ func main() {
 	e.Use(middleware.Recover())
 	timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
 
+	// healthcheck
+	_healthHttpDelivery.NewHealthHandler(e)
 	// Courses
 	courseRepositry := _courseRepo.InitMysqlRepository(db)
 	_courseHttpDelivery.NewCourseHandler(e, _courseUcase.NewCourseUseCase(courseRepositry, timeoutContext))
@@ -96,16 +93,6 @@ func main() {
 	}
 }
 
-// HealthCheck godoc
-// @Summary Show the status of server.
-// @Description get the status of server.
-// @Tags health
-// @Accept */*
-// @Produce json
-// @Success 200 {object} map[string]interface{}
-// @Router / [get]
-func HealthCheck(c echo.Context) error {
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"health": "UP",
-	})
+func initHttpServer() {
+
 }
