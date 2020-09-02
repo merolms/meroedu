@@ -1,4 +1,6 @@
 BINARY=meroedu
+DB_CONFIG_FILE ?= ./migrator/dbconf.yml
+DB_DSN ?= $(shell sed -n 's/^dsn:[[:space:]]*"\(.*\)"/\1/p' $(DB_CONFIG_FILE))
 ##############################################################################
 # Staging
 ##############################################################################
@@ -56,10 +58,10 @@ migrate-build:
 	cd migrator/ && docker build -t migrator .
 
 migrate: migrate-build
-	docker run --network host migrator -path=/migrations/ -database "mysql://user:password@tcp(127.0.0.1:3306)/course_api" up
+	docker run --network host migrator -path=/migrations/ -database "$(DB_DSN)" up
 
 migrate-down:
-	docker run --network host migrator -path=/migrations/ -database "mysql://user:password@tcp(127.0.0.1:3306)/course_api" down -all
+	docker run --network host migrator -path=/migrations/ -database "$(DB_DSN)" down -all
 	
 #############################################################################
 # Utility

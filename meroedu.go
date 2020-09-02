@@ -52,6 +52,13 @@ func main() {
 	if err != nil {
 		log.Error(err)
 	}
+	defer func() {
+		log.Info("Closing database connection")
+		if err := db.Close(); err != nil {
+			log.Error(err)
+		}
+	}()
+
 	e := echo.New()
 
 	// Init Swagger
@@ -76,7 +83,7 @@ func main() {
 	// Start HTTP Server
 	go func() {
 		if err := e.Start(viper.GetString("server.address")); err != nil {
-			e.Logger.Info("Shutting down the server")
+			log.Info("Shutting down the server")
 		}
 	}()
 
@@ -85,7 +92,7 @@ func main() {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
-	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	if err := e.Shutdown(ctx); err != nil {

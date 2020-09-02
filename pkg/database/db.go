@@ -40,14 +40,11 @@ func NewDB() (*sql.DB, error) {
 		log.Warn("waiting for database to be up...")
 		time.Sleep(5 * time.Second)
 	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			log.Error(err)
-		}
-	}()
+
 	if err != nil {
 		log.Error(err)
 		return nil, err
 	}
+	log.Info("Database connection success")
 	return db, nil
 }
