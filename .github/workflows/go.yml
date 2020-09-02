@@ -20,7 +20,7 @@ jobs:
       run: |
         go mod download
     - name: Build
-      run: make engine
+      run: make build-app
     - name: Test
       run: make test-coverage
     - name: Archive code coverage results
