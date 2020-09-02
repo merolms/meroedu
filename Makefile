@@ -1,4 +1,4 @@
-BINARY=engine
+BINARY=meroedu
 ##############################################################################
 # Staging
 ##############################################################################
@@ -66,12 +66,12 @@ migrate-down:
 #############################################################################
 db-diagram:
 	java -jar ~/Downloads/schema-gui/schemaspy-6.1.0.jar -dp ~/Downloads/mysql-connector-java-6.0.6.jar -t mysql -db course_api -host localhost -u root -p "root" -o ~/Downloads/schema-gui/course_api -s course_api
-engine:
-	go build -o ${BINARY} app/*.go
+build-app: clean-app
+	go build -o ${BINARY}
 
-run-engine:
-	./engine
-clean:
+run-app: build-app
+	./${BINARY}
+clean-app:
 	$(eval VALUE=$(shell sh -c "lsof -i:9090 -t"))
 	if [ -f ${BINARY} ] ; then rm ${BINARY} ; fi
 	$(shell sh -c "if [ \"${VALUE}\" != \"\" ]  ; then kill ${VALUE} ; fi")
