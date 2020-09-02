@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -10,6 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/meroedu/meroedu/internal/domain"
 	"github.com/meroedu/meroedu/internal/util"
+	"github.com/meroedu/meroedu/pkg/log"
 )
 
 // ResponseError represents the response error struct
@@ -45,7 +45,7 @@ func NewContentHandler(e *echo.Echo, us domain.ContentUseCase) {
 
 // GetAll ...
 func (c *ContentHandler) GetAll(echoContext echo.Context) error {
-	fmt.Println("Calling GetAll Contents")
+	log.Info("Calling GetAll Contents")
 	ctx := echoContext.Request().Context()
 	start, limit := 0, 10
 	var err error
@@ -73,7 +73,7 @@ func (c *ContentHandler) GetAll(echoContext echo.Context) error {
 
 // GetByID ...
 func (c *ContentHandler) GetByID(echoContext echo.Context) error {
-	fmt.Println("Calling GetByID Contents")
+	log.Info("Calling GetByID Contents")
 	idParam, err := strconv.Atoi(echoContext.Param("id"))
 	if err != nil {
 		return echoContext.JSON(http.StatusNotFound, domain.ErrNotFound.Error())

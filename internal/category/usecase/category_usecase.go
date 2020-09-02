@@ -2,10 +2,10 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/meroedu/meroedu/internal/domain"
+	log "github.com/meroedu/meroedu/pkg/log"
 )
 
 // CategoryUseCase ...
@@ -64,8 +64,8 @@ func (usecase *CategoryUseCase) CreateCategory(c context.Context, category *doma
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 	// existingCategory, err := usecase.GetByTitle(ctx, category.Title)
-	// fmt.Println(existingCategory)
-	// fmt.Println(domain.Category{})
+	// log.Info(existingCategory)
+	// log.Info(domain.Category{})
 	// if existingCategory != (domain.Category{}) {
 	// 	return domain.ErrConflict
 	// }
@@ -84,8 +84,8 @@ func (usecase *CategoryUseCase) UpdateCategory(c context.Context, category *doma
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 	existingCategory, err := usecase.GetByID(ctx, id)
-	fmt.Println(existingCategory)
-	fmt.Println(domain.Category{})
+	log.Info(existingCategory)
+	log.Info(domain.Category{})
 	// if existingCategory != (domain.Category{}) {
 	// 	return domain.ErrConflict
 	// }

@@ -2,10 +2,10 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/meroedu/meroedu/internal/domain"
+	"github.com/meroedu/meroedu/pkg/log"
 )
 
 // LessonUseCase ...
@@ -64,8 +64,8 @@ func (usecase *LessonUseCase) CreateLesson(c context.Context, lesson *domain.Les
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 	// existingLesson, err := usecase.GetByTitle(ctx, lesson.Title)
-	// fmt.Println(existingLesson)
-	// fmt.Println(domain.Lesson{})
+	// log.Info(existingLesson)
+	// log.Info(domain.Lesson{})
 	// if existingLesson != (domain.Lesson{}) {
 	// 	return domain.ErrConflict
 	// }
@@ -84,8 +84,8 @@ func (usecase *LessonUseCase) UpdateLesson(c context.Context, lesson *domain.Les
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 	existingLesson, err := usecase.GetByID(ctx, id)
-	fmt.Println(existingLesson)
-	fmt.Println(domain.Lesson{})
+	log.Info(existingLesson)
+	log.Info(domain.Lesson{})
 	// if existingLesson != (domain.Lesson{}) {
 	// 	return domain.ErrConflict
 	// }

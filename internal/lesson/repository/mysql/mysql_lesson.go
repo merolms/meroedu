@@ -54,7 +54,7 @@ func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...inter
 }
 
 func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res []domain.Lesson, err error) {
-	fmt.Println("Called GetAll Lessons")
+	log.Info("Called GetAll Lessons")
 	query := `SELECT id,name, updated_at, created_at FROM lessons ORDER BY created_at DESC LIMIT ?,?`
 
 	res, err = m.fetch(ctx, query, start, limit)

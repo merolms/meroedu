@@ -2,10 +2,10 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/meroedu/meroedu/internal/domain"
+	"github.com/meroedu/meroedu/pkg/log"
 )
 
 // CourseUseCase ...
@@ -31,7 +31,7 @@ func (usecase *CourseUseCase) GetAll(c context.Context, start int, limit int) (r
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 	// count, err := usecase.courseRepo.GetCourseCount(ctx)
-	// fmt.Println(count)
+	// log.Info(count)
 	res, err = usecase.courseRepo.GetAll(ctx, start, limit)
 	if err != nil {
 		return nil, err
@@ -69,8 +69,8 @@ func (usecase *CourseUseCase) CreateCourse(c context.Context, course *domain.Cou
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 	existedCourse, err := usecase.GetByTitle(ctx, course.Title)
-	fmt.Println(existedCourse)
-	fmt.Println(domain.Course{})
+	log.Info(existedCourse)
+	log.Info(domain.Course{})
 	// if existedCourse != (domain.Course{}) {
 	// 	return domain.ErrConflict
 	// }
@@ -89,8 +89,8 @@ func (usecase *CourseUseCase) UpdateCourse(c context.Context, course *domain.Cou
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 	existedCourse, err := usecase.GetByID(ctx, id)
-	fmt.Println(existedCourse)
-	fmt.Println(domain.Course{})
+	log.Info(existedCourse)
+	log.Info(domain.Course{})
 	// if existedCourse != (domain.Course{}) {
 	// 	return domain.ErrConflict
 	// }

@@ -2,10 +2,10 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/meroedu/meroedu/internal/domain"
+	"github.com/meroedu/meroedu/pkg/log"
 )
 
 // TagUseCase ...
@@ -64,8 +64,8 @@ func (usecase *TagUseCase) CreateTag(c context.Context, tag *domain.Tag) (err er
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 	// existingTag, err := usecase.GetByTitle(ctx, tag.Title)
-	// fmt.Println(existingTag)
-	// fmt.Println(domain.Tag{})
+	// log.Info(existingTag)
+	// log.Info(domain.Tag{})
 	// if existingTag != (domain.Tag{}) {
 	// 	return domain.ErrConflict
 	// }
@@ -84,8 +84,8 @@ func (usecase *TagUseCase) UpdateTag(c context.Context, tag *domain.Tag, id int6
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 	existingTag, err := usecase.GetByID(ctx, id)
-	fmt.Println(existingTag)
-	fmt.Println(domain.Tag{})
+	log.Info(existingTag)
+	log.Info(domain.Tag{})
 	// if existingTag != (domain.Tag{}) {
 	// 	return domain.ErrConflict
 	// }

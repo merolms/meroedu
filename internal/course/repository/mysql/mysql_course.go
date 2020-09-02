@@ -121,7 +121,7 @@ func (m *mysqlRepository) CreateCourse(ctx context.Context, a *domain.Course) (e
 	} else {
 		fields = append(fields, a.Category.ID)
 	}
-	fmt.Println(fields...)
+	log.Info(fields...)
 	res, err := stmt.ExecContext(ctx, fields...)
 	if err != nil {
 		log.Error("Error while executing statement ", err)

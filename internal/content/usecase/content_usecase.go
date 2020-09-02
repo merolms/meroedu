@@ -2,10 +2,10 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/meroedu/meroedu/internal/domain"
+	"github.com/meroedu/meroedu/pkg/log"
 )
 
 // ContentUseCase ...
@@ -64,8 +64,8 @@ func (usecase *ContentUseCase) CreateContent(c context.Context, content *domain.
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 	// existingContent, err := usecase.GetByTitle(ctx, content.Title)
-	// fmt.Println(existingContent)
-	// fmt.Println(domain.Content{})
+	// log.Info(existingContent)
+	// log.Info(domain.Content{})
 	// if existingContent != (domain.Content{}) {
 	// 	return domain.ErrConflict
 	// }
@@ -84,8 +84,8 @@ func (usecase *ContentUseCase) UpdateContent(c context.Context, content *domain.
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 	existingContent, err := usecase.GetByID(ctx, id)
-	fmt.Println(existingContent)
-	fmt.Println(domain.Content{})
+	log.Info(existingContent)
+	log.Info(domain.Content{})
 	// if existingContent != (domain.Content{}) {
 	// 	return domain.ErrConflict
 	// }

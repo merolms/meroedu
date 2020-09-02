@@ -45,7 +45,7 @@ func NewTagHandler(e *echo.Echo, us domain.TagUseCase) {
 
 // GetAll ...
 func (c *TagHandler) GetAll(echoContext echo.Context) error {
-	fmt.Println("Calling GetAll Tags")
+	log.Info("Calling GetAll Tags")
 	ctx := echoContext.Request().Context()
 	start, limit := 0, 10
 	var err error
@@ -73,7 +73,7 @@ func (c *TagHandler) GetAll(echoContext echo.Context) error {
 
 // GetByID ...
 func (c *TagHandler) GetByID(echoContext echo.Context) error {
-	fmt.Println("Calling GetByID Tags")
+	log.Info("Calling GetByID Tags")
 	idParam, err := strconv.Atoi(echoContext.Param("id"))
 	if err != nil {
 		return echoContext.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
