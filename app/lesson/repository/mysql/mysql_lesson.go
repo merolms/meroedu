@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/meroedu/meroedu/app/domain"
-	"github.com/sirupsen/logrus"
+	log "github.com/meroedu/meroedu/logger"
 )
 
 type mysqlRepository struct {
@@ -22,14 +22,14 @@ func InitMysqlRepository(db *sql.DB) domain.LessonRepository {
 func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...interface{}) (result []domain.Lesson, err error) {
 	rows, err := m.Conn.QueryContext(ctx, query, args...)
 	if err != nil {
-		logrus.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 
 	defer func() {
 		errRow := rows.Close()
 		if errRow != nil {
-			logrus.Error(errRow)
+			log.Error(errRow)
 		}
 	}()
 
@@ -44,7 +44,7 @@ func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...inter
 		)
 
 		if err != nil {
-			logrus.Error(err)
+			log.Error(err)
 			return nil, err
 		}
 		result = append(result, t)
@@ -84,17 +84,17 @@ func (m *mysqlRepository) CreateLesson(ctx context.Context, a *domain.Lesson) (e
 	query := `INSERT  lessons SET title=?, updated_at=? , created_at=?`
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
-		logrus.Error("Error while preparing statement ", err)
+		log.Error("Error while preparing statement ", err)
 		return
 	}
 	res, err := stmt.ExecContext(ctx, a.Title, a.UpdatedAt, a.CreatedAt)
 	if err != nil {
-		logrus.Error("Error while executing statement ", err)
+		log.Error("Error while executing statement ", err)
 		return
 	}
 	lastID, err := res.LastInsertId()
 	if err != nil {
-		logrus.Error("Got Error from LastInsertId method: ", err)
+		log.Error("Got Error from LastInsertId method: ", err)
 		return
 	}
 	a.ID = lastID

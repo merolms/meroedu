@@ -81,7 +81,8 @@ docker:
 swagger:
 	go get github.com/swaggo/swag/cmd/swag
 	cd app/ && $$(go env GOPATH)/bin/swag init -g main.go --output ../api_docs
-
+mock:
+	cd app/domain && mockery --all --keeptree
 db-up:
 	docker-compose up -d mysql
 .PHONY: clean install unittest build docker run stop vendor lint-prepare lint

@@ -22,6 +22,7 @@ import (
 	_courseRepo "github.com/meroedu/meroedu/app/course/repository/mysql"
 	_courseUcase "github.com/meroedu/meroedu/app/course/usecase"
 	"github.com/meroedu/meroedu/infrastructure/datastore"
+	log "github.com/meroedu/meroedu/logger"
 	"github.com/spf13/viper"
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
@@ -48,7 +49,10 @@ func main() {
 
 	// Load the config
 	config.ReadConfig(*configPath)
-	db := datastore.NewDB()
+	db, err := datastore.NewDB()
+	if err != nil {
+		log.Error(err)
+	}
 	// db.AutoMigrate(domain.Course{}, domain.Category{})
 	e := echo.New()
 

@@ -18,7 +18,7 @@ type CourseUseCase struct {
 	contextTimeOut time.Duration
 }
 
-// NewCourseUseCase will creae new an
+// NewCourseUseCase will create new an
 func NewCourseUseCase(c domain.CourseRepository, timeout time.Duration) domain.CourseUseCase {
 	return &CourseUseCase{
 		courseRepo:     c,
@@ -30,7 +30,8 @@ func NewCourseUseCase(c domain.CourseRepository, timeout time.Duration) domain.C
 func (usecase *CourseUseCase) GetAll(c context.Context, start int, limit int) (res []domain.Course, err error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
-
+	// count, err := usecase.courseRepo.GetCourseCount(ctx)
+	// fmt.Println(count)
 	res, err = usecase.courseRepo.GetAll(ctx, start, limit)
 	if err != nil {
 		return nil, err

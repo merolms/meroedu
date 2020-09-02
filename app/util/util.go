@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/meroedu/meroedu/app/domain"
-	"github.com/sirupsen/logrus"
+	log "github.com/meroedu/meroedu/logger"
 	"gopkg.in/go-playground/validator.v9"
 )
 
@@ -13,7 +13,7 @@ func GetStatusCode(err error) int {
 	if err == nil {
 		return http.StatusOK
 	}
-	logrus.Error(err)
+	log.Error(err)
 	switch err {
 	case domain.ErrInternalServerError:
 		return http.StatusInternalServerError

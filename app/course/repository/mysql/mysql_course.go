@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/meroedu/meroedu/app/domain"
-	"github.com/sirupsen/logrus"
+	log "github.com/meroedu/meroedu/logger"
 )
 
 type mysqlRepository struct {
@@ -22,14 +22,14 @@ func InitMysqlRepository(db *sql.DB) domain.CourseRepository {
 func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...interface{}) (result []domain.Course, err error) {
 	rows, err := m.Conn.QueryContext(ctx, query, args...)
 	if err != nil {
-		logrus.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 
 	defer func() {
 		errRow := rows.Close()
 		if errRow != nil {
-			logrus.Error(errRow)
+			log.Error(errRow)
 		}
 	}()
 
@@ -41,13 +41,13 @@ func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...inter
 			&t.ID,
 			&t.Title,
 			&t.Description,
-			&t.Author.ID,
-			&t.Category.ID,
+			&t.AuthorID,
+			&t.CategoryID,
 			&t.UpdatedAt,
 			&t.CreatedAt,
 		)
 		if err != nil {
-			logrus.Error(err)
+			log.Error(err)
 			return nil, err
 		}
 		t.Author = domain.User{
@@ -105,7 +105,7 @@ func (m *mysqlRepository) CreateCourse(ctx context.Context, a *domain.Course) (e
 	query := `INSERT  courses SET title=?, description=?, author_id=?, category_id=?`
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
-		logrus.Error("Error while preparing statement ", err)
+		log.Error("Error while preparing statement ", err)
 		return
 	}
 	var fields []interface{}
@@ -124,12 +124,12 @@ func (m *mysqlRepository) CreateCourse(ctx context.Context, a *domain.Course) (e
 	fmt.Println(fields...)
 	res, err := stmt.ExecContext(ctx, fields...)
 	if err != nil {
-		logrus.Error("Error while executing statement ", err)
+		log.Error("Error while executing statement ", err)
 		return
 	}
 	lastID, err := res.LastInsertId()
 	if err != nil {
-		logrus.Error("Got Error from LastInsertId method: ", err)
+		log.Error("Got Error from LastInsertId method: ", err)
 		return
 	}
 	a.ID = lastID
@@ -182,5 +182,22 @@ func (m *mysqlRepository) UpdateCourse(ctx context.Context, ar *domain.Course) (
 		return
 	}
 
+	return
+}
+
+func (m *mysqlRepository) GetCourseCount(ctx context.Context) (count int64, err error) {
+	query := `SELECT count(*) FROM courses`
+
+	rows, err := m.Conn.QueryContext(ctx, query)
+	defer rows.Close()
+	if err != nil {
+		log.Error(err)
+		return 0, err
+	}
+	for rows.Next() {
+		if err := rows.Scan(&count); err != nil {
+			log.Error(err)
+		}
+	}
 	return
 }
