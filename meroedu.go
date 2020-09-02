@@ -18,7 +18,7 @@ import (
 	_courseHttpDeliveryMiddleware "github.com/meroedu/meroedu/internal/course/delivery/http/middleware"
 	_courseRepo "github.com/meroedu/meroedu/internal/course/repository/mysql"
 	_courseUcase "github.com/meroedu/meroedu/internal/course/usecase"
-	_healthHttpDelivery "github.com/meroedu/meroedu/internal/healthcheck/delivery/http"
+	_healthHttpDelivery "github.com/meroedu/meroedu/internal/health/delivery/http"
 	datastore "github.com/meroedu/meroedu/pkg/database"
 	log "github.com/meroedu/meroedu/pkg/log"
 	"github.com/spf13/viper"
@@ -91,8 +91,4 @@ func main() {
 	if err := e.Shutdown(ctx); err != nil {
 		e.Logger.Fatal(err)
 	}
-}
-
-func initHttpServer() {
-
 }
