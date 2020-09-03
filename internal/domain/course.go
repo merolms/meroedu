@@ -6,23 +6,23 @@ import (
 )
 
 // Status ...
-type Status uint8
+type Status string
 
 const (
-	CourseInDraft   string = "Draft"
-	CourseArchived  string = "Archived"
-	CourseAssigned  string = "Assigned"
-	CoursePublished string = "Published"
-	CoursePublic    string = "Public"
-	CourseCreated   string = "Created"
-	CourseComplete  string = "Completed"
-	StatusSuccess   string = "Success"
-	StatusQueued    string = "Queued"
-	StatusSending   string = "Sending"
-	StatusUnknown   string = "Unknown"
-	StatusScheduled string = "Scheduled"
-	StatusRetry     string = "Retrying"
-	Error           string = "Error"
+	CourseInDraft   Status = "Draft"
+	CourseArchived  Status = "Archived"
+	CourseAssigned  Status = "Assigned"
+	CoursePublished Status = "Published"
+	CoursePublic    Status = "Public"
+	CourseCreated   Status = "Created"
+	CourseComplete  Status = "Completed"
+	StatusSuccess   Status = "Success"
+	StatusQueued    Status = "Queued"
+	StatusSending   Status = "Sending"
+	StatusUnknown   Status = "Unknown"
+	StatusScheduled Status = "Scheduled"
+	StatusRetry     Status = "Retrying"
+	Error           Status = "Error"
 )
 
 // Course is a struct represent a created Course
@@ -40,7 +40,7 @@ type Course struct {
 	Users       []User       `json:"users,omitauthorempty"`
 	Lessons     []Lesson     `json:"lessons,omitempty"`
 	Attachments []Attachment `json:"attachments,omitempty"`
-	Status      string       `json:"status,omitempty"`
+	Status      Status       `json:"status,omitempty"`
 	UpdatedAt   time.Time    `json:"updated_at,omitempty"`
 	CreatedAt   time.Time    `json:"created_at,omitempty"`
 }

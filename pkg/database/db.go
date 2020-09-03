@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/meroedu/meroedu/internal/config"
-	log "github.com/meroedu/meroedu/pkg/log"
+	"github.com/meroedu/meroedu/pkg/log"
 )
 
 // MaxDatabaseConnectionAttempts ...

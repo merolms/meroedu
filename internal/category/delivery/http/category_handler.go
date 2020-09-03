@@ -6,7 +6,7 @@ import (
 
 	"strings"
 
-	log "github.com/meroedu/meroedu/pkg/log"
+	"github.com/meroedu/meroedu/pkg/log"
 
 	"github.com/labstack/echo/v4"
 	"github.com/meroedu/meroedu/internal/domain"

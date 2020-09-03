@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/meroedu/meroedu/internal/domain"
-	log "github.com/meroedu/meroedu/pkg/log"
+	"github.com/meroedu/meroedu/pkg/log"
 )
 
 type mysqlRepository struct {

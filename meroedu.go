@@ -20,7 +20,7 @@ import (
 	_courseUcase "github.com/meroedu/meroedu/internal/course/usecase"
 	_healthHttpDelivery "github.com/meroedu/meroedu/internal/health/delivery/http"
 	datastore "github.com/meroedu/meroedu/pkg/database"
-	log "github.com/meroedu/meroedu/pkg/log"
+	"github.com/meroedu/meroedu/pkg/log"
 	"github.com/spf13/viper"
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"gopkg.in/alecthomas/kingpin.v2"
