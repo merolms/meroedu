@@ -37,7 +37,7 @@ type Course struct {
 	Tags        []Tag        `json:"tags,omitempty"`
 	AuthorID    NullInt64    `json:"-,omitempty"`
 	Author      User         `json:"author,omitempty"`
-	Users       []User       `json:"users,omitauthorempty"`
+	Users       []User       `json:"users,omitempty"`
 	Lessons     []Lesson     `json:"lessons,omitempty"`
 	Attachments []Attachment `json:"attachments,omitempty"`
 	Status      Status       `json:"status,omitempty"`
