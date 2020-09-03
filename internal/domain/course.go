@@ -51,10 +51,6 @@ type CourseStats struct {
 	LessonCount    int64 `json:"lesson_count"`
 	TotalCompleted int64 `json:"total_complete"`
 	TotalAssigned  int64 `json:"total_assign"`
-	ClickedLink    int64 `json:"clicked"`
-	SubmittedData  int64 `json:"submitted_data"`
-	EmailReported  int64 `json:"email_reported"`
-	Error          int64 `json:"error"`
 }
 
 // CourseReponse is a struct representing the overview of Courses
