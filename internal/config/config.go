@@ -33,7 +33,6 @@ func ReadConfig(filepath string) error {
 
 	if err := viper.ReadInConfig(); err != nil {
 		return err
-		// log.Fatalf("Error Reading Config %s\n", err)
 	}
 
 	if err := viper.Unmarshal(&Config); err != nil {

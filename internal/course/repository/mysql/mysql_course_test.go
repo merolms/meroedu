@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	courseMysqlRepo "github.com/meroedu/meroedu/internal/course/repository/mysql"
+	mysqlrepo "github.com/meroedu/meroedu/internal/course/repository/mysql"
 	"github.com/meroedu/meroedu/internal/domain"
 	"github.com/stretchr/testify/assert"
 	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
@@ -31,7 +31,7 @@ func TestGetAll(t *testing.T) {
 
 	query := `SELECT id,title, description, author_id, category_id, updated_at, created_at FROM courses ORDER BY created_at DESC LIMIT \?,\?`
 	mock.ExpectQuery(query).WillReturnRows(rows)
-	c := courseMysqlRepo.InitMysqlRepository(db)
+	c := mysqlrepo.InitMysqlRepository(db)
 	start, limit := 0, 10
 	list, err := c.GetAll(context.TODO(), start, limit)
 	assert.NoError(t, err)
@@ -49,7 +49,7 @@ func TestGetByID(t *testing.T) {
 
 	query := `SELECT id,title, description, author_id, category_id,updated_at, created_at FROM courses WHERE ID = \?`
 	mock.ExpectQuery(query).WillReturnRows(row)
-	c := courseMysqlRepo.InitMysqlRepository(db)
+	c := mysqlrepo.InitMysqlRepository(db)
 	course, err := c.GetByID(context.TODO(), 1)
 	assert.NoError(t, err)
 	assert.NotNil(t, course)
@@ -65,7 +65,7 @@ func TestGetByTitle(t *testing.T) {
 
 	query := `SELECT id,title, description, author_id, category_id,updated_at, created_at FROM courses WHERE title = \?`
 	mock.ExpectQuery(query).WillReturnRows(row)
-	c := courseMysqlRepo.InitMysqlRepository(db)
+	c := mysqlrepo.InitMysqlRepository(db)
 	course, err := c.GetByTitle(context.TODO(), "testing-2")
 	assert.NoError(t, err)
 	assert.NotNil(t, course)
@@ -90,7 +90,7 @@ func TestCreateCourse(t *testing.T) {
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(c.Title, c.Description, c.Author.ID, c.Category.ID).WillReturnResult(sqlmock.NewResult(12, 1))
 
-	repo := courseMysqlRepo.InitMysqlRepository(db)
+	repo := mysqlrepo.InitMysqlRepository(db)
 	err = repo.CreateCourse(context.TODO(), c)
 	assert.NoError(t, err)
 	assert.Equal(t, int64(12), c.ID)
@@ -106,7 +106,7 @@ func TestDeleteCourse(t *testing.T) {
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(course_id).WillReturnResult(sqlmock.NewResult(12, 1))
 
-	repo := courseMysqlRepo.InitMysqlRepository(db)
+	repo := mysqlrepo.InitMysqlRepository(db)
 	err = repo.DeleteCourse(context.TODO(), int64(course_id))
 	assert.NoError(t, err)
 }
@@ -133,7 +133,7 @@ func TestUpdateCourse(t *testing.T) {
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(c.Title, c.Author.ID, c.Category.ID, c.UpdatedAt, c.ID).WillReturnResult(sqlmock.NewResult(12, 1))
 
-	repo := courseMysqlRepo.InitMysqlRepository(db)
+	repo := mysqlrepo.InitMysqlRepository(db)
 	err = repo.UpdateCourse(context.TODO(), c)
 	assert.NoError(t, err)
 }

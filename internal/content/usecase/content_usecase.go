@@ -63,12 +63,6 @@ func (usecase *ContentUseCase) GetByID(c context.Context, id int64) (res domain.
 func (usecase *ContentUseCase) CreateContent(c context.Context, content *domain.Content) (err error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
-	// existingContent, err := usecase.GetByTitle(ctx, content.Title)
-	// log.Info(existingContent)
-	// log.Info(domain.Content{})
-	// if existingContent != (domain.Content{}) {
-	// 	return domain.ErrConflict
-	// }
 	content.UpdatedAt = time.Now()
 	content.CreatedAt = time.Now()
 	err = usecase.contentRepo.CreateContent(ctx, content)

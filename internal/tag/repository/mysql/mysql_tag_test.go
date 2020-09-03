@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/meroedu/meroedu/internal/domain"
-	tagMysqlRepo "github.com/meroedu/meroedu/internal/tag/repository/mysql"
+	mysqlrepo "github.com/meroedu/meroedu/internal/tag/repository/mysql"
 	"github.com/stretchr/testify/assert"
 	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
@@ -26,7 +26,7 @@ func TestGetAll(t *testing.T) {
 
 	query := `SELECT id,name, updated_at, created_at FROM tags ORDER BY created_at DESC LIMIT \?,\?`
 	mock.ExpectQuery(query).WillReturnRows(rows)
-	c := tagMysqlRepo.InitMysqlRepository(db)
+	c := mysqlrepo.InitMysqlRepository(db)
 	start, limit := 0, 10
 	list, err := c.GetAll(context.TODO(), start, limit)
 	assert.NoError(t, err)
@@ -44,7 +44,7 @@ func TestGetByID(t *testing.T) {
 
 	query := `SELECT id,name,updated_at,created_at FROM tags WHERE ID = \?`
 	mock.ExpectQuery(query).WillReturnRows(row)
-	c := tagMysqlRepo.InitMysqlRepository(db)
+	c := mysqlrepo.InitMysqlRepository(db)
 	tag, err := c.GetByID(context.TODO(), 1)
 	assert.NoError(t, err)
 	assert.NotNil(t, tag)
@@ -64,7 +64,7 @@ func TestCreateTag(t *testing.T) {
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(c.Name, c.UpdatedAt, c.CreatedAt).WillReturnResult(sqlmock.NewResult(12, 1))
 
-	repo := tagMysqlRepo.InitMysqlRepository(db)
+	repo := mysqlrepo.InitMysqlRepository(db)
 	err = repo.CreateTag(context.TODO(), c)
 	assert.NoError(t, err)
 	assert.Equal(t, int64(12), c.ID)
@@ -80,7 +80,7 @@ func TestDeleteTag(t *testing.T) {
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(tag_id).WillReturnResult(sqlmock.NewResult(12, 1))
 
-	repo := tagMysqlRepo.InitMysqlRepository(db)
+	repo := mysqlrepo.InitMysqlRepository(db)
 	err = repo.DeleteTag(context.TODO(), int64(tag_id))
 	assert.NoError(t, err)
 }
@@ -100,7 +100,7 @@ func TestUpdateTag(t *testing.T) {
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(c.Name, c.UpdatedAt, c.ID).WillReturnResult(sqlmock.NewResult(12, 1))
 
-	repo := tagMysqlRepo.InitMysqlRepository(db)
+	repo := mysqlrepo.InitMysqlRepository(db)
 	err = repo.UpdateTag(context.TODO(), c)
 	assert.NoError(t, err)
 }

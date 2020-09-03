@@ -63,12 +63,6 @@ func (usecase *TagUseCase) GetByID(c context.Context, id int64) (res domain.Tag,
 func (usecase *TagUseCase) CreateTag(c context.Context, tag *domain.Tag) (err error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
-	// existingTag, err := usecase.GetByTitle(ctx, tag.Title)
-	// log.Info(existingTag)
-	// log.Info(domain.Tag{})
-	// if existingTag != (domain.Tag{}) {
-	// 	return domain.ErrConflict
-	// }
 	tag.UpdatedAt = time.Now()
 	tag.CreatedAt = time.Now()
 	err = usecase.tagRepo.CreateTag(ctx, tag)

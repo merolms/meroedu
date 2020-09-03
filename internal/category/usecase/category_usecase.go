@@ -63,12 +63,6 @@ func (usecase *CategoryUseCase) GetByID(c context.Context, id int64) (res domain
 func (usecase *CategoryUseCase) CreateCategory(c context.Context, category *domain.Category) (err error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
-	// existingCategory, err := usecase.GetByTitle(ctx, category.Title)
-	// log.Info(existingCategory)
-	// log.Info(domain.Category{})
-	// if existingCategory != (domain.Category{}) {
-	// 	return domain.ErrConflict
-	// }
 	category.UpdatedAt = time.Now()
 	category.CreatedAt = time.Now()
 	err = usecase.categoryRepo.CreateCategory(ctx, category)

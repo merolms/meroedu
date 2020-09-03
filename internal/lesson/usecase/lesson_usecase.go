@@ -63,12 +63,6 @@ func (usecase *LessonUseCase) GetByID(c context.Context, id int64) (res domain.L
 func (usecase *LessonUseCase) CreateLesson(c context.Context, lesson *domain.Lesson) (err error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
-	// existingLesson, err := usecase.GetByTitle(ctx, lesson.Title)
-	// log.Info(existingLesson)
-	// log.Info(domain.Lesson{})
-	// if existingLesson != (domain.Lesson{}) {
-	// 	return domain.ErrConflict
-	// }
 	lesson.UpdatedAt = time.Now()
 	lesson.CreatedAt = time.Now()
 	err = usecase.lessonRepo.CreateLesson(ctx, lesson)
