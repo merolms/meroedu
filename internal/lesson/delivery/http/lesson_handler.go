@@ -9,7 +9,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/meroedu/meroedu/internal/domain"
 	"github.com/meroedu/meroedu/internal/util"
-	"github.com/meroedu/meroedu/pkg/log"
 )
 
 // ResponseError represents the response error struct
@@ -45,7 +44,6 @@ func NewLessonHandler(e *echo.Echo, us domain.LessonUseCase) {
 
 // GetAll ...
 func (c *LessonHandler) GetAll(echoContext echo.Context) error {
-	log.Info("Calling GetAll Lessons")
 	ctx := echoContext.Request().Context()
 	start, limit := 0, 10
 	var err error
@@ -73,7 +71,6 @@ func (c *LessonHandler) GetAll(echoContext echo.Context) error {
 
 // GetByID ...
 func (c *LessonHandler) GetByID(echoContext echo.Context) error {
-	log.Info("Calling GetByID Lessons")
 	idParam, err := strconv.Atoi(echoContext.Param("id"))
 	if err != nil {
 		return echoContext.JSON(http.StatusNotFound, domain.ErrNotFound.Error())

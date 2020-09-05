@@ -73,11 +73,11 @@ func main() {
 	// healthcheck
 	_healthHttpDelivery.NewHealthHandler(e)
 	// Courses
-	courseRepositry := _courseRepo.InitMysqlRepository(db)
+	courseRepositry := _courseRepo.Init(db)
 	_courseHttpDelivery.NewCourseHandler(e, _courseUcase.NewCourseUseCase(courseRepositry, timeoutContext))
 
 	// Categories
-	categoryRepository := _categoryRepo.InitMysqlRepository(db)
+	categoryRepository := _categoryRepo.Init(db)
 	_categoryHttpDelivery.NewCategroyHandler(e, _categoryUcase.NewCategoryUseCase(categoryRepository, timeoutContext))
 
 	// Start HTTP Server

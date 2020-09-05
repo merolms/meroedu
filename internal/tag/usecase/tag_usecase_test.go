@@ -15,10 +15,6 @@ import (
 
 func TestGetAll(t *testing.T) {
 	mockTagRepo := new(mocks.TagRepository)
-	// mockUserRepo := new(mocks.UserRepository)
-	// mockLessonRepo := new(mocks.LessonRepository)
-	// mockAttachmentRepo:=new(mocks.AttachmentRepository)
-	// mockCategoryRepo:=new(mocks.CategoryRepository)
 	mockListTag := []domain.Tag{
 		domain.Tag{
 			ID: 1, Name: "title-1",
@@ -81,35 +77,37 @@ func TestGetByID(t *testing.T) {
 	})
 }
 
-// func TestGetByTitle(t *testing.T) {
-// 	mockTagRepo := new(mocks.TagRepository)
-// 	mockTag := domain.Tag{
-// 		Name: "title-1",
-// 	}
-// 	t.Run("success", func(t *testing.T) {
-// 		mockTagRepo.On("GetByTitle", mock.Anything, mock.AnythingOfType("string")).Return(mockTag, nil).Once()
-// 		u := ucase.NewTagUseCase(mockTagRepo, time.Second*2)
+func TestGetByName(t *testing.T) {
+	mockTagRepo := new(mocks.TagRepository)
+	mockTag := domain.Tag{
+		Name:      "tag-1",
+		UpdatedAt: time.Now(),
+		CreatedAt: time.Now(),
+	}
+	t.Run("success", func(t *testing.T) {
+		mockTagRepo.On("GetByName", mock.Anything, mock.AnythingOfType("string")).Return(mockTag, nil).Once()
+		u := ucase.NewTagUseCase(mockTagRepo, time.Second*2)
 
-// 		a, err := u.GetByTitle(context.TODO(), mockTag.Title)
+		a, err := u.GetByName(context.TODO(), mockTag.Name)
 
-// 		assert.NoError(t, err)
-// 		assert.NotNil(t, a)
+		assert.NoError(t, err)
+		assert.NotNil(t, a)
 
-// 		mockTagRepo.AssertExpectations(t)
-// 	})
-// 	t.Run("error-failed", func(t *testing.T) {
-// 		mockTagRepo.On("GetByTitle", mock.Anything, mock.AnythingOfType("string")).Return(domain.Tag{}, errors.New("Unexpected")).Once()
+		mockTagRepo.AssertExpectations(t)
+	})
+	t.Run("error-failed", func(t *testing.T) {
+		mockTagRepo.On("GetByName", mock.Anything, mock.AnythingOfType("string")).Return(domain.Tag{}, errors.New("Unexpected")).Once()
 
-// 		u := ucase.NewTagUseCase(mockTagRepo, time.Second*2)
+		u := ucase.NewTagUseCase(mockTagRepo, time.Second*2)
 
-// 		a, err := u.GetByTitle(context.TODO(), "random")
+		a, err := u.GetByName(context.TODO(), "random")
 
-// 		assert.Error(t, err)
-// 		assert.Equal(t, domain.Tag{}, a)
+		assert.Error(t, err)
+		assert.Equal(t, domain.Tag{}, a)
 
-// 		mockTagRepo.AssertExpectations(t)
-// 	})
-// }
+		mockTagRepo.AssertExpectations(t)
+	})
+}
 func TestCreateTag(t *testing.T) {
 	mockTagRepo := new(mocks.TagRepository)
 	mockTag := domain.Tag{

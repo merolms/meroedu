@@ -13,8 +13,8 @@ type mysqlRepository struct {
 	Conn *sql.DB
 }
 
-// InitMysqlRepository will create an object that represent the lesson's Repository interface
-func InitMysqlRepository(db *sql.DB) domain.LessonRepository {
+// Init will create an object that represent the lesson's Repository interface
+func Init(db *sql.DB) domain.LessonRepository {
 	return &mysqlRepository{
 		Conn: db,
 	}
@@ -54,7 +54,6 @@ func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...inter
 }
 
 func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res []domain.Lesson, err error) {
-	log.Info("Called GetAll Lessons")
 	query := `SELECT id,name, updated_at, created_at FROM lessons ORDER BY created_at DESC LIMIT ?,?`
 
 	res, err = m.fetch(ctx, query, start, limit)

@@ -9,7 +9,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/meroedu/meroedu/internal/domain"
 	"github.com/meroedu/meroedu/internal/util"
-	"github.com/meroedu/meroedu/pkg/log"
 )
 
 // ResponseError represents the response error struct
@@ -43,18 +42,24 @@ func NewCourseHandler(e *echo.Echo, us domain.CourseUseCase) {
 	e.POST("/courses/:id/teams", handler.GetByID)
 
 	// Update Operation
-	e.PUT("/courses/:id", handler.GetByID)
+	e.PUT("/courses/:id", handler.UpdateCourse)
 	e.PUT("/courses/:id/lessons/:id", handler.GetByID)
 	e.PUT("/courses/actions", handler.GetByID)
 
 	// Remove/Delete Operation
-	e.DELETE("/courses/:id", handler.GetByID)
+	e.DELETE("/courses/:id", handler.DeleteCourse)
 	e.DELETE("/courses/:id/lessons/:id", handler.GetByID)
 }
 
-// GetAll ...
+// GetAll godoc
+// @Summary Show the status of server.
+// @Description get the status of server.
+// @Tags courses
+// @Accept */*
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /courses [get]
 func (c *CourseHandler) GetAll(echoContext echo.Context) error {
-	log.Info("Calling GetAll Courses")
 	ctx := echoContext.Request().Context()
 	start, limit := 0, 10
 	var err error
@@ -82,7 +87,6 @@ func (c *CourseHandler) GetAll(echoContext echo.Context) error {
 
 // GetByID ...
 func (c *CourseHandler) GetByID(echoContext echo.Context) error {
-	log.Info("Calling GetByID Courses")
 	idParam, err := strconv.Atoi(echoContext.Param("id"))
 	if err != nil {
 		return echoContext.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
@@ -93,7 +97,7 @@ func (c *CourseHandler) GetByID(echoContext echo.Context) error {
 	if err != nil {
 		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
-	return echoContext.JSON(http.StatusOK, listCourse)
+	return echoContext.JSON(http.StatusOK, *listCourse)
 }
 
 // CreateCourse ...
@@ -120,7 +124,7 @@ func (c *CourseHandler) CreateCourse(echoContext echo.Context) error {
 func (c *CourseHandler) UpdateCourse(echoContext echo.Context) error {
 	idParam, err := strconv.Atoi(echoContext.Param("id"))
 	if err != nil {
-		return echoContext.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
+		return echoContext.JSON(http.StatusNotFound, err)
 	}
 	var course domain.Course
 	err = echoContext.Bind(&course)
@@ -136,6 +140,24 @@ func (c *CourseHandler) UpdateCourse(echoContext echo.Context) error {
 	if err != nil {
 		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
-	return echoContext.JSON(http.StatusCreated, course)
+	return echoContext.JSON(http.StatusOK, course)
 
+}
+
+// DeleteCourse will delete course by given param
+func (c *CourseHandler) DeleteCourse(echoContext echo.Context) error {
+	idP, err := strconv.Atoi(echoContext.Param("id"))
+	if err != nil {
+		return echoContext.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
+	}
+
+	id := int64(idP)
+	ctx := echoContext.Request().Context()
+
+	err = c.CourseUseCase.DeleteCourse(ctx, id)
+	if err != nil {
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
+	}
+
+	return echoContext.NoContent(http.StatusNoContent)
 }

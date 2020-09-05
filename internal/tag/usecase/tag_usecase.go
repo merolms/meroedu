@@ -48,16 +48,16 @@ func (usecase *TagUseCase) GetByID(c context.Context, id int64) (res domain.Tag,
 	return res, nil
 }
 
-// // GetByTitle ...
-// func (usecase *TagUseCase) GetByTitle(c context.Context, title string) (res domain.Tag, err error) {
-// 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
-// 	defer cancel()
-// 	res, err = usecase.tagRepo.GetByTitle(ctx, title)
-// 	if err != nil {
-// 		return domain.Tag{}, err
-// 	}
-// 	return res, nil
-// }
+// GetByName ...
+func (usecase *TagUseCase) GetByName(c context.Context, title string) (res domain.Tag, err error) {
+	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
+	defer cancel()
+	res, err = usecase.tagRepo.GetByName(ctx, title)
+	if err != nil {
+		return domain.Tag{}, err
+	}
+	return res, nil
+}
 
 // CreateTag ..
 func (usecase *TagUseCase) CreateTag(c context.Context, tag *domain.Tag) (err error) {

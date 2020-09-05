@@ -31,7 +31,7 @@ func TestGetAll(t *testing.T) {
 
 	query := `SELECT id,title, description, author_id, category_id, updated_at, created_at FROM courses ORDER BY created_at DESC LIMIT \?,\?`
 	mock.ExpectQuery(query).WillReturnRows(rows)
-	c := mysqlrepo.InitMysqlRepository(db)
+	c := mysqlrepo.Init(db)
 	start, limit := 0, 10
 	list, err := c.GetAll(context.TODO(), start, limit)
 	assert.NoError(t, err)
@@ -49,10 +49,11 @@ func TestGetByID(t *testing.T) {
 
 	query := `SELECT id,title, description, author_id, category_id,updated_at, created_at FROM courses WHERE ID = \?`
 	mock.ExpectQuery(query).WillReturnRows(row)
-	c := mysqlrepo.InitMysqlRepository(db)
+	c := mysqlrepo.Init(db)
 	course, err := c.GetByID(context.TODO(), 1)
+
 	assert.NoError(t, err)
-	assert.NotNil(t, course)
+	assert.NotNil(t, *course)
 }
 
 func TestGetByTitle(t *testing.T) {
@@ -65,7 +66,7 @@ func TestGetByTitle(t *testing.T) {
 
 	query := `SELECT id,title, description, author_id, category_id,updated_at, created_at FROM courses WHERE title = \?`
 	mock.ExpectQuery(query).WillReturnRows(row)
-	c := mysqlrepo.InitMysqlRepository(db)
+	c := mysqlrepo.Init(db)
 	course, err := c.GetByTitle(context.TODO(), "testing-2")
 	assert.NoError(t, err)
 	assert.NotNil(t, course)
@@ -90,7 +91,7 @@ func TestCreateCourse(t *testing.T) {
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(c.Title, c.Description, c.Author.ID, c.Category.ID).WillReturnResult(sqlmock.NewResult(12, 1))
 
-	repo := mysqlrepo.InitMysqlRepository(db)
+	repo := mysqlrepo.Init(db)
 	err = repo.CreateCourse(context.TODO(), c)
 	assert.NoError(t, err)
 	assert.Equal(t, int64(12), c.ID)
@@ -106,7 +107,7 @@ func TestDeleteCourse(t *testing.T) {
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(course_id).WillReturnResult(sqlmock.NewResult(12, 1))
 
-	repo := mysqlrepo.InitMysqlRepository(db)
+	repo := mysqlrepo.Init(db)
 	err = repo.DeleteCourse(context.TODO(), int64(course_id))
 	assert.NoError(t, err)
 }
@@ -129,11 +130,11 @@ func TestUpdateCourse(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error %s was not expected when opening stub database connection", err)
 	}
-	query := `UPDATE course set title=\?, author_id=\?, category_id=\?, updated_at=\? WHERE ID = \?`
+	query := `UPDATE courses set title=\?, description=\?, updated_at=\? WHERE ID = \?`
 	prep := mock.ExpectPrepare(query)
-	prep.ExpectExec().WithArgs(c.Title, c.Author.ID, c.Category.ID, c.UpdatedAt, c.ID).WillReturnResult(sqlmock.NewResult(12, 1))
+	prep.ExpectExec().WithArgs(c.Title, c.Description, c.UpdatedAt, c.ID).WillReturnResult(sqlmock.NewResult(12, 1))
 
-	repo := mysqlrepo.InitMysqlRepository(db)
+	repo := mysqlrepo.Init(db)
 	err = repo.UpdateCourse(context.TODO(), c)
 	assert.NoError(t, err)
 }

@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	categoryMysqlRepo "github.com/meroedu/meroedu/internal/category/repository/mysql"
+	mysqlrepo "github.com/meroedu/meroedu/internal/category/repository/mysql"
 	"github.com/meroedu/meroedu/internal/domain"
 	"github.com/stretchr/testify/assert"
 	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
@@ -26,7 +26,7 @@ func TestGetAll(t *testing.T) {
 
 	query := `SELECT id,name, updated_at, created_at FROM categories ORDER BY created_at DESC LIMIT \?,\?`
 	mock.ExpectQuery(query).WillReturnRows(rows)
-	c := categoryMysqlRepo.InitMysqlRepository(db)
+	c := mysqlrepo.Init(db)
 	start, limit := 0, 10
 	list, err := c.GetAll(context.TODO(), start, limit)
 	assert.NoError(t, err)
@@ -44,8 +44,24 @@ func TestGetByID(t *testing.T) {
 
 	query := `SELECT id,name,updated_at,created_at FROM categories WHERE ID = \?`
 	mock.ExpectQuery(query).WillReturnRows(row)
-	c := categoryMysqlRepo.InitMysqlRepository(db)
+	c := mysqlrepo.Init(db)
 	category, err := c.GetByID(context.TODO(), 1)
+	assert.NoError(t, err)
+	assert.NotNil(t, category)
+}
+
+func TestGetByName(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	row := sqlmock.NewRows([]string{"id", "name", "updated_at", "created_at"}).
+		AddRow("1", "testing-2", time.Now(), time.Now())
+
+	query := `SELECT id,name,updated_at,created_at FROM categories WHERE name = \?`
+	mock.ExpectQuery(query).WillReturnRows(row)
+	c := mysqlrepo.Init(db)
+	category, err := c.GetByName(context.TODO(), "testing-2")
 	assert.NoError(t, err)
 	assert.NotNil(t, category)
 }
@@ -64,7 +80,7 @@ func TestCreateCategory(t *testing.T) {
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(c.Name, c.UpdatedAt, c.CreatedAt).WillReturnResult(sqlmock.NewResult(12, 1))
 
-	repo := categoryMysqlRepo.InitMysqlRepository(db)
+	repo := mysqlrepo.Init(db)
 	err = repo.CreateCategory(context.TODO(), c)
 	assert.NoError(t, err)
 	assert.Equal(t, int64(12), c.ID)
@@ -80,7 +96,7 @@ func TestDeleteCategory(t *testing.T) {
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(category_id).WillReturnResult(sqlmock.NewResult(12, 1))
 
-	repo := categoryMysqlRepo.InitMysqlRepository(db)
+	repo := mysqlrepo.Init(db)
 	err = repo.DeleteCategory(context.TODO(), int64(category_id))
 	assert.NoError(t, err)
 }
@@ -100,7 +116,7 @@ func TestUpdateCategory(t *testing.T) {
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(c.Name, c.UpdatedAt, c.ID).WillReturnResult(sqlmock.NewResult(12, 1))
 
-	repo := categoryMysqlRepo.InitMysqlRepository(db)
+	repo := mysqlrepo.Init(db)
 	err = repo.UpdateCategory(context.TODO(), c)
 	assert.NoError(t, err)
 }

@@ -13,8 +13,8 @@ type mysqlRepository struct {
 	Conn *sql.DB
 }
 
-// InitMysqlRepository will create an object that represent the tag's Repository interface
-func InitMysqlRepository(db *sql.DB) domain.ContentRepository {
+// Init will create an object that represent the tag's Repository interface
+func Init(db *sql.DB) domain.ContentRepository {
 	return &mysqlRepository{
 		Conn: db,
 	}
@@ -54,7 +54,6 @@ func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...inter
 }
 
 func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res []domain.Content, err error) {
-	log.Info("Called GetAll Contents")
 	query := `SELECT id,title, updated_at, created_at FROM contents ORDER BY created_at DESC LIMIT ?,?`
 
 	res, err = m.fetch(ctx, query, start, limit)

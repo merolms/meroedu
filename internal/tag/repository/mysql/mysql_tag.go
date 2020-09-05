@@ -13,8 +13,8 @@ type mysqlRepository struct {
 	Conn *sql.DB
 }
 
-// InitMysqlRepository will create an object that represent the tag's Repository interface
-func InitMysqlRepository(db *sql.DB) domain.TagRepository {
+// Init will create an object that represent the tag's Repository interface
+func Init(db *sql.DB) domain.TagRepository {
 	return &mysqlRepository{
 		Conn: db,
 	}
@@ -54,7 +54,6 @@ func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...inter
 }
 
 func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res []domain.Tag, err error) {
-	log.Info("Called GetAll Tags")
 	query := `SELECT id,name, updated_at, created_at FROM tags ORDER BY created_at DESC LIMIT ?,?`
 
 	res, err = m.fetch(ctx, query, start, limit)
@@ -71,6 +70,20 @@ func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (res domain.Tag
 		return domain.Tag{}, err
 	}
 
+	if len(list) > 0 {
+		res = list[0]
+	} else {
+		return res, domain.ErrNotFound
+	}
+
+	return
+}
+func (m *mysqlRepository) GetByName(ctx context.Context, name string) (res domain.Tag, err error) {
+	query := `SELECT id,name,updated_at,created_at FROM tags WHERE name = ?`
+	list, err := m.fetch(ctx, query, name)
+	if err != nil {
+		return domain.Tag{}, err
+	}
 	if len(list) > 0 {
 		res = list[0]
 	} else {

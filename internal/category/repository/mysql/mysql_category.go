@@ -13,8 +13,8 @@ type mysqlRepository struct {
 	Conn *sql.DB
 }
 
-// InitMysqlRepository will create an object that represent the category's Repository interface
-func InitMysqlRepository(db *sql.DB) domain.CategoryRepository {
+// Init will create an object that represent the category's Repository interface
+func Init(db *sql.DB) domain.CategoryRepository {
 	return &mysqlRepository{
 		Conn: db,
 	}
@@ -70,6 +70,20 @@ func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (res domain.Cat
 		return domain.Category{}, err
 	}
 
+	if len(list) > 0 {
+		res = list[0]
+	} else {
+		return res, domain.ErrNotFound
+	}
+
+	return
+}
+func (m *mysqlRepository) GetByName(ctx context.Context, name string) (res domain.Category, err error) {
+	query := `SELECT id,name,updated_at,created_at FROM categories WHERE name = ?`
+	list, err := m.fetch(ctx, query, name)
+	if err != nil {
+		return domain.Category{}, err
+	}
 	if len(list) > 0 {
 		res = list[0]
 	} else {

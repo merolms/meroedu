@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/meroedu/meroedu/internal/domain"
-	"github.com/meroedu/meroedu/pkg/log"
 )
 
 // CategoryUseCase ...
@@ -48,16 +47,16 @@ func (usecase *CategoryUseCase) GetByID(c context.Context, id int64) (res domain
 	return res, nil
 }
 
-// // GetByTitle ...
-// func (usecase *CategoryUseCase) GetByTitle(c context.Context, title string) (res domain.Category, err error) {
-// 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
-// 	defer cancel()
-// 	res, err = usecase.categoryRepo.GetByTitle(ctx, title)
-// 	if err != nil {
-// 		return domain.Category{}, err
-// 	}
-// 	return res, nil
-// }
+// GetByName ...
+func (usecase *CategoryUseCase) GetByName(c context.Context, title string) (res domain.Category, err error) {
+	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
+	defer cancel()
+	res, err = usecase.categoryRepo.GetByName(ctx, title)
+	if err != nil {
+		return domain.Category{}, err
+	}
+	return res, nil
+}
 
 // CreateCategory ..
 func (usecase *CategoryUseCase) CreateCategory(c context.Context, category *domain.Category) (err error) {
@@ -78,11 +77,9 @@ func (usecase *CategoryUseCase) UpdateCategory(c context.Context, category *doma
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 	existingCategory, err := usecase.GetByID(ctx, id)
-	log.Info(existingCategory)
-	log.Info(domain.Category{})
-	// if existingCategory != (domain.Category{}) {
-	// 	return domain.ErrConflict
-	// }
+	if existingCategory == (domain.Category{}) {
+		return domain.ErrNotFound
+	}
 	category.ID = id
 	category.UpdatedAt = time.Now()
 	err = usecase.categoryRepo.UpdateCategory(ctx, category)

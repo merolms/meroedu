@@ -26,7 +26,7 @@ func TestGetAll(t *testing.T) {
 
 	query := `SELECT id,title, updated_at, created_at FROM contents ORDER BY created_at DESC LIMIT \?,\?`
 	mock.ExpectQuery(query).WillReturnRows(rows)
-	c := mysqlrepo.InitMysqlRepository(db)
+	c := mysqlrepo.Init(db)
 	start, limit := 0, 10
 	list, err := c.GetAll(context.TODO(), start, limit)
 	assert.NoError(t, err)
@@ -44,7 +44,7 @@ func TestGetByID(t *testing.T) {
 
 	query := `SELECT id,title,updated_at,created_at FROM contents WHERE ID = \?`
 	mock.ExpectQuery(query).WillReturnRows(row)
-	c := mysqlrepo.InitMysqlRepository(db)
+	c := mysqlrepo.Init(db)
 	tag, err := c.GetByID(context.TODO(), 1)
 	assert.NoError(t, err)
 	assert.NotNil(t, tag)
@@ -64,7 +64,7 @@ func TestCreateContent(t *testing.T) {
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(c.Title, c.UpdatedAt, c.CreatedAt).WillReturnResult(sqlmock.NewResult(12, 1))
 
-	repo := mysqlrepo.InitMysqlRepository(db)
+	repo := mysqlrepo.Init(db)
 	err = repo.CreateContent(context.TODO(), c)
 	assert.NoError(t, err)
 	assert.Equal(t, int64(12), c.ID)
@@ -80,7 +80,7 @@ func TestDeleteContent(t *testing.T) {
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(tag_id).WillReturnResult(sqlmock.NewResult(12, 1))
 
-	repo := mysqlrepo.InitMysqlRepository(db)
+	repo := mysqlrepo.Init(db)
 	err = repo.DeleteContent(context.TODO(), int64(tag_id))
 	assert.NoError(t, err)
 }
@@ -100,7 +100,7 @@ func TestUpdateContent(t *testing.T) {
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(c.Title, c.UpdatedAt, c.ID).WillReturnResult(sqlmock.NewResult(12, 1))
 
-	repo := mysqlrepo.InitMysqlRepository(db)
+	repo := mysqlrepo.Init(db)
 	err = repo.UpdateContent(context.TODO(), c)
 	assert.NoError(t, err)
 }

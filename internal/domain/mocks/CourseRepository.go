@@ -66,14 +66,16 @@ func (_m *CourseRepository) GetAll(ctx context.Context, start int, limit int) ([
 }
 
 // GetByID provides a mock function with given fields: ctx, id
-func (_m *CourseRepository) GetByID(ctx context.Context, id int64) (domain.Course, error) {
+func (_m *CourseRepository) GetByID(ctx context.Context, id int64) (*domain.Course, error) {
 	ret := _m.Called(ctx, id)
 
-	var r0 domain.Course
-	if rf, ok := ret.Get(0).(func(context.Context, int64) domain.Course); ok {
+	var r0 *domain.Course
+	if rf, ok := ret.Get(0).(func(context.Context, int64) *domain.Course); ok {
 		r0 = rf(ctx, id)
 	} else {
-		r0 = ret.Get(0).(domain.Course)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.Course)
+		}
 	}
 
 	var r1 error
@@ -87,14 +89,16 @@ func (_m *CourseRepository) GetByID(ctx context.Context, id int64) (domain.Cours
 }
 
 // GetByTitle provides a mock function with given fields: ctx, title
-func (_m *CourseRepository) GetByTitle(ctx context.Context, title string) (domain.Course, error) {
+func (_m *CourseRepository) GetByTitle(ctx context.Context, title string) (*domain.Course, error) {
 	ret := _m.Called(ctx, title)
 
-	var r0 domain.Course
-	if rf, ok := ret.Get(0).(func(context.Context, string) domain.Course); ok {
+	var r0 *domain.Course
+	if rf, ok := ret.Get(0).(func(context.Context, string) *domain.Course); ok {
 		r0 = rf(ctx, title)
 	} else {
-		r0 = ret.Get(0).(domain.Course)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.Course)
+		}
 	}
 
 	var r1 error

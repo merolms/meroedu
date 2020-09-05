@@ -26,7 +26,7 @@ func TestGetAll(t *testing.T) {
 
 	query := `SELECT id,name, updated_at, created_at FROM tags ORDER BY created_at DESC LIMIT \?,\?`
 	mock.ExpectQuery(query).WillReturnRows(rows)
-	c := mysqlrepo.InitMysqlRepository(db)
+	c := mysqlrepo.Init(db)
 	start, limit := 0, 10
 	list, err := c.GetAll(context.TODO(), start, limit)
 	assert.NoError(t, err)
@@ -44,12 +44,26 @@ func TestGetByID(t *testing.T) {
 
 	query := `SELECT id,name,updated_at,created_at FROM tags WHERE ID = \?`
 	mock.ExpectQuery(query).WillReturnRows(row)
-	c := mysqlrepo.InitMysqlRepository(db)
+	c := mysqlrepo.Init(db)
 	tag, err := c.GetByID(context.TODO(), 1)
 	assert.NoError(t, err)
 	assert.NotNil(t, tag)
 }
+func TestGetByName(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	row := sqlmock.NewRows([]string{"id", "name", "updated_at", "created_at"}).
+		AddRow("1", "testing-2", time.Now(), time.Now())
 
+	query := `SELECT id,name,updated_at,created_at FROM tags WHERE name = \?`
+	mock.ExpectQuery(query).WillReturnRows(row)
+	c := mysqlrepo.Init(db)
+	category, err := c.GetByName(context.TODO(), "testing-2")
+	assert.NoError(t, err)
+	assert.NotNil(t, category)
+}
 func TestCreateTag(t *testing.T) {
 	c := &domain.Tag{
 		Name:      "Programming",
@@ -64,7 +78,7 @@ func TestCreateTag(t *testing.T) {
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(c.Name, c.UpdatedAt, c.CreatedAt).WillReturnResult(sqlmock.NewResult(12, 1))
 
-	repo := mysqlrepo.InitMysqlRepository(db)
+	repo := mysqlrepo.Init(db)
 	err = repo.CreateTag(context.TODO(), c)
 	assert.NoError(t, err)
 	assert.Equal(t, int64(12), c.ID)
@@ -80,7 +94,7 @@ func TestDeleteTag(t *testing.T) {
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(tag_id).WillReturnResult(sqlmock.NewResult(12, 1))
 
-	repo := mysqlrepo.InitMysqlRepository(db)
+	repo := mysqlrepo.Init(db)
 	err = repo.DeleteTag(context.TODO(), int64(tag_id))
 	assert.NoError(t, err)
 }
@@ -100,7 +114,7 @@ func TestUpdateTag(t *testing.T) {
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(c.Name, c.UpdatedAt, c.ID).WillReturnResult(sqlmock.NewResult(12, 1))
 
-	repo := mysqlrepo.InitMysqlRepository(db)
+	repo := mysqlrepo.Init(db)
 	err = repo.UpdateTag(context.TODO(), c)
 	assert.NoError(t, err)
 }

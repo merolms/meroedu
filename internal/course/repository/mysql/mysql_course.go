@@ -13,8 +13,8 @@ type mysqlRepository struct {
 	Conn *sql.DB
 }
 
-// InitMysqlRepository will create an object that represent the course's Repository interface
-func InitMysqlRepository(db *sql.DB) domain.CourseRepository {
+// Init will create an object that represent the course's Repository interface
+func Init(db *sql.DB) domain.CourseRepository {
 	return &mysqlRepository{
 		Conn: db,
 	}
@@ -68,37 +68,37 @@ func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res
 	}
 	return res, nil
 }
-func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (res domain.Course, err error) {
+func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (*domain.Course, error) {
 	query := `SELECT id,title, description, author_id, category_id,updated_at, created_at FROM courses WHERE ID = ?`
 
 	list, err := m.fetch(ctx, query, id)
 	if err != nil {
-		return domain.Course{}, err
+		return nil, err
 	}
-
+	var course domain.Course
 	if len(list) > 0 {
-		res = list[0]
+		course = list[0]
 	} else {
-		return res, domain.ErrNotFound
+		return &course, domain.ErrNotFound
 	}
 
-	return
+	return &course, nil
 }
 
-func (m *mysqlRepository) GetByTitle(ctx context.Context, title string) (res domain.Course, err error) {
+func (m *mysqlRepository) GetByTitle(ctx context.Context, title string) (*domain.Course, error) {
 	query := `SELECT id,title, description, author_id, category_id,updated_at, created_at FROM courses WHERE title = ?`
 
 	list, err := m.fetch(ctx, query, title)
 	if err != nil {
-		return
+		return nil, err
 	}
-
+	var course domain.Course
 	if len(list) > 0 {
-		res = list[0]
+		course = list[0]
 	} else {
-		return res, domain.ErrNotFound
+		return nil, domain.ErrNotFound
 	}
-	return
+	return &course, nil
 }
 
 func (m *mysqlRepository) CreateCourse(ctx context.Context, a *domain.Course) (err error) {
@@ -162,14 +162,14 @@ func (m *mysqlRepository) DeleteCourse(ctx context.Context, id int64) (err error
 	return
 }
 func (m *mysqlRepository) UpdateCourse(ctx context.Context, ar *domain.Course) (err error) {
-	query := `UPDATE course set title=?, author_id=?, category_id=?, updated_at=? WHERE ID = ?`
+	query := `UPDATE courses set title=?, description=?, updated_at=? WHERE ID = ?`
 
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
 
-	res, err := stmt.ExecContext(ctx, ar.Title, ar.Author.ID, ar.Category.ID, ar.UpdatedAt, ar.ID)
+	res, err := stmt.ExecContext(ctx, ar.Title, ar.Description, ar.UpdatedAt, ar.ID)
 	if err != nil {
 		return
 	}

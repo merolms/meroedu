@@ -6,8 +6,6 @@ import (
 
 	"strings"
 
-	"github.com/meroedu/meroedu/pkg/log"
-
 	"github.com/labstack/echo/v4"
 	"github.com/meroedu/meroedu/internal/domain"
 	"github.com/meroedu/meroedu/internal/util"
@@ -46,7 +44,6 @@ func NewCategroyHandler(e *echo.Echo, us domain.CategoryUseCase) {
 
 // GetAll ...
 func (c *CategoryHandler) GetAll(echoContext echo.Context) error {
-	log.Info("Calling GetAll Categories")
 	ctx := echoContext.Request().Context()
 	start, limit := 0, 10
 	var err error
@@ -74,7 +71,6 @@ func (c *CategoryHandler) GetAll(echoContext echo.Context) error {
 
 // GetByID ...
 func (c *CategoryHandler) GetByID(echoContext echo.Context) error {
-	log.Info("Calling GetByID Categories")
 	idParam, err := strconv.Atoi(echoContext.Param("id"))
 	if err != nil {
 		return echoContext.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
