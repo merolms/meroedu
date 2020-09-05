@@ -3,12 +3,27 @@ package domain
 import (
 	"database/sql"
 	"reflect"
+	"time"
 )
+
+// Status ...
+type Status string
+
+const (
+	Success Status = "success"
+	Error   Status = "error"
+)
+
+// APIResponseError example
+type APIResponseError struct {
+	ErrorCode    int
+	ErrorMessage string
+	CreatedAt    time.Time
+}
 
 // Response contains the attributes found in an API response
 type Response struct {
-	Message string      `json:"message"`
-	Success bool        `json:"success"`
+	Message Status      `json:"message"`
 	Data    interface{} `json:"data"`
 }
 

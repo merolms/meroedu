@@ -5,9 +5,6 @@ import (
 	"time"
 )
 
-// Status ...
-type Status string
-
 const (
 	CourseInDraft   Status = "Draft"
 	CourseArchived  Status = "Archived"
@@ -22,7 +19,6 @@ const (
 	StatusUnknown   Status = "Unknown"
 	StatusScheduled Status = "Scheduled"
 	StatusRetry     Status = "Retrying"
-	Error           Status = "Error"
 )
 
 // Course is a struct represent a created Course
@@ -54,10 +50,10 @@ type CourseStats struct {
 	TotalAssigned  int64 `json:"total_assign"`
 }
 
-// CourseReponse is a struct representing the overview of Courses
+// CourseSummaries  is a struct representing the overview of Courses
 type CourseSummaries struct {
-	Total   int64    `json:"total"`
-	Courses []Course `json:"Courses"`
+	Response
+	Total int64 `json:"total"`
 }
 
 // Tags ...
