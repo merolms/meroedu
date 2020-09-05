@@ -1,7 +1,0 @@
-ALTER TABLE `course_tags`
-ADD CONSTRAINT FK_TAGS_TAG_ID
-FOREIGN KEY (`tag_id`) REFERENCES `tags`(`id`);
-
-ALTER TABLE `course_tags`
-ADD CONSTRAINT FK_COURSES_COURSE_ID
-FOREIGN KEY (`course_id`) REFERENCES `courses`(`id`);
