@@ -26,6 +26,12 @@ type Response struct {
 	Data    interface{} `json:"data"`
 }
 
+// Summaries contains the attributes for GetAll API pagination response
+type Summaries struct {
+	Response
+	Total int64 `json:"total"`
+}
+
 // NullInt64 ...
 type NullInt64 struct {
 	sql.NullInt64

@@ -59,7 +59,7 @@ func NewCourseHandler(e *echo.Echo, us domain.CourseUseCase) {
 // @Produce json
 // @Param start query int true "start"
 // @Param limit query int true "limit"
-// @Success 200 {object} domain.CourseSummaries
+// @Success 200 {object} domain.Summaries
 // @Failure 500 {object} domain.APIResponseError "Internal Server Error"
 // @Router /courses [get]
 func (c *CourseHandler) GetAll(echoContext echo.Context) error {
@@ -85,7 +85,7 @@ func (c *CourseHandler) GetAll(echoContext echo.Context) error {
 	if err != nil {
 		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
-	res := domain.CourseSummaries{
+	res := domain.Summaries{
 		Response: domain.Response{
 			Message: domain.Success,
 			Data:    listCourse,
