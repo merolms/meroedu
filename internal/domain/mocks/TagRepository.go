@@ -66,14 +66,16 @@ func (_m *TagRepository) GetAll(ctx context.Context, start int, limit int) ([]do
 }
 
 // GetByID provides a mock function with given fields: ctx, id
-func (_m *TagRepository) GetByID(ctx context.Context, id int64) (domain.Tag, error) {
+func (_m *TagRepository) GetByID(ctx context.Context, id int64) (*domain.Tag, error) {
 	ret := _m.Called(ctx, id)
 
-	var r0 domain.Tag
-	if rf, ok := ret.Get(0).(func(context.Context, int64) domain.Tag); ok {
+	var r0 *domain.Tag
+	if rf, ok := ret.Get(0).(func(context.Context, int64) *domain.Tag); ok {
 		r0 = rf(ctx, id)
 	} else {
-		r0 = ret.Get(0).(domain.Tag)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.Tag)
+		}
 	}
 
 	var r1 error
@@ -87,14 +89,16 @@ func (_m *TagRepository) GetByID(ctx context.Context, id int64) (domain.Tag, err
 }
 
 // GetByName provides a mock function with given fields: ctx, name
-func (_m *TagRepository) GetByName(ctx context.Context, name string) (domain.Tag, error) {
+func (_m *TagRepository) GetByName(ctx context.Context, name string) (*domain.Tag, error) {
 	ret := _m.Called(ctx, name)
 
-	var r0 domain.Tag
-	if rf, ok := ret.Get(0).(func(context.Context, string) domain.Tag); ok {
+	var r0 *domain.Tag
+	if rf, ok := ret.Get(0).(func(context.Context, string) *domain.Tag); ok {
 		r0 = rf(ctx, name)
 	} else {
-		r0 = ret.Get(0).(domain.Tag)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.Tag)
+		}
 	}
 
 	var r1 error

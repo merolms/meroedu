@@ -127,3 +127,32 @@ func (c *TagHandler) UpdateTag(echoContext echo.Context) error {
 	return echoContext.JSON(http.StatusCreated, tag)
 
 }
+
+// DeleteTag godoc
+// @Summary Delete existing tag
+// @Description delete tag by given parameter id
+// @Tags tags
+// @Accept */*
+// @Produce json
+// @Param id path int true "Tag Id"
+// @Success 200 {object} domain.Response
+// @Failure 400 {object} domain.APIResponseError
+// @Failure 404 {object} domain.APIResponseError
+// @Failure 500 {object} domain.APIResponseError "Internal Server Error"
+// @Router /courses/{id} [delete]
+func (c *TagHandler) DeleteTag(echoContext echo.Context) error {
+	idP, err := strconv.Atoi(echoContext.Param("id"))
+	if err != nil {
+		return echoContext.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
+	}
+
+	id := int64(idP)
+	ctx := echoContext.Request().Context()
+
+	err = c.TagUseCase.DeleteTag(ctx, id)
+	if err != nil {
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
+	}
+
+	return echoContext.NoContent(http.StatusNoContent)
+}

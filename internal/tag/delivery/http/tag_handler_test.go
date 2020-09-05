@@ -76,7 +76,7 @@ func TestGetByID(t *testing.T) {
 
 	num := int(mockTag.ID)
 
-	mockUCase.On("GetByID", mock.Anything, int64(num)).Return(mockTag, nil)
+	mockUCase.On("GetByID", mock.Anything, int64(num)).Return(&mockTag, nil)
 
 	e := echo.New()
 	req, err := http.NewRequest(echo.GET, "/tags/"+strconv.Itoa(num), strings.NewReader(""))
@@ -130,4 +130,68 @@ func TestCreateTag(t *testing.T) {
 
 	assert.Equal(t, http.StatusCreated, rec.Code)
 	mockUCase.AssertExpectations(t)
+}
+
+func TestUpdateTag(t *testing.T) {
+	mockTag := domain.Tag{
+		ID:        124,
+		Name:      "tag1",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	tempmockTag := mockTag
+	mockUCase := new(mocks.TagUseCase)
+	j, err := json.Marshal(tempmockTag)
+	assert.NoError(t, err)
+	mockUCase.On("UpdateTag", mock.Anything, mock.AnythingOfType("*domain.Tag"), mock.AnythingOfType("int64")).Return(nil)
+	e := echo.New()
+	req, err := http.NewRequest(echo.PUT, "/tags/124", strings.NewReader(string(j)))
+	assert.NoError(t, err)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("/tags/:id")
+	c.SetParamNames("id")
+	c.SetParamValues("124")
+
+	handler := tagHTTP.TagHandler{
+		TagUseCase: mockUCase,
+	}
+	err = handler.UpdateTag(c)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusCreated, rec.Code)
+	mockUCase.AssertExpectations(t)
+}
+
+func TestDeleteTag(t *testing.T) {
+	var mockTag domain.Tag
+	err := faker.FakeData(&mockTag)
+	assert.NoError(t, err)
+
+	mockUCase := new(mocks.TagUseCase)
+
+	num := int(mockTag.ID)
+
+	mockUCase.On("DeleteTag", mock.Anything, int64(num)).Return(nil)
+
+	e := echo.New()
+	req, err := http.NewRequest(echo.DELETE, "/tags/"+strconv.Itoa(num), strings.NewReader(""))
+	assert.NoError(t, err)
+
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("tags/:id")
+	c.SetParamNames("id")
+	c.SetParamValues(strconv.Itoa(num))
+	handler := tagHTTP.TagHandler{
+		TagUseCase: mockUCase,
+	}
+	err = handler.DeleteTag(c)
+	require.NoError(t, err)
+
+	assert.Equal(t, http.StatusNoContent, rec.Code)
+	mockUCase.AssertExpectations(t)
+
 }
