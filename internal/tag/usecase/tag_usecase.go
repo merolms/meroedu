@@ -2,10 +2,10 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/meroedu/meroedu/internal/domain"
-	"github.com/meroedu/meroedu/pkg/log"
 )
 
 // TagUseCase ...
@@ -36,25 +36,25 @@ func (usecase *TagUseCase) GetAll(c context.Context, start int, limit int) (res 
 }
 
 // GetByID ...
-func (usecase *TagUseCase) GetByID(c context.Context, id int64) (res domain.Tag, err error) {
+func (usecase *TagUseCase) GetByID(c context.Context, id int64) (res *domain.Tag, err error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 
 	res, err = usecase.tagRepo.GetByID(ctx, id)
 	if err != nil {
-		return domain.Tag{}, err
+		return nil, err
 	}
 
 	return res, nil
 }
 
 // GetByName ...
-func (usecase *TagUseCase) GetByName(c context.Context, title string) (res domain.Tag, err error) {
+func (usecase *TagUseCase) GetByName(c context.Context, title string) (res *domain.Tag, err error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 	res, err = usecase.tagRepo.GetByName(ctx, title)
 	if err != nil {
-		return domain.Tag{}, err
+		return nil, err
 	}
 	return res, nil
 }
@@ -63,6 +63,10 @@ func (usecase *TagUseCase) GetByName(c context.Context, title string) (res domai
 func (usecase *TagUseCase) CreateTag(c context.Context, tag *domain.Tag) (err error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
+	existingTag, err := usecase.tagRepo.GetByName(ctx, tag.Name)
+	if existingTag != nil {
+		return domain.ErrConflict
+	}
 	tag.UpdatedAt = time.Now()
 	tag.CreatedAt = time.Now()
 	err = usecase.tagRepo.CreateTag(ctx, tag)
@@ -78,17 +82,30 @@ func (usecase *TagUseCase) UpdateTag(c context.Context, tag *domain.Tag, id int6
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 	existingTag, err := usecase.GetByID(ctx, id)
-	log.Info(existingTag)
-	log.Info(domain.Tag{})
-	// if existingTag != (domain.Tag{}) {
-	// 	return domain.ErrConflict
-	// }
+	if existingTag == nil {
+		return domain.ErrNotFound
+	}
 	tag.ID = id
 	tag.UpdatedAt = time.Now()
 	err = usecase.tagRepo.UpdateTag(ctx, tag)
+	fmt.Println("Error came from update mysql: ", err)
 	if err != nil {
-		return
+		return err
 	}
-	return
+	return nil
 
+}
+
+// DeleteTag ...
+func (usecase *TagUseCase) DeleteTag(c context.Context, id int64) (err error) {
+	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
+	defer cancel()
+	existedCourse, err := usecase.tagRepo.GetByID(ctx, id)
+	if err != nil {
+		return err
+	}
+	if existedCourse == nil {
+		return domain.ErrNotFound
+	}
+	return usecase.tagRepo.DeleteTag(ctx, id)
 }

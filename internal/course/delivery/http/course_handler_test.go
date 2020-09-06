@@ -179,12 +179,12 @@ func TestDeleteCourse(t *testing.T) {
 	mockUCase.On("DeleteCourse", mock.Anything, int64(num)).Return(nil)
 
 	e := echo.New()
-	req, err := http.NewRequest(echo.DELETE, "/course/"+strconv.Itoa(num), strings.NewReader(""))
+	req, err := http.NewRequest(echo.DELETE, "/courses/"+strconv.Itoa(num), strings.NewReader(""))
 	assert.NoError(t, err)
 
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	c.SetPath("course/:id")
+	c.SetPath("courses/:id")
 	c.SetParamNames("id")
 	c.SetParamValues(strconv.Itoa(num))
 	handler := courseHTTP.CourseHandler{
