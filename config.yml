@@ -4,6 +4,8 @@ server:
   address: ":9090"
 context:
   timeout: 2
+filesystem:
+  relativePath: "uploads"
 database:
   params:
     parseTime: "true"

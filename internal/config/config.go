@@ -5,6 +5,9 @@ import (
 )
 
 type config struct {
+	Filesystem struct {
+		RelativePath string
+	}
 	Database struct {
 		User                 string
 		Password             string

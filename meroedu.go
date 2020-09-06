@@ -12,6 +12,7 @@ import (
 	_ "github.com/meroedu/meroedu/api_docs"
 	_attachmentHttpDelivery "github.com/meroedu/meroedu/internal/attachment/delivery/http"
 	_attachmentRepo "github.com/meroedu/meroedu/internal/attachment/repository/mysql"
+	_attachmentStore "github.com/meroedu/meroedu/internal/attachment/storage/filesystem"
 	_attachmentUcase "github.com/meroedu/meroedu/internal/attachment/usecase"
 	_categoryHttpDelivery "github.com/meroedu/meroedu/internal/category/delivery/http"
 	_categoryRepo "github.com/meroedu/meroedu/internal/category/repository/mysql"
@@ -85,7 +86,11 @@ func main() {
 
 	// Attachment
 	attachmentRepository := _attachmentRepo.Init(db)
-	_attachmentHttpDelivery.NewAttachmentHandler(e, _attachmentUcase.NewAttachmentUseCase(attachmentRepository, timeoutContext))
+	attachmentStorage, err := _attachmentStore.Init()
+	if err != nil {
+		log.Fatalf("Error initializing attachment storage: %v", err)
+	}
+	_attachmentHttpDelivery.NewAttachmentHandler(e, _attachmentUcase.NewAttachmentUseCase(attachmentRepository, attachmentStorage, timeoutContext))
 
 	// Start HTTP Server
 	go func() {

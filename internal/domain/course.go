@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// Course Status
 const (
 	CourseInDraft   Status = "Draft"
 	CourseArchived  Status = "Archived"
@@ -23,23 +24,22 @@ const (
 
 // Course is a struct represent a created Course
 type Course struct {
-	ID          int64        `json:"id" `
-	Title       string       `json:"title" validate:"required"`
-	Description string       `json:"description,omitempty"`
-	ImageURL    string       `json:"image_url,omitempty"`
-	Duration    uint16       `json:"duration,omitempty"`
-	CategoryID  NullInt64    `json:"category_id,omitempty"`
-	Category    Category     `json:"categories,omitempty"`
-	test        []string     `json:test,omitempty`
-	Tags        []Tag        `json:"tags,omitempty"`
-	AuthorID    NullInt64    `json:"author_id,omitempty"`
-	Author      User         `json:"author,omitempty"`
-	Users       []User       `json:"users,omitempty"`
-	Lessons     []Lesson     `json:"lessons,omitempty"`
-	Attachments []Attachment `json:"attachments,omitempty"`
-	Status      Status       `json:"status,omitempty"`
-	UpdatedAt   time.Time    `json:"updated_at,omitempty"`
-	CreatedAt   time.Time    `json:"created_at,omitempty"`
+	ID          int64     `json:"id" `
+	Title       string    `json:"title" validate:"required"`
+	Description string    `json:"description,omitempty"`
+	ImageURL    string    `json:"image_url,omitempty"`
+	Duration    uint16    `json:"duration,omitempty"`
+	CategoryID  NullInt64 `json:"category_id,omitempty"`
+	Category    Category  `json:"categories,omitempty"`
+	Tags        []Tag     `json:"tags,omitempty"`
+	AuthorID    NullInt64 `json:"author_id,omitempty"`
+	Author      User      `json:"author,omitempty"`
+	Users       []User    `json:"users,omitempty"`
+	Lessons     []Lesson  `json:"lessons,omitempty"`
+	// Attachments []Attachment `json:"attachments,omitempty"`
+	Status    Status    `json:"status,omitempty"`
+	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	CreatedAt time.Time `json:"created_at,omitempty"`
 }
 
 // CourseStats is a struct representing the statistics for a single Course

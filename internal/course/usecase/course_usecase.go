@@ -10,10 +10,10 @@ import (
 
 // CourseUseCase ...
 type CourseUseCase struct {
-	courseRepo     domain.CourseRepository
-	userRepo       domain.UserRepository
-	lessonRepo     domain.LessonRepository
-	attachmentRepo domain.AttachmentRepository
+	courseRepo domain.CourseRepository
+	userRepo   domain.UserRepository
+	lessonRepo domain.LessonRepository
+	// attachmentRepo domain.AttachmentRepository
 	tagRepo        domain.TagRepository
 	categoryRepo   domain.CategoryRepository
 	contextTimeOut time.Duration

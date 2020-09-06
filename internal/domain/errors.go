@@ -11,4 +11,8 @@ var (
 	ErrConflict = errors.New("Your Item already exist")
 	// ErrBadParamInput will throw if the given request-body or params is not valid
 	ErrBadParamInput = errors.New("Given Param is not valid")
+	// ErrUnsupportedFileType will throw if the given file type is not supported by system
+	ErrUnsupportedFileType = errors.New("Unsupported file type")
+	// ErrBadInput will throw if the given request-body or form-data is not valid
+	ErrBadInput = errors.New("Given Input is not valid")
 )

@@ -39,14 +39,16 @@ func (a *AttachmentHandler) Upload(echoContext echo.Context) error {
 	if err != nil {
 		return err
 	}
+
 	attachment := domain.Attachment{
 		File:     file,
 		Filename: fileHeader.Filename,
 		Size:     file.(util.Sizer).Size(),
+		Type:     fileHeader.Header.Get("Content-Type"),
 	}
-	err = a.AttachmentUseCase.Upload(ctx, attachment)
+	res, err := a.AttachmentUseCase.CreateAttachment(ctx, attachment)
 	if err != nil {
 		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
-	return echoContext.JSON(http.StatusCreated, "attachment saved")
+	return echoContext.JSON(http.StatusCreated, res)
 }

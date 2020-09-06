@@ -2,53 +2,67 @@ package usecase
 
 import (
 	"context"
-	"io"
-	"os"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/meroedu/meroedu/internal/domain"
+	"github.com/meroedu/meroedu/pkg/log"
 )
 
 // AttachmentUseCase ...
 type AttachmentUseCase struct {
-	attachmentRepo domain.AttachmentRepository
-	contextTimeOut time.Duration
+	attachmentStore domain.AttachmentStorage
+	attachmentRepo  domain.AttachmentRepository
+	contextTimeOut  time.Duration
 }
 
 // NewAttachmentUseCase ...
-func NewAttachmentUseCase(a domain.AttachmentRepository, timeout time.Duration) domain.AttachmentUserCase {
+func NewAttachmentUseCase(a domain.AttachmentRepository, store domain.AttachmentStorage, timeout time.Duration) domain.AttachmentUserCase {
 	return &AttachmentUseCase{
-		attachmentRepo: a,
-		contextTimeOut: timeout,
+		attachmentRepo:  a,
+		attachmentStore: store,
+		contextTimeOut:  timeout,
 	}
 }
 
-// Upload ...
-func (usecase *AttachmentUseCase) Upload(ctx context.Context, attachment domain.Attachment) error {
+// CreateAttachment ...
+func (usecase *AttachmentUseCase) CreateAttachment(ctx context.Context, attachment domain.Attachment) (*domain.Attachment, error) {
 	ctx, cancel := context.WithTimeout(ctx, usecase.contextTimeOut)
 	defer cancel()
-
-	src := attachment.File
-
-	// Get project Root Directory
-	rootDirectory, er := os.Getwd()
-	if er != nil {
-		return er
+	filename := getFileName(attachment.Type)
+	if filename == nil {
+		return nil, domain.ErrUnsupportedFileType
 	}
-
-	// generate random file
-	// id := uuid.New()
-
-	filePath := rootDirectory + "/uploads/" + attachment.Filename
-	dst, err := os.Create(filePath)
+	attachment.Name = *filename
+	err := usecase.attachmentStore.CreateAttachment(ctx, attachment)
 	if err != nil {
-		return err
+		log.Errorf("Error occur %v", err)
+		return nil, err
 	}
+	return &attachment, nil
+}
+func getUUID() string {
+	id := uuid.New()
+	return id.String()
+}
 
-	defer dst.Close()
-
-	if _, err = io.Copy(dst, src); err != nil {
-		return err
+// GetFileName will return file name with concating with uniquie id(uuid)
+func getFileName(fileType string) *string {
+	log.Infof("Requested file type:%v", fileType)
+	var filename string = ""
+	switch fileType {
+	case "image/png":
+		filename = getUUID() + ".png"
+		return &filename
+	case "image/jpg":
+		filename = getUUID() + ".jpg"
+		return &filename
+	case "text/markdown":
+		filename = getUUID() + ".md"
+		return &filename
+	case "text/html":
+		filename = getUUID() + ".html"
+		return &filename
 	}
 	return nil
 }
