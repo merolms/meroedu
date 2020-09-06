@@ -100,11 +100,11 @@ func (usecase *TagUseCase) UpdateTag(c context.Context, tag *domain.Tag, id int6
 func (usecase *TagUseCase) DeleteTag(c context.Context, id int64) (err error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
-	existedCourse, err := usecase.tagRepo.GetByID(ctx, id)
+	existedTag, err := usecase.tagRepo.GetByID(ctx, id)
 	if err != nil {
 		return err
 	}
-	if existedCourse == nil {
+	if existedTag == nil {
 		return domain.ErrNotFound
 	}
 	return usecase.tagRepo.DeleteTag(ctx, id)

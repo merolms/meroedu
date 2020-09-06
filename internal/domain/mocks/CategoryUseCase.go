@@ -28,6 +28,20 @@ func (_m *CategoryUseCase) CreateCategory(ctx context.Context, Category *domain.
 	return r0
 }
 
+// DeleteCategory provides a mock function with given fields: ctx, id
+func (_m *CategoryUseCase) DeleteCategory(ctx context.Context, id int64) error {
+	ret := _m.Called(ctx, id)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, int64) error); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // GetAll provides a mock function with given fields: ctx, start, limit
 func (_m *CategoryUseCase) GetAll(ctx context.Context, start int, limit int) ([]domain.Category, error) {
 	ret := _m.Called(ctx, start, limit)
@@ -52,14 +66,16 @@ func (_m *CategoryUseCase) GetAll(ctx context.Context, start int, limit int) ([]
 }
 
 // GetByID provides a mock function with given fields: ctx, id
-func (_m *CategoryUseCase) GetByID(ctx context.Context, id int64) (domain.Category, error) {
+func (_m *CategoryUseCase) GetByID(ctx context.Context, id int64) (*domain.Category, error) {
 	ret := _m.Called(ctx, id)
 
-	var r0 domain.Category
-	if rf, ok := ret.Get(0).(func(context.Context, int64) domain.Category); ok {
+	var r0 *domain.Category
+	if rf, ok := ret.Get(0).(func(context.Context, int64) *domain.Category); ok {
 		r0 = rf(ctx, id)
 	} else {
-		r0 = ret.Get(0).(domain.Category)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.Category)
+		}
 	}
 
 	var r1 error
@@ -73,14 +89,16 @@ func (_m *CategoryUseCase) GetByID(ctx context.Context, id int64) (domain.Catego
 }
 
 // GetByName provides a mock function with given fields: ctx, name
-func (_m *CategoryUseCase) GetByName(ctx context.Context, name string) (domain.Category, error) {
+func (_m *CategoryUseCase) GetByName(ctx context.Context, name string) (*domain.Category, error) {
 	ret := _m.Called(ctx, name)
 
-	var r0 domain.Category
-	if rf, ok := ret.Get(0).(func(context.Context, string) domain.Category); ok {
+	var r0 *domain.Category
+	if rf, ok := ret.Get(0).(func(context.Context, string) *domain.Category); ok {
 		r0 = rf(ctx, name)
 	} else {
-		r0 = ret.Get(0).(domain.Category)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.Category)
+		}
 	}
 
 	var r1 error

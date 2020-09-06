@@ -62,35 +62,36 @@ func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res
 	}
 	return res, nil
 }
-func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (res domain.Category, err error) {
+func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (res *domain.Category, err error) {
 	query := `SELECT id,name,updated_at,created_at FROM categories WHERE ID = ?`
 
 	list, err := m.fetch(ctx, query, id)
 	if err != nil {
-		return domain.Category{}, err
+		return nil, err
 	}
-
+	var category domain.Category
 	if len(list) > 0 {
-		res = list[0]
+		category = list[0]
 	} else {
-		return res, domain.ErrNotFound
+		return &category, domain.ErrNotFound
 	}
 
-	return
+	return &category, nil
 }
-func (m *mysqlRepository) GetByName(ctx context.Context, name string) (res domain.Category, err error) {
+func (m *mysqlRepository) GetByName(ctx context.Context, name string) (res *domain.Category, err error) {
 	query := `SELECT id,name,updated_at,created_at FROM categories WHERE name = ?`
 	list, err := m.fetch(ctx, query, name)
 	if err != nil {
-		return domain.Category{}, err
+		return nil, err
 	}
+	var category domain.Category
 	if len(list) > 0 {
-		res = list[0]
+		category = list[0]
 	} else {
-		return res, domain.ErrNotFound
+		return &category, domain.ErrNotFound
 	}
 
-	return
+	return &category, nil
 }
 
 func (m *mysqlRepository) CreateCategory(ctx context.Context, a *domain.Category) (err error) {

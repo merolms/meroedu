@@ -198,7 +198,7 @@ func TestDeleteTag(t *testing.T) {
 		mockTagRepo.AssertExpectations(t)
 	})
 	t.Run("error-happens-in-db", func(t *testing.T) {
-		mockTagRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(&domain.Tag{}, errors.New("Unexpected Error")).Once()
+		mockTagRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(nil, errors.New("Unexpected Error")).Once()
 
 		u := ucase.NewTagUseCase(mockTagRepo, time.Second*2)
 

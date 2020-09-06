@@ -66,14 +66,16 @@ func (_m *CategoryRepository) GetAll(ctx context.Context, start int, limit int) 
 }
 
 // GetByID provides a mock function with given fields: ctx, id
-func (_m *CategoryRepository) GetByID(ctx context.Context, id int64) (domain.Category, error) {
+func (_m *CategoryRepository) GetByID(ctx context.Context, id int64) (*domain.Category, error) {
 	ret := _m.Called(ctx, id)
 
-	var r0 domain.Category
-	if rf, ok := ret.Get(0).(func(context.Context, int64) domain.Category); ok {
+	var r0 *domain.Category
+	if rf, ok := ret.Get(0).(func(context.Context, int64) *domain.Category); ok {
 		r0 = rf(ctx, id)
 	} else {
-		r0 = ret.Get(0).(domain.Category)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.Category)
+		}
 	}
 
 	var r1 error
@@ -87,14 +89,16 @@ func (_m *CategoryRepository) GetByID(ctx context.Context, id int64) (domain.Cat
 }
 
 // GetByName provides a mock function with given fields: ctx, name
-func (_m *CategoryRepository) GetByName(ctx context.Context, name string) (domain.Category, error) {
+func (_m *CategoryRepository) GetByName(ctx context.Context, name string) (*domain.Category, error) {
 	ret := _m.Called(ctx, name)
 
-	var r0 domain.Category
-	if rf, ok := ret.Get(0).(func(context.Context, string) domain.Category); ok {
+	var r0 *domain.Category
+	if rf, ok := ret.Get(0).(func(context.Context, string) *domain.Category); ok {
 		r0 = rf(ctx, name)
 	} else {
-		r0 = ret.Get(0).(domain.Category)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.Category)
+		}
 	}
 
 	var r1 error

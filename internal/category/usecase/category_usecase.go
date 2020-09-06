@@ -35,25 +35,25 @@ func (usecase *CategoryUseCase) GetAll(c context.Context, start int, limit int) 
 }
 
 // GetByID ...
-func (usecase *CategoryUseCase) GetByID(c context.Context, id int64) (res domain.Category, err error) {
+func (usecase *CategoryUseCase) GetByID(c context.Context, id int64) (res *domain.Category, err error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 
 	res, err = usecase.categoryRepo.GetByID(ctx, id)
 	if err != nil {
-		return domain.Category{}, err
+		return nil, err
 	}
 
 	return res, nil
 }
 
 // GetByName ...
-func (usecase *CategoryUseCase) GetByName(c context.Context, title string) (res domain.Category, err error) {
+func (usecase *CategoryUseCase) GetByName(c context.Context, title string) (res *domain.Category, err error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 	res, err = usecase.categoryRepo.GetByName(ctx, title)
 	if err != nil {
-		return domain.Category{}, err
+		return nil, err
 	}
 	return res, nil
 }
@@ -62,13 +62,17 @@ func (usecase *CategoryUseCase) GetByName(c context.Context, title string) (res 
 func (usecase *CategoryUseCase) CreateCategory(c context.Context, category *domain.Category) (err error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
+	existingCategory, err := usecase.GetByName(ctx, category.Name)
+	if existingCategory != nil {
+		return domain.ErrConflict
+	}
 	category.UpdatedAt = time.Now()
 	category.CreatedAt = time.Now()
 	err = usecase.categoryRepo.CreateCategory(ctx, category)
 	if err != nil {
-		return
+		return err
 	}
-	return
+	return err
 
 }
 
@@ -77,7 +81,7 @@ func (usecase *CategoryUseCase) UpdateCategory(c context.Context, category *doma
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 	existingCategory, err := usecase.GetByID(ctx, id)
-	if existingCategory == (domain.Category{}) {
+	if existingCategory == nil {
 		return domain.ErrNotFound
 	}
 	category.ID = id
@@ -88,4 +92,18 @@ func (usecase *CategoryUseCase) UpdateCategory(c context.Context, category *doma
 	}
 	return
 
+}
+
+// DeleteCategory ...
+func (usecase *CategoryUseCase) DeleteCategory(c context.Context, id int64) (err error) {
+	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
+	defer cancel()
+	existedCategory, err := usecase.GetByID(ctx, id)
+	if err != nil {
+		return err
+	}
+	if existedCategory == nil {
+		return domain.ErrNotFound
+	}
+	return usecase.categoryRepo.DeleteCategory(ctx, id)
 }
