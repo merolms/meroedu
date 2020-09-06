@@ -126,7 +126,7 @@ func TestCreateContent(t *testing.T) {
 		mockContentRepo.AssertExpectations(t)
 	})
 	t.Run("existing-title", func(t *testing.T) {
-		// mockContentRepo.On("GetByTitle", mock.Anything, mock.AnythingOfType("string")).Return(existingCourse, nil).Once()
+		// mockContentRepo.On("GetByTitle", mock.Anything, mock.AnythingOfType("string")).Return(existingContent, nil).Once()
 		mockContentRepo.On("CreateContent", mock.Anything, mock.AnythingOfType("*domain.Content")).Return(nil).Once()
 		u := ucase.NewContentUseCase(mockContentRepo, time.Second*2)
 
@@ -156,12 +156,12 @@ func TestUpdateContent(t *testing.T) {
 		mockContentRepo.AssertExpectations(t)
 	})
 	t.Run("existing-title", func(t *testing.T) {
-		existingCourse := mockContent
-		mockContentRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(existingCourse, nil).Once()
+		existingContent := mockContent
+		mockContentRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(existingContent, nil).Once()
 		mockContentRepo.On("UpdateContent", mock.Anything, mock.AnythingOfType("*domain.Content")).Return(nil).Once()
 		u := ucase.NewContentUseCase(mockContentRepo, time.Second*2)
 
-		err := u.UpdateContent(context.TODO(), &mockContent, existingCourse.ID)
+		err := u.UpdateContent(context.TODO(), &mockContent, existingContent.ID)
 
 		assert.NoError(t, err)
 		mockContentRepo.AssertExpectations(t)

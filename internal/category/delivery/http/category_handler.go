@@ -35,11 +35,11 @@ func NewCategroyHandler(e *echo.Echo, us domain.CategoryUseCase) {
 	e.POST("/categories", handler.CreateCategory)
 
 	// Update Operation
-	e.PUT("/categories/:id", handler.GetByID)
+	e.PUT("/categories/:id", handler.UpdateCategory)
 	e.PUT("/categories/actions", handler.GetByID)
 
 	// Remove/Delete Operation
-	e.DELETE("/categories/:id", handler.GetByID)
+	e.DELETE("/categories/:id", handler.DeleteCategory)
 }
 
 // GetAll godoc

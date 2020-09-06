@@ -519,6 +519,172 @@ paths:
       summary: Update existing course
       tags:
       - courses
+  /lessons:
+    get:
+      consumes:
+      - '*/*'
+      description: Get All lessons summaries..
+      parameters:
+      - description: start
+        in: query
+        name: start
+        required: true
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Summaries'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Get All lessons summaries.
+      tags:
+      - lessons
+    post:
+      consumes:
+      - '*/*'
+      description: Create New Lesson
+      parameters:
+      - description: Lesson Data
+        in: body
+        name: Lesson
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Lesson'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Create New Lesson
+      tags:
+      - lessons
+  /lessons/{id}:
+    delete:
+      consumes:
+      - '*/*'
+      description: delete Lesson by given parameter id
+      parameters:
+      - description: Lesson Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Delete existing Lesson
+      tags:
+      - lessons
+    get:
+      consumes:
+      - '*/*'
+      description: Get Specific Lesson details.
+      parameters:
+      - description: Lesson Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: We need ID!!
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Can not find ID
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Get Lesson by ID.
+      tags:
+      - lessons
+    put:
+      consumes:
+      - '*/*'
+      description: Update existing Lesson
+      parameters:
+      - description: Lesson Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Lesson Data
+        in: body
+        name: Lesson
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Lesson'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Update existing Lesson
+      tags:
+      - lessons
   /tags:
     get:
       consumes:
