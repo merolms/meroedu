@@ -42,7 +42,17 @@ func NewContentHandler(e *echo.Echo, us domain.ContentUseCase) {
 	e.DELETE("/contents/:id", handler.GetByID)
 }
 
-// GetAll ...
+// GetAll godoc
+// @Summary Get All contents summaries.
+// @Description Get All contents summaries..
+// @Tags contents
+// @Accept */*
+// @Produce json
+// @Param start query int true "start"
+// @Param limit query int true "limit"
+// @Success 200 {object} domain.Summaries
+// @Failure 500 {object} domain.APIResponseError "Internal Server Error"
+// @Router /contents [get]
 func (c *ContentHandler) GetAll(echoContext echo.Context) error {
 	ctx := echoContext.Request().Context()
 	start, limit := 0, 10
@@ -66,10 +76,27 @@ func (c *ContentHandler) GetAll(echoContext echo.Context) error {
 	if err != nil {
 		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
-	return echoContext.JSON(http.StatusOK, list)
+	res := domain.Summaries{
+		Response: domain.Response{
+			Message: domain.Success,
+			Data:    list,
+		},
+	}
+	return echoContext.JSON(http.StatusOK, res)
 }
 
-// GetByID ...
+// GetByID godoc
+// @Summary Get Content by ID.
+// @Description Get Specific Content details.
+// @Tags contents
+// @Accept */*
+// @Produce json
+// @Param id path int true "Content Id"
+// @Success 200 {object} domain.Response
+// @Failure 400 {object} domain.APIResponseError "We need ID!!"
+// @Failure 404 {object} domain.APIResponseError "Can not find ID"
+// @Failure 500 {object} domain.APIResponseError "Internal Server Error"
+// @Router /contents/{id} [get]
 func (c *ContentHandler) GetByID(echoContext echo.Context) error {
 	idParam, err := strconv.Atoi(echoContext.Param("id"))
 	if err != nil {
@@ -77,14 +104,29 @@ func (c *ContentHandler) GetByID(echoContext echo.Context) error {
 	}
 	ctx := echoContext.Request().Context()
 
-	list, err := c.ContentUseCase.GetByID(ctx, int64(idParam))
+	content, err := c.ContentUseCase.GetByID(ctx, int64(idParam))
 	if err != nil {
 		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
-	return echoContext.JSON(http.StatusOK, list)
+	res := domain.Response{
+		Data:    content,
+		Message: domain.Success,
+	}
+	return echoContext.JSON(http.StatusOK, res)
 }
 
-// CreateContent ...
+// CreateContent godoc
+// @Summary Create New Content
+// @Description Create New Content
+// @Tags contents
+// @Accept */*
+// @Produce json
+// @Param Content body domain.Content true "Content Data"
+// @Success 200 {object} domain.Response
+// @Failure 400 {object} domain.APIResponseError
+// @Failure 404 {object} domain.APIResponseError
+// @Failure 500 {object} domain.APIResponseError "Internal Server Error"
+// @Router /contents [post]
 func (c *ContentHandler) CreateContent(echoContext echo.Context) error {
 	var content domain.Content
 	err := echoContext.Bind(&content)
@@ -104,7 +146,19 @@ func (c *ContentHandler) CreateContent(echoContext echo.Context) error {
 
 }
 
-// UpdateContent ...
+// UpdateContent godoc
+// @Summary Update existing Content
+// @Description Update existing Content
+// @Tags contents
+// @Accept */*
+// @Produce json
+// @Param id path int true "Content Id"
+// @Param Content body domain.Content true "Content Data"
+// @Success 200 {object} domain.Response
+// @Failure 400 {object} domain.APIResponseError
+// @Failure 404 {object} domain.APIResponseError
+// @Failure 500 {object} domain.APIResponseError "Internal Server Error"
+// @Router /contents/{id} [put]
 func (c *ContentHandler) UpdateContent(echoContext echo.Context) error {
 	idParam, err := strconv.Atoi(echoContext.Param("id"))
 	if err != nil {
@@ -124,6 +178,39 @@ func (c *ContentHandler) UpdateContent(echoContext echo.Context) error {
 	if err != nil {
 		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
-	return echoContext.JSON(http.StatusCreated, content)
+	res := domain.Response{
+		Data:    content,
+		Message: domain.Success,
+	}
+	return echoContext.JSON(http.StatusOK, res)
 
+}
+
+// DeleteContent godoc
+// @Summary Delete existing content
+// @Description delete content by given parameter id
+// @Tags contents
+// @Accept */*
+// @Produce json
+// @Param id path int true "content Id"
+// @Success 200 {object} domain.Response
+// @Failure 400 {object} domain.APIResponseError
+// @Failure 404 {object} domain.APIResponseError
+// @Failure 500 {object} domain.APIResponseError "Internal Server Error"
+// @Router /contents/{id} [delete]
+func (c *ContentHandler) DeleteContent(echoContext echo.Context) error {
+	idP, err := strconv.Atoi(echoContext.Param("id"))
+	if err != nil {
+		return echoContext.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
+	}
+
+	id := int64(idP)
+	ctx := echoContext.Request().Context()
+
+	err = c.ContentUseCase.DeleteContent(ctx, id)
+	if err != nil {
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
+	}
+
+	return echoContext.NoContent(http.StatusNoContent)
 }

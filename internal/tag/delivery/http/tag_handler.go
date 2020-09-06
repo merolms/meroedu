@@ -35,11 +35,11 @@ func NewTagHandler(e *echo.Echo, us domain.TagUseCase) {
 	e.POST("/tags", handler.CreateTag)
 
 	// Update Operation
-	e.PUT("/tags/:id", handler.GetByID)
+	e.PUT("/tags/:id", handler.UpdateTag)
 	e.PUT("/tags/actions", handler.GetByID)
 
 	// Remove/Delete Operation
-	e.DELETE("/tags/:id", handler.GetByID)
+	e.DELETE("/tags/:id", handler.DeleteTag)
 }
 
 // GetAll godoc

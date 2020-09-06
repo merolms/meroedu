@@ -20,15 +20,16 @@ type Content struct {
 // ContentUseCase represent the Content's repository contract
 type ContentUseCase interface {
 	GetAll(ctx context.Context, start int, limit int) ([]Content, error)
-	GetByID(ctx context.Context, id int64) (Content, error)
+	GetByID(ctx context.Context, id int64) (*Content, error)
 	UpdateContent(ctx context.Context, Content *Content, id int64) error
 	CreateContent(ctx context.Context, Content *Content) error
+	DeleteContent(ctx context.Context, id int64) error
 }
 
 // ContentRepository represent the Content's repository
 type ContentRepository interface {
 	GetAll(ctx context.Context, start int, limit int) ([]Content, error)
-	GetByID(ctx context.Context, id int64) (Content, error)
+	GetByID(ctx context.Context, id int64) (*Content, error)
 	UpdateContent(ctx context.Context, Content *Content) error
 	CreateContent(ctx context.Context, Content *Content) error
 	DeleteContent(ctx context.Context, id int64) error

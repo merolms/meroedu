@@ -62,21 +62,21 @@ func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res
 	}
 	return res, nil
 }
-func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (res domain.Content, err error) {
+func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (res *domain.Content, err error) {
 	query := `SELECT id,title,updated_at,created_at FROM contents WHERE ID = ?`
 
 	list, err := m.fetch(ctx, query, id)
 	if err != nil {
-		return domain.Content{}, err
+		return nil, err
 	}
-
+	var content domain.Content
 	if len(list) > 0 {
-		res = list[0]
+		content = list[0]
 	} else {
-		return res, domain.ErrNotFound
+		return &content, domain.ErrNotFound
 	}
 
-	return
+	return &content, nil
 }
 
 func (m *mysqlRepository) CreateContent(ctx context.Context, a *domain.Content) (err error) {
