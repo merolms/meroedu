@@ -10,6 +10,9 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/meroedu/meroedu/api_docs"
+	_attachmentHttpDelivery "github.com/meroedu/meroedu/internal/attachment/delivery/http"
+	_attachmentRepo "github.com/meroedu/meroedu/internal/attachment/repository/mysql"
+	_attachmentUcase "github.com/meroedu/meroedu/internal/attachment/usecase"
 	_categoryHttpDelivery "github.com/meroedu/meroedu/internal/category/delivery/http"
 	_categoryRepo "github.com/meroedu/meroedu/internal/category/repository/mysql"
 	_categoryUcase "github.com/meroedu/meroedu/internal/category/usecase"
@@ -79,6 +82,10 @@ func main() {
 	// Categories
 	categoryRepository := _categoryRepo.Init(db)
 	_categoryHttpDelivery.NewCategroyHandler(e, _categoryUcase.NewCategoryUseCase(categoryRepository, timeoutContext))
+
+	// Attachment
+	attachmentRepository := _attachmentRepo.Init(db)
+	_attachmentHttpDelivery.NewAttachmentHandler(e, _attachmentUcase.NewAttachmentUseCase(attachmentRepository, timeoutContext))
 
 	// Start HTTP Server
 	go func() {
