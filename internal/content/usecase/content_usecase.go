@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/meroedu/meroedu/internal/domain"
-	"github.com/meroedu/meroedu/pkg/log"
 )
 
 // ContentUseCase ...
@@ -36,28 +35,17 @@ func (usecase *ContentUseCase) GetAll(c context.Context, start int, limit int) (
 }
 
 // GetByID ...
-func (usecase *ContentUseCase) GetByID(c context.Context, id int64) (res domain.Content, err error) {
+func (usecase *ContentUseCase) GetByID(c context.Context, id int64) (res *domain.Content, err error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 
 	res, err = usecase.contentRepo.GetByID(ctx, id)
 	if err != nil {
-		return domain.Content{}, err
+		return nil, err
 	}
 
 	return res, nil
 }
-
-// // GetByTitle ...
-// func (usecase *ContentUseCase) GetByTitle(c context.Context, title string) (res domain.Content, err error) {
-// 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
-// 	defer cancel()
-// 	res, err = usecase.contentRepo.GetByTitle(ctx, title)
-// 	if err != nil {
-// 		return domain.Content{}, err
-// 	}
-// 	return res, nil
-// }
 
 // CreateContent ..
 func (usecase *ContentUseCase) CreateContent(c context.Context, content *domain.Content) (err error) {
@@ -78,11 +66,9 @@ func (usecase *ContentUseCase) UpdateContent(c context.Context, content *domain.
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 	existingContent, err := usecase.GetByID(ctx, id)
-	log.Info(existingContent)
-	log.Info(domain.Content{})
-	// if existingContent != (domain.Content{}) {
-	// 	return domain.ErrConflict
-	// }
+	if existingContent == nil {
+		return domain.ErrNotFound
+	}
 	content.ID = id
 	content.UpdatedAt = time.Now()
 	err = usecase.contentRepo.UpdateContent(ctx, content)
@@ -91,4 +77,18 @@ func (usecase *ContentUseCase) UpdateContent(c context.Context, content *domain.
 	}
 	return
 
+}
+
+// DeleteContent ...
+func (usecase *ContentUseCase) DeleteContent(c context.Context, id int64) (err error) {
+	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
+	defer cancel()
+	existedTag, err := usecase.GetByID(ctx, id)
+	if err != nil {
+		return err
+	}
+	if existedTag == nil {
+		return domain.ErrNotFound
+	}
+	return usecase.contentRepo.DeleteContent(ctx, id)
 }

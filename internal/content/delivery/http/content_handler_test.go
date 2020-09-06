@@ -76,7 +76,7 @@ func TestGetByID(t *testing.T) {
 
 	num := int(mockContent.ID)
 
-	mockUCase.On("GetByID", mock.Anything, int64(num)).Return(mockContent, nil)
+	mockUCase.On("GetByID", mock.Anything, int64(num)).Return(&mockContent, nil)
 
 	e := echo.New()
 	req, err := http.NewRequest(echo.GET, "/contents/"+strconv.Itoa(num), strings.NewReader(""))
@@ -130,4 +130,35 @@ func TestCreateContent(t *testing.T) {
 
 	assert.Equal(t, http.StatusCreated, rec.Code)
 	mockUCase.AssertExpectations(t)
+}
+
+func TestDeleteContent(t *testing.T) {
+	var mockContent domain.Content
+	err := faker.FakeData(&mockContent)
+	assert.NoError(t, err)
+
+	mockUCase := new(mocks.ContentUseCase)
+
+	num := int(mockContent.ID)
+
+	mockUCase.On("DeleteContent", mock.Anything, int64(num)).Return(nil)
+
+	e := echo.New()
+	req, err := http.NewRequest(echo.DELETE, "/contents/"+strconv.Itoa(num), strings.NewReader(""))
+	assert.NoError(t, err)
+
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("contents/:id")
+	c.SetParamNames("id")
+	c.SetParamValues(strconv.Itoa(num))
+	handler := contentHTTP.ContentHandler{
+		ContentUseCase: mockUCase,
+	}
+	err = handler.DeleteContent(c)
+	require.NoError(t, err)
+
+	assert.Equal(t, http.StatusNoContent, rec.Code)
+	mockUCase.AssertExpectations(t)
+
 }

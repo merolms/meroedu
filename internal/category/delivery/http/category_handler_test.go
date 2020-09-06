@@ -76,7 +76,7 @@ func TestGetByID(t *testing.T) {
 
 	num := int(mockCategory.ID)
 
-	mockUCase.On("GetByID", mock.Anything, int64(num)).Return(mockCategory, nil)
+	mockUCase.On("GetByID", mock.Anything, int64(num)).Return(&mockCategory, nil)
 
 	e := echo.New()
 	req, err := http.NewRequest(echo.GET, "/categories/"+strconv.Itoa(num), strings.NewReader(""))
@@ -129,5 +129,68 @@ func TestCreateCategory(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, http.StatusCreated, rec.Code)
+	mockUCase.AssertExpectations(t)
+}
+
+func TestUpdateCategory(t *testing.T) {
+	mockTag := domain.Category{
+		ID:        124,
+		Name:      "category",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	tempmockCategory := mockTag
+	mockUCase := new(mocks.CategoryUseCase)
+	j, err := json.Marshal(tempmockCategory)
+	assert.NoError(t, err)
+	mockUCase.On("UpdateCategory", mock.Anything, mock.AnythingOfType("*domain.Category"), mock.AnythingOfType("int64")).Return(nil)
+	e := echo.New()
+	req, err := http.NewRequest(echo.PUT, "/categories/124", strings.NewReader(string(j)))
+	assert.NoError(t, err)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("/categories/:id")
+	c.SetParamNames("id")
+	c.SetParamValues("124")
+
+	handler := categoryHTTP.CategoryHandler{
+		CategoryUseCase: mockUCase,
+	}
+	err = handler.UpdateCategory(c)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, rec.Code)
+	mockUCase.AssertExpectations(t)
+}
+
+func TestDeleteCategory(t *testing.T) {
+	var mockTag domain.Category
+	err := faker.FakeData(&mockTag)
+	assert.NoError(t, err)
+
+	mockUCase := new(mocks.CategoryUseCase)
+
+	num := int(mockTag.ID)
+
+	mockUCase.On("DeleteCategory", mock.Anything, int64(num)).Return(nil)
+
+	e := echo.New()
+	req, err := http.NewRequest(echo.DELETE, "/categories/"+strconv.Itoa(num), strings.NewReader(""))
+	assert.NoError(t, err)
+
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("categories/:id")
+	c.SetParamNames("id")
+	c.SetParamValues(strconv.Itoa(num))
+	handler := categoryHTTP.CategoryHandler{
+		CategoryUseCase: mockUCase,
+	}
+	err = handler.DeleteCategory(c)
+	require.NoError(t, err)
+
+	assert.Equal(t, http.StatusNoContent, rec.Code)
 	mockUCase.AssertExpectations(t)
 }

@@ -52,12 +52,15 @@ func NewCourseHandler(e *echo.Echo, us domain.CourseUseCase) {
 }
 
 // GetAll godoc
-// @Summary Show the status of server.
-// @Description get the status of server.
+// @Summary Get All Courses summaries.
+// @Description Get All Courses summaries..
 // @Tags courses
 // @Accept */*
 // @Produce json
-// @Success 200 {object} map[string]interface{}
+// @Param start query int true "start"
+// @Param limit query int true "limit"
+// @Success 200 {object} domain.Summaries
+// @Failure 500 {object} domain.APIResponseError "Internal Server Error"
 // @Router /courses [get]
 func (c *CourseHandler) GetAll(echoContext echo.Context) error {
 	ctx := echoContext.Request().Context()
@@ -82,10 +85,27 @@ func (c *CourseHandler) GetAll(echoContext echo.Context) error {
 	if err != nil {
 		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
-	return echoContext.JSON(http.StatusOK, listCourse)
+	res := domain.Summaries{
+		Response: domain.Response{
+			Message: domain.Success,
+			Data:    listCourse,
+		},
+	}
+	return echoContext.JSON(http.StatusOK, res)
 }
 
-// GetByID ...
+// GetByID godoc
+// @Summary Get Course by ID.
+// @Description Get Specific course details.
+// @Tags courses
+// @Accept */*
+// @Produce json
+// @Param id path int true "Course Id"
+// @Success 200 {object} domain.Response
+// @Failure 400 {object} domain.APIResponseError "We need ID!!"
+// @Failure 404 {object} domain.APIResponseError "Can not find ID"
+// @Failure 500 {object} domain.APIResponseError "Internal Server Error"
+// @Router /courses/{id} [get]
 func (c *CourseHandler) GetByID(echoContext echo.Context) error {
 	idParam, err := strconv.Atoi(echoContext.Param("id"))
 	if err != nil {
@@ -93,14 +113,29 @@ func (c *CourseHandler) GetByID(echoContext echo.Context) error {
 	}
 	ctx := echoContext.Request().Context()
 
-	listCourse, err := c.CourseUseCase.GetByID(ctx, int64(idParam))
+	course, err := c.CourseUseCase.GetByID(ctx, int64(idParam))
 	if err != nil {
 		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
-	return echoContext.JSON(http.StatusOK, *listCourse)
+	res := domain.Response{
+		Data:    course,
+		Message: domain.Success,
+	}
+	return echoContext.JSON(http.StatusOK, res)
 }
 
-// CreateCourse ...
+// CreateCourse godoc
+// @Summary Create New Course
+// @Description Create New Course
+// @Tags courses
+// @Accept */*
+// @Produce json
+// @Param course body domain.Course true "Course Data"
+// @Success 200 {object} domain.Response
+// @Failure 400 {object} domain.APIResponseError
+// @Failure 404 {object} domain.APIResponseError
+// @Failure 500 {object} domain.APIResponseError "Internal Server Error"
+// @Router /courses [post]
 func (c *CourseHandler) CreateCourse(echoContext echo.Context) error {
 	var course domain.Course
 	err := echoContext.Bind(&course)
@@ -116,11 +151,27 @@ func (c *CourseHandler) CreateCourse(echoContext echo.Context) error {
 	if err != nil {
 		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
-	return echoContext.JSON(http.StatusCreated, course)
+	res := domain.Response{
+		Data:    course,
+		Message: domain.Success,
+	}
+	return echoContext.JSON(http.StatusCreated, res)
 
 }
 
-// UpdateCourse ...
+// UpdateCourse godoc
+// @Summary Update existing course
+// @Description Update existing course
+// @Tags courses
+// @Accept */*
+// @Produce json
+// @Param id path int true "Course Id"
+// @Param course body domain.Course true "Course Data"
+// @Success 200 {object} domain.Response
+// @Failure 400 {object} domain.APIResponseError
+// @Failure 404 {object} domain.APIResponseError
+// @Failure 500 {object} domain.APIResponseError "Internal Server Error"
+// @Router /courses/{id} [put]
 func (c *CourseHandler) UpdateCourse(echoContext echo.Context) error {
 	idParam, err := strconv.Atoi(echoContext.Param("id"))
 	if err != nil {
@@ -140,11 +191,25 @@ func (c *CourseHandler) UpdateCourse(echoContext echo.Context) error {
 	if err != nil {
 		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
-	return echoContext.JSON(http.StatusOK, course)
-
+	res := domain.Response{
+		Data:    course,
+		Message: domain.Success,
+	}
+	return echoContext.JSON(http.StatusOK, res)
 }
 
-// DeleteCourse will delete course by given param
+// DeleteCourse godoc
+// @Summary Delete existing Course
+// @Description delete course by given parameter id
+// @Tags courses
+// @Accept */*
+// @Produce json
+// @Param id path int true "Course Id"
+// @Success 200 {object} domain.Response
+// @Failure 400 {object} domain.APIResponseError
+// @Failure 404 {object} domain.APIResponseError
+// @Failure 500 {object} domain.APIResponseError "Internal Server Error"
+// @Router /courses/{id} [delete]
 func (c *CourseHandler) DeleteCourse(echoContext echo.Context) error {
 	idP, err := strconv.Atoi(echoContext.Param("id"))
 	if err != nil {

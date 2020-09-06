@@ -53,7 +53,7 @@ func TestGetByID(t *testing.T) {
 		Title: "title-1",
 	}
 	t.Run("success", func(t *testing.T) {
-		mockLessonRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(mockLesson, nil).Once()
+		mockLessonRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(&mockLesson, nil).Once()
 		u := ucase.NewLessonUseCase(mockLessonRepo, time.Second*2)
 
 		a, err := u.GetByID(context.TODO(), mockLesson.ID)
@@ -64,48 +64,18 @@ func TestGetByID(t *testing.T) {
 		mockLessonRepo.AssertExpectations(t)
 	})
 	t.Run("error-failed", func(t *testing.T) {
-		mockLessonRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(domain.Lesson{}, errors.New("Unexpected")).Once()
+		mockLessonRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(nil, errors.New("Unexpected")).Once()
 
 		u := ucase.NewLessonUseCase(mockLessonRepo, time.Second*2)
 
 		a, err := u.GetByID(context.TODO(), mockLesson.ID)
 
 		assert.Error(t, err)
-		assert.Equal(t, domain.Lesson{}, a)
-
+		assert.Nil(t, a)
 		mockLessonRepo.AssertExpectations(t)
 	})
 }
 
-// func TestGetByTitle(t *testing.T) {
-// 	mockLessonRepo := new(mocks.LessonRepository)
-// 	mockLesson := domain.Lesson{
-// 		Name: "title-1",
-// 	}
-// 	t.Run("success", func(t *testing.T) {
-// 		mockLessonRepo.On("GetByTitle", mock.Anything, mock.AnythingOfType("string")).Return(mockLesson, nil).Once()
-// 		u := ucase.NewLessonUseCase(mockLessonRepo, time.Second*2)
-
-// 		a, err := u.GetByTitle(context.TODO(), mockLesson.Title)
-
-// 		assert.NoError(t, err)
-// 		assert.NotNil(t, a)
-
-// 		mockLessonRepo.AssertExpectations(t)
-// 	})
-// 	t.Run("error-failed", func(t *testing.T) {
-// 		mockLessonRepo.On("GetByTitle", mock.Anything, mock.AnythingOfType("string")).Return(domain.Lesson{}, errors.New("Unexpected")).Once()
-
-// 		u := ucase.NewLessonUseCase(mockLessonRepo, time.Second*2)
-
-// 		a, err := u.GetByTitle(context.TODO(), "random")
-
-// 		assert.Error(t, err)
-// 		assert.Equal(t, domain.Lesson{}, a)
-
-// 		mockLessonRepo.AssertExpectations(t)
-// 	})
-// }
 func TestCreateLesson(t *testing.T) {
 	mockLessonRepo := new(mocks.LessonRepository)
 	mockLesson := domain.Lesson{
@@ -115,7 +85,6 @@ func TestCreateLesson(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		tempmockLesson := mockLesson
 		tempmockLesson.ID = 0
-		// mockLessonRepo.On("GetByTitle", mock.Anything, mock.AnythingOfType("string")).Return(domain.Lesson{}, domain.ErrNotFound).Once()
 		mockLessonRepo.On("CreateLesson", mock.Anything, mock.AnythingOfType("*domain.Lesson")).Return(nil).Once()
 		u := ucase.NewLessonUseCase(mockLessonRepo, time.Second*2)
 
@@ -125,14 +94,13 @@ func TestCreateLesson(t *testing.T) {
 		assert.Equal(t, mockLesson.Title, tempmockLesson.Title)
 		mockLessonRepo.AssertExpectations(t)
 	})
-	t.Run("existing-title", func(t *testing.T) {
-		// mockLessonRepo.On("GetByTitle", mock.Anything, mock.AnythingOfType("string")).Return(existingCourse, nil).Once()
-		mockLessonRepo.On("CreateLesson", mock.Anything, mock.AnythingOfType("*domain.Lesson")).Return(nil).Once()
+	t.Run("error", func(t *testing.T) {
+		mockLessonRepo.On("CreateLesson", mock.Anything, mock.AnythingOfType("*domain.Lesson")).Return(errors.New("unexpected error occur")).Once()
 		u := ucase.NewLessonUseCase(mockLessonRepo, time.Second*2)
 
 		err := u.CreateLesson(context.TODO(), &mockLesson)
 
-		assert.NoError(t, err)
+		assert.Error(t, err)
 		mockLessonRepo.AssertExpectations(t)
 	})
 }
@@ -145,7 +113,7 @@ func TestUpdateLesson(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		tempmockLesson := mockLesson
-		mockLessonRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(domain.Lesson{}, domain.ErrNotFound).Once()
+		mockLessonRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(&tempmockLesson, nil).Once()
 		mockLessonRepo.On("UpdateLesson", mock.Anything, mock.AnythingOfType("*domain.Lesson")).Return(nil).Once()
 		u := ucase.NewLessonUseCase(mockLessonRepo, time.Second*2)
 
@@ -155,15 +123,57 @@ func TestUpdateLesson(t *testing.T) {
 		assert.Equal(t, mockLesson.ID, tempmockLesson.ID)
 		mockLessonRepo.AssertExpectations(t)
 	})
-	t.Run("existing-title", func(t *testing.T) {
-		existingCourse := mockLesson
-		mockLessonRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(existingCourse, nil).Once()
-		mockLessonRepo.On("UpdateLesson", mock.Anything, mock.AnythingOfType("*domain.Lesson")).Return(nil).Once()
+	t.Run("error-lesson", func(t *testing.T) {
+		existingLesson := mockLesson
+		mockLessonRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(nil, nil).Once()
+		mockLessonRepo.On("UpdateLesson", mock.Anything, mock.AnythingOfType("*domain.Lesson")).Return(domain.ErrNotFound).Once()
 		u := ucase.NewLessonUseCase(mockLessonRepo, time.Second*2)
 
-		err := u.UpdateLesson(context.TODO(), &mockLesson, existingCourse.ID)
+		err := u.UpdateLesson(context.TODO(), &mockLesson, existingLesson.ID)
+
+		assert.Error(t, err)
+		// mockLessonRepo.AssertExpectations(t)
+	})
+}
+
+func TestDeleteLesson(t *testing.T) {
+	mockLessonRepo := new(mocks.LessonRepository)
+	mockLesson := domain.Lesson{
+		Title:       "Hello",
+		Description: "Description here",
+	}
+
+	t.Run("success", func(t *testing.T) {
+		mockLessonRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(&mockLesson, nil).Once()
+
+		mockLessonRepo.On("DeleteLesson", mock.Anything, mock.AnythingOfType("int64")).Return(nil).Once()
+
+		u := ucase.NewLessonUseCase(mockLessonRepo, time.Second*2)
+
+		err := u.DeleteLesson(context.TODO(), mockLesson.ID)
 
 		assert.NoError(t, err)
 		mockLessonRepo.AssertExpectations(t)
 	})
+	t.Run("course-is-not-exist", func(t *testing.T) {
+		mockLessonRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(nil, nil).Once()
+
+		u := ucase.NewLessonUseCase(mockLessonRepo, time.Second*2)
+
+		err := u.DeleteLesson(context.TODO(), mockLesson.ID)
+
+		assert.Error(t, err)
+		mockLessonRepo.AssertExpectations(t)
+	})
+	t.Run("error-happens-in-db", func(t *testing.T) {
+		mockLessonRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(nil, errors.New("Unexpected Error")).Once()
+
+		u := ucase.NewLessonUseCase(mockLessonRepo, time.Second*2)
+
+		err := u.DeleteLesson(context.TODO(), mockLesson.ID)
+
+		assert.Error(t, err)
+		mockLessonRepo.AssertExpectations(t)
+	})
+
 }

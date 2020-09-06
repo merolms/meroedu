@@ -15,10 +15,6 @@ import (
 
 func TestGetAll(t *testing.T) {
 	mockCategoryRepo := new(mocks.CategoryRepository)
-	// mockUserRepo := new(mocks.UserRepository)
-	// mockLessonRepo := new(mocks.LessonRepository)
-	// mockAttachmentRepo:=new(mocks.AttachmentRepository)
-	// mockCategoryRepo:=new(mocks.CategoryRepository)
 	mockListCategory := []domain.Category{
 		domain.Category{
 			ID: 1, Name: "title-1",
@@ -57,7 +53,7 @@ func TestGetByID(t *testing.T) {
 		Name: "title-1",
 	}
 	t.Run("success", func(t *testing.T) {
-		mockCategoryRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(mockCategory, nil).Once()
+		mockCategoryRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(&mockCategory, nil).Once()
 		u := ucase.NewCategoryUseCase(mockCategoryRepo, time.Second*2)
 
 		a, err := u.GetByID(context.TODO(), mockCategory.ID)
@@ -68,14 +64,14 @@ func TestGetByID(t *testing.T) {
 		mockCategoryRepo.AssertExpectations(t)
 	})
 	t.Run("error-failed", func(t *testing.T) {
-		mockCategoryRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(domain.Category{}, errors.New("Unexpected")).Once()
+		mockCategoryRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(nil, errors.New("Unexpected")).Once()
 
 		u := ucase.NewCategoryUseCase(mockCategoryRepo, time.Second*2)
 
 		a, err := u.GetByID(context.TODO(), mockCategory.ID)
 
 		assert.Error(t, err)
-		assert.Equal(t, domain.Category{}, a)
+		assert.Nil(t, a)
 
 		mockCategoryRepo.AssertExpectations(t)
 	})
@@ -89,7 +85,7 @@ func TestGetByName(t *testing.T) {
 		CreatedAt: time.Now(),
 	}
 	t.Run("success", func(t *testing.T) {
-		mockCategoryRepo.On("GetByName", mock.Anything, mock.AnythingOfType("string")).Return(mockCategory, nil).Once()
+		mockCategoryRepo.On("GetByName", mock.Anything, mock.AnythingOfType("string")).Return(&mockCategory, nil).Once()
 		u := ucase.NewCategoryUseCase(mockCategoryRepo, time.Second*2)
 
 		a, err := u.GetByName(context.TODO(), mockCategory.Name)
@@ -100,14 +96,14 @@ func TestGetByName(t *testing.T) {
 		mockCategoryRepo.AssertExpectations(t)
 	})
 	t.Run("error-failed", func(t *testing.T) {
-		mockCategoryRepo.On("GetByName", mock.Anything, mock.AnythingOfType("string")).Return(domain.Category{}, errors.New("Unexpected")).Once()
+		mockCategoryRepo.On("GetByName", mock.Anything, mock.AnythingOfType("string")).Return(nil, errors.New("Unexpected")).Once()
 
 		u := ucase.NewCategoryUseCase(mockCategoryRepo, time.Second*2)
 
 		a, err := u.GetByName(context.TODO(), "random")
 
 		assert.Error(t, err)
-		assert.Equal(t, domain.Category{}, a)
+		assert.Nil(t, a)
 
 		mockCategoryRepo.AssertExpectations(t)
 	})
@@ -121,7 +117,7 @@ func TestCreateCategory(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		tempmockCategory := mockCategory
 		tempmockCategory.ID = 0
-		// mockCategoryRepo.On("GetByName", mock.Anything, mock.AnythingOfType("string")).Return(domain.Category{}, domain.ErrNotFound).Once()
+		mockCategoryRepo.On("GetByName", mock.Anything, mock.AnythingOfType("string")).Return(nil, domain.ErrNotFound).Once()
 		mockCategoryRepo.On("CreateCategory", mock.Anything, mock.AnythingOfType("*domain.Category")).Return(nil).Once()
 		u := ucase.NewCategoryUseCase(mockCategoryRepo, time.Second*2)
 
@@ -132,14 +128,14 @@ func TestCreateCategory(t *testing.T) {
 		mockCategoryRepo.AssertExpectations(t)
 	})
 	t.Run("error", func(t *testing.T) {
-		// mockCategoryRepo.On("GetByName", mock.Anything, mock.AnythingOfType("string")).Return(existingCourse, nil).Once()
-		mockCategoryRepo.On("CreateCategory", mock.Anything, mock.AnythingOfType("*domain.Category")).Return(nil).Once()
+		mockCategoryRepo.On("GetByName", mock.Anything, mock.AnythingOfType("string")).Return(&mockCategory, nil).Once()
+		mockCategoryRepo.On("CreateCategory", mock.Anything, mock.AnythingOfType("*domain.Category")).Return(domain.ErrConflict).Once()
 		u := ucase.NewCategoryUseCase(mockCategoryRepo, time.Second*2)
 
 		err := u.CreateCategory(context.TODO(), &mockCategory)
 
-		assert.NoError(t, err)
-		mockCategoryRepo.AssertExpectations(t)
+		assert.Error(t, err)
+		// mockCategoryRepo.AssertExpectations(t)
 	})
 }
 func TestUpdateCategory(t *testing.T) {
@@ -151,7 +147,7 @@ func TestUpdateCategory(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		tempmockCategory := mockCategory
-		mockCategoryRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(mockCategory, nil).Once()
+		mockCategoryRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(&mockCategory, nil).Once()
 		mockCategoryRepo.On("UpdateCategory", mock.Anything, mock.AnythingOfType("*domain.Category")).Return(nil).Once()
 		u := ucase.NewCategoryUseCase(mockCategoryRepo, time.Second*2)
 
@@ -163,13 +159,54 @@ func TestUpdateCategory(t *testing.T) {
 	})
 	t.Run("error", func(t *testing.T) {
 		category := mockCategory
-		mockCategoryRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(category, nil).Once()
+		mockCategoryRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(nil, nil).Once()
 		mockCategoryRepo.On("UpdateCategory", mock.Anything, mock.AnythingOfType("*domain.Category")).Return(domain.ErrNotFound).Once()
 		u := ucase.NewCategoryUseCase(mockCategoryRepo, time.Second*2)
 
 		err := u.UpdateCategory(context.TODO(), &mockCategory, category.ID)
 
 		assert.Error(t, err)
+		// mockCategoryRepo.AssertExpectations(t)
+	})
+}
+
+func TestDeleteCategory(t *testing.T) {
+	mockCategoryRepo := new(mocks.CategoryRepository)
+	mockCategory := domain.Category{
+		Name: "category",
+	}
+
+	t.Run("success", func(t *testing.T) {
+		mockCategoryRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(&mockCategory, nil).Once()
+
+		mockCategoryRepo.On("DeleteCategory", mock.Anything, mock.AnythingOfType("int64")).Return(nil).Once()
+
+		u := ucase.NewCategoryUseCase(mockCategoryRepo, time.Second*2)
+
+		err := u.DeleteCategory(context.TODO(), mockCategory.ID)
+
+		assert.NoError(t, err)
 		mockCategoryRepo.AssertExpectations(t)
 	})
+	t.Run("tag-is-not-exist", func(t *testing.T) {
+		mockCategoryRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(nil, nil).Once()
+
+		u := ucase.NewCategoryUseCase(mockCategoryRepo, time.Second*2)
+
+		err := u.DeleteCategory(context.TODO(), mockCategory.ID)
+
+		assert.Error(t, err)
+		mockCategoryRepo.AssertExpectations(t)
+	})
+	t.Run("error-happens-in-db", func(t *testing.T) {
+		mockCategoryRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(nil, errors.New("Unexpected Error")).Once()
+
+		u := ucase.NewCategoryUseCase(mockCategoryRepo, time.Second*2)
+
+		err := u.DeleteCategory(context.TODO(), mockCategory.ID)
+
+		assert.Error(t, err)
+		mockCategoryRepo.AssertExpectations(t)
+	})
+
 }

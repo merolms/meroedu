@@ -28,6 +28,20 @@ func (_m *TagUseCase) CreateTag(ctx context.Context, Tag *domain.Tag) error {
 	return r0
 }
 
+// DeleteTag provides a mock function with given fields: ctx, id
+func (_m *TagUseCase) DeleteTag(ctx context.Context, id int64) error {
+	ret := _m.Called(ctx, id)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, int64) error); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // GetAll provides a mock function with given fields: ctx, start, limit
 func (_m *TagUseCase) GetAll(ctx context.Context, start int, limit int) ([]domain.Tag, error) {
 	ret := _m.Called(ctx, start, limit)
@@ -52,14 +66,16 @@ func (_m *TagUseCase) GetAll(ctx context.Context, start int, limit int) ([]domai
 }
 
 // GetByID provides a mock function with given fields: ctx, id
-func (_m *TagUseCase) GetByID(ctx context.Context, id int64) (domain.Tag, error) {
+func (_m *TagUseCase) GetByID(ctx context.Context, id int64) (*domain.Tag, error) {
 	ret := _m.Called(ctx, id)
 
-	var r0 domain.Tag
-	if rf, ok := ret.Get(0).(func(context.Context, int64) domain.Tag); ok {
+	var r0 *domain.Tag
+	if rf, ok := ret.Get(0).(func(context.Context, int64) *domain.Tag); ok {
 		r0 = rf(ctx, id)
 	} else {
-		r0 = ret.Get(0).(domain.Tag)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.Tag)
+		}
 	}
 
 	var r1 error
@@ -73,14 +89,16 @@ func (_m *TagUseCase) GetByID(ctx context.Context, id int64) (domain.Tag, error)
 }
 
 // GetByName provides a mock function with given fields: ctx, name
-func (_m *TagUseCase) GetByName(ctx context.Context, name string) (domain.Tag, error) {
+func (_m *TagUseCase) GetByName(ctx context.Context, name string) (*domain.Tag, error) {
 	ret := _m.Called(ctx, name)
 
-	var r0 domain.Tag
-	if rf, ok := ret.Get(0).(func(context.Context, string) domain.Tag); ok {
+	var r0 *domain.Tag
+	if rf, ok := ret.Get(0).(func(context.Context, string) *domain.Tag); ok {
 		r0 = rf(ctx, name)
 	} else {
-		r0 = ret.Get(0).(domain.Tag)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.Tag)
+		}
 	}
 
 	var r1 error

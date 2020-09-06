@@ -28,6 +28,20 @@ func (_m *ContentUseCase) CreateContent(ctx context.Context, Content *domain.Con
 	return r0
 }
 
+// DeleteContent provides a mock function with given fields: ctx, id
+func (_m *ContentUseCase) DeleteContent(ctx context.Context, id int64) error {
+	ret := _m.Called(ctx, id)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, int64) error); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // GetAll provides a mock function with given fields: ctx, start, limit
 func (_m *ContentUseCase) GetAll(ctx context.Context, start int, limit int) ([]domain.Content, error) {
 	ret := _m.Called(ctx, start, limit)
@@ -52,14 +66,16 @@ func (_m *ContentUseCase) GetAll(ctx context.Context, start int, limit int) ([]d
 }
 
 // GetByID provides a mock function with given fields: ctx, id
-func (_m *ContentUseCase) GetByID(ctx context.Context, id int64) (domain.Content, error) {
+func (_m *ContentUseCase) GetByID(ctx context.Context, id int64) (*domain.Content, error) {
 	ret := _m.Called(ctx, id)
 
-	var r0 domain.Content
-	if rf, ok := ret.Get(0).(func(context.Context, int64) domain.Content); ok {
+	var r0 *domain.Content
+	if rf, ok := ret.Get(0).(func(context.Context, int64) *domain.Content); ok {
 		r0 = rf(ctx, id)
 	} else {
-		r0 = ret.Get(0).(domain.Content)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.Content)
+		}
 	}
 
 	var r1 error

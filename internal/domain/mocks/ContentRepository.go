@@ -66,14 +66,16 @@ func (_m *ContentRepository) GetAll(ctx context.Context, start int, limit int) (
 }
 
 // GetByID provides a mock function with given fields: ctx, id
-func (_m *ContentRepository) GetByID(ctx context.Context, id int64) (domain.Content, error) {
+func (_m *ContentRepository) GetByID(ctx context.Context, id int64) (*domain.Content, error) {
 	ret := _m.Called(ctx, id)
 
-	var r0 domain.Content
-	if rf, ok := ret.Get(0).(func(context.Context, int64) domain.Content); ok {
+	var r0 *domain.Content
+	if rf, ok := ret.Get(0).(func(context.Context, int64) *domain.Content); ok {
 		r0 = rf(ctx, id)
 	} else {
-		r0 = ret.Get(0).(domain.Content)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.Content)
+		}
 	}
 
 	var r1 error

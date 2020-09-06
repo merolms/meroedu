@@ -1,4 +1,165 @@
 basePath: /
+definitions:
+  domain.APIResponseError:
+    properties:
+      createdAt:
+        type: string
+      errorCode:
+        type: integer
+      errorMessage:
+        type: string
+    type: object
+  domain.Attachment:
+    properties:
+      created_at:
+        type: string
+      file:
+        type: string
+      id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  domain.Category:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  domain.Content:
+    properties:
+      content:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      lesson_id:
+        type: integer
+      title:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  domain.Course:
+    properties:
+      attachments:
+        items:
+          $ref: '#/definitions/domain.Attachment'
+        type: array
+      author:
+        $ref: '#/definitions/domain.User'
+        type: object
+      author_id:
+        $ref: '#/definitions/domain.NullInt64'
+        type: object
+      categories:
+        $ref: '#/definitions/domain.Category'
+        type: object
+      category_id:
+        $ref: '#/definitions/domain.NullInt64'
+        type: object
+      created_at:
+        type: string
+      description:
+        type: string
+      duration:
+        type: integer
+      id:
+        type: integer
+      image_url:
+        type: string
+      lessons:
+        items:
+          $ref: '#/definitions/domain.Lesson'
+        type: array
+      status:
+        type: string
+      tags:
+        items:
+          $ref: '#/definitions/domain.Tag'
+        type: array
+      title:
+        type: string
+      updated_at:
+        type: string
+      users:
+        items:
+          $ref: '#/definitions/domain.User'
+        type: array
+    required:
+    - title
+    type: object
+  domain.Lesson:
+    properties:
+      contents:
+        items:
+          $ref: '#/definitions/domain.Content'
+        type: array
+      course_id:
+        type: integer
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      tags:
+        items:
+          $ref: '#/definitions/domain.Tag'
+        type: array
+      title:
+        type: string
+      updated_at:
+        type: string
+    required:
+    - title
+    type: object
+  domain.NullInt64:
+    type: object
+  domain.Response:
+    properties:
+      data:
+        type: object
+      message:
+        type: string
+    type: object
+  domain.Summaries:
+    properties:
+      data:
+        type: object
+      message:
+        type: string
+      total:
+        type: integer
+    type: object
+  domain.Tag:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  domain.User:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
 info:
   contact:
     name: Mero Edu
@@ -26,20 +187,834 @@ paths:
       summary: Show the status of server.
       tags:
       - health
-  /courses:
+  /categories:
     get:
       consumes:
       - '*/*'
-      description: get the status of server.
+      description: Get All Categories summaries..
+      parameters:
+      - description: start
+        in: query
+        name: start
+        required: true
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
-      summary: Show the status of server.
+            $ref: '#/definitions/domain.Summaries'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Get All Categories summaries.
+      tags:
+      - categories
+    post:
+      consumes:
+      - '*/*'
+      description: Create New Category
+      parameters:
+      - description: Category Data
+        in: body
+        name: category
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Category'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Create New Category
+      tags:
+      - categories
+  /categories/{id}:
+    delete:
+      consumes:
+      - '*/*'
+      description: delete category by given parameter id
+      parameters:
+      - description: Category Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Delete existing category
+      tags:
+      - categories
+    get:
+      consumes:
+      - '*/*'
+      description: Get Specific category details.
+      parameters:
+      - description: category Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: We need ID!!
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Can not find ID
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Get category by ID.
+      tags:
+      - categories
+    put:
+      consumes:
+      - '*/*'
+      description: Update existing category
+      parameters:
+      - description: Category Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Category Data
+        in: body
+        name: Category
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Category'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Update existing category
+      tags:
+      - categories
+  /contents:
+    get:
+      consumes:
+      - '*/*'
+      description: Get All contents summaries..
+      parameters:
+      - description: start
+        in: query
+        name: start
+        required: true
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Summaries'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Get All contents summaries.
+      tags:
+      - contents
+    post:
+      consumes:
+      - '*/*'
+      description: Create New Content
+      parameters:
+      - description: Content Data
+        in: body
+        name: Content
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Content'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Create New Content
+      tags:
+      - contents
+  /contents/{id}:
+    delete:
+      consumes:
+      - '*/*'
+      description: delete content by given parameter id
+      parameters:
+      - description: content Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Delete existing content
+      tags:
+      - contents
+    get:
+      consumes:
+      - '*/*'
+      description: Get Specific Content details.
+      parameters:
+      - description: Content Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: We need ID!!
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Can not find ID
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Get Content by ID.
+      tags:
+      - contents
+    put:
+      consumes:
+      - '*/*'
+      description: Update existing Content
+      parameters:
+      - description: Content Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Content Data
+        in: body
+        name: Content
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Content'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Update existing Content
+      tags:
+      - contents
+  /courses:
+    get:
+      consumes:
+      - '*/*'
+      description: Get All Courses summaries..
+      parameters:
+      - description: start
+        in: query
+        name: start
+        required: true
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Summaries'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Get All Courses summaries.
       tags:
       - courses
+    post:
+      consumes:
+      - '*/*'
+      description: Create New Course
+      parameters:
+      - description: Course Data
+        in: body
+        name: course
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Course'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Create New Course
+      tags:
+      - courses
+  /courses/{id}:
+    delete:
+      consumes:
+      - '*/*'
+      description: delete course by given parameter id
+      parameters:
+      - description: Course Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Delete existing Course
+      tags:
+      - courses
+    get:
+      consumes:
+      - '*/*'
+      description: Get Specific course details.
+      parameters:
+      - description: Course Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: We need ID!!
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Can not find ID
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Get Course by ID.
+      tags:
+      - courses
+    put:
+      consumes:
+      - '*/*'
+      description: Update existing course
+      parameters:
+      - description: Course Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Course Data
+        in: body
+        name: course
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Course'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Update existing course
+      tags:
+      - courses
+  /lessons:
+    get:
+      consumes:
+      - '*/*'
+      description: Get All lessons summaries..
+      parameters:
+      - description: start
+        in: query
+        name: start
+        required: true
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Summaries'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Get All lessons summaries.
+      tags:
+      - lessons
+    post:
+      consumes:
+      - '*/*'
+      description: Create New Lesson
+      parameters:
+      - description: Lesson Data
+        in: body
+        name: Lesson
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Lesson'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Create New Lesson
+      tags:
+      - lessons
+  /lessons/{id}:
+    delete:
+      consumes:
+      - '*/*'
+      description: delete Lesson by given parameter id
+      parameters:
+      - description: Lesson Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Delete existing Lesson
+      tags:
+      - lessons
+    get:
+      consumes:
+      - '*/*'
+      description: Get Specific Lesson details.
+      parameters:
+      - description: Lesson Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: We need ID!!
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Can not find ID
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Get Lesson by ID.
+      tags:
+      - lessons
+    put:
+      consumes:
+      - '*/*'
+      description: Update existing Lesson
+      parameters:
+      - description: Lesson Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Lesson Data
+        in: body
+        name: Lesson
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Lesson'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Update existing Lesson
+      tags:
+      - lessons
+  /tags:
+    get:
+      consumes:
+      - '*/*'
+      description: Get All Tags summaries..
+      parameters:
+      - description: start
+        in: query
+        name: start
+        required: true
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Summaries'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Get All Tags summaries.
+      tags:
+      - tags
+    post:
+      consumes:
+      - '*/*'
+      description: Create New tag
+      parameters:
+      - description: tag Data
+        in: body
+        name: tag
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Tag'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Create New tag
+      tags:
+      - tags
+  /tags/{id}:
+    delete:
+      consumes:
+      - '*/*'
+      description: delete tag by given parameter id
+      parameters:
+      - description: Tag Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Delete existing tag
+      tags:
+      - tags
+    get:
+      consumes:
+      - '*/*'
+      description: Get Specific tag details.
+      parameters:
+      - description: tag Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: We need ID!!
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Can not find ID
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Get tag by ID.
+      tags:
+      - tags
+    put:
+      consumes:
+      - '*/*'
+      description: Update existing tag
+      parameters:
+      - description: tag Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: tag Data
+        in: body
+        name: tag
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Tag'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Update existing tag
+      tags:
+      - tags
 swagger: "2.0"

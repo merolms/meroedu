@@ -28,6 +28,20 @@ func (_m *LessonUseCase) CreateLesson(ctx context.Context, Lesson *domain.Lesson
 	return r0
 }
 
+// DeleteLesson provides a mock function with given fields: ctx, id
+func (_m *LessonUseCase) DeleteLesson(ctx context.Context, id int64) error {
+	ret := _m.Called(ctx, id)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, int64) error); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // GetAll provides a mock function with given fields: ctx, start, limit
 func (_m *LessonUseCase) GetAll(ctx context.Context, start int, limit int) ([]domain.Lesson, error) {
 	ret := _m.Called(ctx, start, limit)
@@ -52,14 +66,16 @@ func (_m *LessonUseCase) GetAll(ctx context.Context, start int, limit int) ([]do
 }
 
 // GetByID provides a mock function with given fields: ctx, id
-func (_m *LessonUseCase) GetByID(ctx context.Context, id int64) (domain.Lesson, error) {
+func (_m *LessonUseCase) GetByID(ctx context.Context, id int64) (*domain.Lesson, error) {
 	ret := _m.Called(ctx, id)
 
-	var r0 domain.Lesson
-	if rf, ok := ret.Get(0).(func(context.Context, int64) domain.Lesson); ok {
+	var r0 *domain.Lesson
+	if rf, ok := ret.Get(0).(func(context.Context, int64) *domain.Lesson); ok {
 		r0 = rf(ctx, id)
 	} else {
-		r0 = ret.Get(0).(domain.Lesson)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.Lesson)
+		}
 	}
 
 	var r1 error

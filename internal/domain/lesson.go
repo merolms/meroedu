@@ -20,15 +20,16 @@ type Lesson struct {
 // LessonUseCase represent the Lesson's repository contract
 type LessonUseCase interface {
 	GetAll(ctx context.Context, start int, limit int) ([]Lesson, error)
-	GetByID(ctx context.Context, id int64) (Lesson, error)
+	GetByID(ctx context.Context, id int64) (*Lesson, error)
 	UpdateLesson(ctx context.Context, Lesson *Lesson, id int64) error
 	CreateLesson(ctx context.Context, Lesson *Lesson) error
+	DeleteLesson(ctx context.Context, id int64) error
 }
 
 // LessonRepository represent the Lesson's repository
 type LessonRepository interface {
 	GetAll(ctx context.Context, start int, limit int) ([]Lesson, error)
-	GetByID(ctx context.Context, id int64) (Lesson, error)
+	GetByID(ctx context.Context, id int64) (*Lesson, error)
 	UpdateLesson(ctx context.Context, Lesson *Lesson) error
 	CreateLesson(ctx context.Context, Lesson *Lesson) error
 	DeleteLesson(ctx context.Context, id int64) error

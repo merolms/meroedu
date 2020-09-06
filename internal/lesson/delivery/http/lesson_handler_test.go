@@ -76,7 +76,7 @@ func TestGetByID(t *testing.T) {
 
 	num := int(mockLesson.ID)
 
-	mockUCase.On("GetByID", mock.Anything, int64(num)).Return(mockLesson, nil)
+	mockUCase.On("GetByID", mock.Anything, int64(num)).Return(&mockLesson, nil)
 
 	e := echo.New()
 	req, err := http.NewRequest(echo.GET, "/lessons/"+strconv.Itoa(num), strings.NewReader(""))
@@ -130,4 +130,69 @@ func TestCreateLesson(t *testing.T) {
 
 	assert.Equal(t, http.StatusCreated, rec.Code)
 	mockUCase.AssertExpectations(t)
+}
+
+func TestUpdateLesson(t *testing.T) {
+	mockLesson := domain.Lesson{
+		ID:          124,
+		Title:       "Title",
+		Description: "Content",
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+
+	tempmockLesson := mockLesson
+	mockUCase := new(mocks.LessonUseCase)
+	j, err := json.Marshal(tempmockLesson)
+	assert.NoError(t, err)
+	mockUCase.On("UpdateLesson", mock.Anything, mock.AnythingOfType("*domain.Lesson"), mock.AnythingOfType("int64")).Return(nil)
+	e := echo.New()
+	req, err := http.NewRequest(echo.PUT, "/lessons/124", strings.NewReader(string(j)))
+	assert.NoError(t, err)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("/lessons/:id")
+	c.SetParamNames("id")
+	c.SetParamValues("124")
+
+	handler := lessonHTTP.LessonHandler{
+		LessonUseCase: mockUCase,
+	}
+	err = handler.UpdateLesson(c)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, rec.Code)
+	mockUCase.AssertExpectations(t)
+}
+
+func TestDeleteLesson(t *testing.T) {
+	var mockLesson domain.Lesson
+	err := faker.FakeData(&mockLesson)
+	assert.NoError(t, err)
+
+	mockUCase := new(mocks.LessonUseCase)
+
+	num := int(mockLesson.ID)
+
+	mockUCase.On("DeleteLesson", mock.Anything, int64(num)).Return(nil)
+
+	e := echo.New()
+	req, err := http.NewRequest(echo.DELETE, "/lessons/"+strconv.Itoa(num), strings.NewReader(""))
+	assert.NoError(t, err)
+
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("lessons/:id")
+	c.SetParamNames("id")
+	c.SetParamValues(strconv.Itoa(num))
+	handler := lessonHTTP.LessonHandler{
+		LessonUseCase: mockUCase,
+	}
+	err = handler.DeleteLesson(c)
+	require.NoError(t, err)
+
+	assert.Equal(t, http.StatusNoContent, rec.Code)
+	mockUCase.AssertExpectations(t)
+
 }

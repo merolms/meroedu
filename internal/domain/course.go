@@ -5,9 +5,6 @@ import (
 	"time"
 )
 
-// Status ...
-type Status string
-
 const (
 	CourseInDraft   Status = "Draft"
 	CourseArchived  Status = "Archived"
@@ -22,21 +19,20 @@ const (
 	StatusUnknown   Status = "Unknown"
 	StatusScheduled Status = "Scheduled"
 	StatusRetry     Status = "Retrying"
-	Error           Status = "Error"
 )
 
 // Course is a struct represent a created Course
 type Course struct {
-	ID          int64     `json:"id" `
-	Title       string    `json:"title" validate:"required"`
-	Description string    `json:"description,omitempty"`
-	ImageURL    string    `json:"image_url,omitempty"`
-	Duration    uint16    `json:"duration,omitempty"`
-	CategoryID  NullInt64 `json:"-,omitempty"`
-	Category    Category  `json:"categories,omitempty"`
-	test        []string  `json:test,omitempty`
-	// Tags        []Tag        `json:"tags,omitempty"`
-	AuthorID    NullInt64    `json:"-,omitempty"`
+	ID          int64        `json:"id" `
+	Title       string       `json:"title" validate:"required"`
+	Description string       `json:"description,omitempty"`
+	ImageURL    string       `json:"image_url,omitempty"`
+	Duration    uint16       `json:"duration,omitempty"`
+	CategoryID  NullInt64    `json:"category_id,omitempty"`
+	Category    Category     `json:"categories,omitempty"`
+	test        []string     `json:test,omitempty`
+	Tags        []Tag        `json:"tags,omitempty"`
+	AuthorID    NullInt64    `json:"author_id,omitempty"`
 	Author      User         `json:"author,omitempty"`
 	Users       []User       `json:"users,omitempty"`
 	Lessons     []Lesson     `json:"lessons,omitempty"`
@@ -54,10 +50,10 @@ type CourseStats struct {
 	TotalAssigned  int64 `json:"total_assign"`
 }
 
-// CourseReponse is a struct representing the overview of Courses
+// CourseSummaries  is a struct representing the overview of Courses
 type CourseSummaries struct {
-	Total   int64    `json:"total"`
-	Courses []Course `json:"Courses"`
+	Response
+	Total int64 `json:"total"`
 }
 
 // Tags ...

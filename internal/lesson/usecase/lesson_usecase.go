@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/meroedu/meroedu/internal/domain"
-	"github.com/meroedu/meroedu/pkg/log"
 )
 
 // LessonUseCase ...
@@ -36,28 +35,17 @@ func (usecase *LessonUseCase) GetAll(c context.Context, start int, limit int) (r
 }
 
 // GetByID ...
-func (usecase *LessonUseCase) GetByID(c context.Context, id int64) (res domain.Lesson, err error) {
+func (usecase *LessonUseCase) GetByID(c context.Context, id int64) (res *domain.Lesson, err error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 
 	res, err = usecase.lessonRepo.GetByID(ctx, id)
 	if err != nil {
-		return domain.Lesson{}, err
+		return nil, err
 	}
 
 	return res, nil
 }
-
-// // GetByTitle ...
-// func (usecase *LessonUseCase) GetByTitle(c context.Context, title string) (res domain.Lesson, err error) {
-// 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
-// 	defer cancel()
-// 	res, err = usecase.lessonRepo.GetByTitle(ctx, title)
-// 	if err != nil {
-// 		return domain.Lesson{}, err
-// 	}
-// 	return res, nil
-// }
 
 // CreateLesson ..
 func (usecase *LessonUseCase) CreateLesson(c context.Context, lesson *domain.Lesson) (err error) {
@@ -78,11 +66,9 @@ func (usecase *LessonUseCase) UpdateLesson(c context.Context, lesson *domain.Les
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 	existingLesson, err := usecase.GetByID(ctx, id)
-	log.Info(existingLesson)
-	log.Info(domain.Lesson{})
-	// if existingLesson != (domain.Lesson{}) {
-	// 	return domain.ErrConflict
-	// }
+	if existingLesson == nil {
+		return domain.ErrNotFound
+	}
 	lesson.ID = id
 	lesson.UpdatedAt = time.Now()
 	err = usecase.lessonRepo.UpdateLesson(ctx, lesson)
@@ -91,4 +77,18 @@ func (usecase *LessonUseCase) UpdateLesson(c context.Context, lesson *domain.Les
 	}
 	return
 
+}
+
+// DeleteLesson ...
+func (usecase *LessonUseCase) DeleteLesson(c context.Context, id int64) (err error) {
+	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
+	defer cancel()
+	existedCourse, err := usecase.GetByID(ctx, id)
+	if err != nil {
+		return err
+	}
+	if existedCourse == nil {
+		return domain.ErrNotFound
+	}
+	return usecase.lessonRepo.DeleteLesson(ctx, id)
 }
