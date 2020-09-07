@@ -5,10 +5,12 @@ RUN apk update && apk upgrade && \
     apk --update add git make
 
 WORKDIR /app
-
+COPY go.mod . 
+COPY go.sum .
+RUN go mod download
 COPY . .
 
-RUN make engine
+RUN make build
 
 # Distribution
 FROM alpine:latest
@@ -21,7 +23,7 @@ WORKDIR /app
 
 EXPOSE 9090
 
-COPY --from=builder /app/engine /app
-COPY --from=builder /app/config.yml /app
+COPY --from=builder /app/meroedu /app
+COPY --from=builder /app/config.yml /app/
 
-CMD /app/engine
+CMD /app/meroedu

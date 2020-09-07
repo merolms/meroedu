@@ -14,3 +14,5 @@ coverage.out
 ./out
 .scannerwork/
 meroedu
+config.yml
+migrator/dbconf.yml

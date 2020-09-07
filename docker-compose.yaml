@@ -4,32 +4,37 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: course_management_api
+    container_name: backend
     ports:
-      - 9090:8080
+      - 9090:9090
     depends_on:
-      mariadb:
+      db:
         condition: service_healthy
     volumes:
       - ./config.json:/app/config.json
-  mariadb:
-    image: mariadb:10.5.5 
-    container_name: mariadb
+  db:
+    image: 'docker.io/bitnami/mariadb-galera:10.5-debian-10'
+    container_name: db
+    ports:
+      - '3306:3306'
+      - '4444:4444'
+      - '4567:4567'
+      - '4568:4568'
     volumes:
-      - ./course.sql:/docker-entrypoint-initdb.d/init.sql
-    ports:
-      - 3306:3306
+      - 'db:/bitnami/mariadb'
     environment:
-      - MYSQL_DATABASE=course_api
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=password
-      - MYSQL_ROOT_PASSWORD=root
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - MARIADB_ROOT_PASSWORD=root
+      - MARIADB_GALERA_MARIABACKUP_PASSWORD=backup
+      - MARIADB_DATABASE=course_api
+      - MARIADB_USER=user
+      - MARIADB_PASSWORD=password
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      test: ['CMD', '/opt/bitnami/scripts/mariadb-galera/healthcheck.sh']
+      interval: 15s
       timeout: 5s
-      retries: 10
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
+      retries: 6
+
+volumes:
+  db:
+    driver: local
