@@ -17,7 +17,7 @@ type AttachmentUseCase struct {
 }
 
 // NewAttachmentUseCase ...
-func NewAttachmentUseCase(a domain.AttachmentRepository, store domain.AttachmentStorage, timeout time.Duration) domain.AttachmentUserCase {
+func NewAttachmentUseCase(a domain.AttachmentRepository, store domain.AttachmentStorage, timeout time.Duration) domain.AttachmentUseCase {
 	return &AttachmentUseCase{
 		attachmentRepo:  a,
 		attachmentStore: store,
@@ -41,6 +41,7 @@ func (usecase *AttachmentUseCase) CreateAttachment(ctx context.Context, attachme
 	}
 	return &attachment, nil
 }
+
 func getUUID() string {
 	id := uuid.New()
 	return id.String()
@@ -54,7 +55,7 @@ func getFileName(fileType string) *string {
 	case "image/png":
 		filename = getUUID() + ".png"
 		return &filename
-	case "image/jpg":
+	case "image/jpg", "image/jpeg":
 		filename = getUUID() + ".jpg"
 		return &filename
 	case "text/markdown":
@@ -65,4 +66,16 @@ func getFileName(fileType string) *string {
 		return &filename
 	}
 	return nil
+}
+
+// DownloadAttachment will return filepath as string
+func (usecase *AttachmentUseCase) DownloadAttachment(ctx context.Context, fileName string) (string, error) {
+	ctx, cancel := context.WithTimeout(ctx, usecase.contextTimeOut)
+	defer cancel()
+	filePath, err := usecase.attachmentStore.DownloadAttachment(ctx, fileName)
+	if err != nil {
+		log.Errorf("Error occur %v", err)
+		return "", err
+	}
+	return filePath, nil
 }

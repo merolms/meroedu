@@ -15,16 +15,17 @@ type ResponseError struct {
 
 // AttachmentHandler ...
 type AttachmentHandler struct {
-	AttachmentUseCase domain.AttachmentUserCase
+	AttachmentUseCase domain.AttachmentUseCase
 }
 
 // NewAttachmentHandler ...
-func NewAttachmentHandler(e *echo.Echo, us domain.AttachmentUserCase) {
+func NewAttachmentHandler(e *echo.Echo, us domain.AttachmentUseCase) {
 	handler := &AttachmentHandler{
 		AttachmentUseCase: us,
 	}
 	// Get Operation
 	e.POST("attachment/upload", handler.Upload)
+	e.GET("attachment/download", handler.Download)
 }
 
 // Upload ...
@@ -51,4 +52,15 @@ func (a *AttachmentHandler) Upload(echoContext echo.Context) error {
 		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
 	return echoContext.JSON(http.StatusCreated, res)
+}
+
+// Download serves file
+func (a *AttachmentHandler) Download(echoContext echo.Context) error {
+	ctx := echoContext.Request().Context()
+	fileName := echoContext.QueryParam("fileName")
+	filePath, err := a.AttachmentUseCase.DownloadAttachment(ctx, fileName)
+	if err != nil {
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
+	}
+	return echoContext.File(filePath)
 }

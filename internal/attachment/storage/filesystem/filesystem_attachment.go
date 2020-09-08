@@ -46,3 +46,11 @@ func (repo *fileStorage) CreateAttachment(ctx context.Context, attachment domain
 	}
 	return nil
 }
+
+func (repo *fileStorage) DownloadAttachment(ctx context.Context, fileName string) (string, error) {
+	filePath := repo.path + "/" + fileName
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		return "", err
+	}
+	return filePath, nil
+}
