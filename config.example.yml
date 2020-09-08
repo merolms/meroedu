@@ -9,7 +9,7 @@ filesystem:
 database:
   params:
     parseTime: "true"
-  host: localhost
+  host: db
   port: 3306
   user: user
   password: password
