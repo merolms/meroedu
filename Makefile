@@ -33,9 +33,6 @@ lint:
 # Test
 ###############################################################################
 
-test-richgo:
-	richgo test -v -cover -covermode=atomic ./...
-
 test: 
 	go test -v -cover -covermode=atomic ./...
 
@@ -67,8 +64,6 @@ migrate-down:
 #############################################################################
 # Utility
 #############################################################################
-db-diagram:
-	java -jar ~/Downloads/schema-gui/schemaspy-6.1.0.jar -dp ~/Downloads/mysql-connector-java-6.0.6.jar -t mysql -db course_api -host localhost -u root -p "root" -o ~/Downloads/schema-gui/course_api -s course_api
 build:
 	go build -o ${BINARY}
 build-app: clean-app
