@@ -23,7 +23,7 @@ func NewAttachmentHandler(e *echo.Echo, us domain.AttachmentUserCase) {
 	handler := &AttachmentHandler{
 		AttachmentUseCase: us,
 	}
-	// Get Operation
+	// Upload Attachment
 	e.POST("attachment/upload", handler.Upload)
 }
 
