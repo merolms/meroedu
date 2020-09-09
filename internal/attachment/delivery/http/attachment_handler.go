@@ -23,12 +23,21 @@ func NewAttachmentHandler(e *echo.Echo, us domain.AttachmentUserCase) {
 	handler := &AttachmentHandler{
 		AttachmentUseCase: us,
 	}
-	// Upload Attachment
-	e.POST("attachment/upload", handler.Upload)
+	// Create Attachment
+	e.POST("attachments", handler.CreateAttachment)
 }
 
-// Upload ...
-func (a *AttachmentHandler) Upload(echoContext echo.Context) error {
+// CreateAttachment godoc
+// @Summary Create an attachment.
+// @Description Create an attachment..
+// @Tags attachments
+// @Accept */*
+// @Param   file formData file true  "Upload file"
+// @Produce json
+// @Success 200 {object} domain.Response
+// @Failure 500 {object} domain.APIResponseError "Internal Server Error"
+// @Router /attachments [post]
+func (a *AttachmentHandler) CreateAttachment(echoContext echo.Context) error {
 	ctx := echoContext.Request().Context()
 	fileHeader, err := echoContext.FormFile("file")
 	if err != nil {
@@ -46,9 +55,13 @@ func (a *AttachmentHandler) Upload(echoContext echo.Context) error {
 		Size:     file.(util.Sizer).Size(),
 		Type:     fileHeader.Header.Get("Content-Type"),
 	}
-	res, err := a.AttachmentUseCase.CreateAttachment(ctx, attachment)
+	response, err := a.AttachmentUseCase.CreateAttachment(ctx, attachment)
 	if err != nil {
 		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
+	}
+	res := domain.Response{
+		Data:    response,
+		Message: domain.Success,
 	}
 	return echoContext.JSON(http.StatusCreated, res)
 }
