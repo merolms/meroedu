@@ -29,14 +29,15 @@ func createFile(filename string) (*os.File, error) {
 		log.Errorf("Error occur while creating file from path: %v, Error: %v", path, err)
 		return nil, err
 	}
-	err = os.Remove(path)
-	if err != nil {
-		log.Errorf("Error occur while removing aile from path: %v, Error: %v", path, err)
-	}
 	defer dst.Close()
 	file, err := os.Open(path)
 	if err != nil {
 		log.Errorf("Error while opeing file: %v", err)
+		return nil, err
+	}
+	err = os.Remove(path)
+	if err != nil {
+		log.Errorf("Error occur while removing aile from path: %v, Error: %v", path, err)
 	}
 	defer file.Close()
 	return file, nil
@@ -51,10 +52,10 @@ func TestCreateAttachment(t *testing.T) {
 	filetypes := []string{"image/png", "image/jpg", "text/markdown", "text/html"}
 	t.Run("success", func(t *testing.T) {
 		file, err := createFile("meroedu.png")
+		if err != nil {
+			t.Errorf("Error creating temp file %v", err)
+		}
 		for _, filetype := range filetypes {
-			if err != nil {
-				t.Errorf("Error creating temp file %v", err)
-			}
 			mockAttachment.File = file
 			mockAttachment.Type = filetype
 			mockAttachmentStore.On("CreateAttachment", mock.Anything, mock.AnythingOfType("domain.Attachment")).Return(nil).Once()

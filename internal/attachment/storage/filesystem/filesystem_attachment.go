@@ -31,6 +31,9 @@ func Init() (domain.AttachmentStorage, error) {
 
 func (repo *fileStorage) CreateAttachment(ctx context.Context, attachment domain.Attachment) error {
 	src := attachment.File
+	if src == nil {
+		return domain.ErrFileEmpty
+	}
 	filePath := repo.path + "/" + attachment.Name
 	dst, err := os.Create(filePath)
 	if err != nil {

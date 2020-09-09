@@ -15,4 +15,6 @@ var (
 	ErrUnsupportedFileType = errors.New("Unsupported file type")
 	// ErrBadInput will throw if the given request-body or form-data is not valid
 	ErrBadInput = errors.New("Given Input is not valid")
+	// ErrFileEmpty will throw if the file is empty
+	ErrFileEmpty = errors.New("Given input file is empty")
 )
