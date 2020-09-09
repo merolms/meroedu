@@ -21,7 +21,11 @@ import (
 
 func TestUpload(t *testing.T) {
 	mockUCase := new(mocks.AttachmentUserCase)
-	path := "/home/auzmor/Documents/product/mystuff/root/meroedu/internal/attachment/delivery/http/attachment_handler.go" //The path to upload the file
+	rootDirectory, err := os.Getwd()
+	if err != nil {
+		t.Error(err)
+	}
+	path := rootDirectory + "/attachment_handler.go" //The path to upload the file
 	file, err := os.Open(path)
 	if err != nil {
 		t.Error(err)
