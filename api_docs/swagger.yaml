@@ -11,7 +11,11 @@ definitions:
     type: object
   domain.Attachment:
     properties:
+      course_id:
+        type: integer
       created_at:
+        type: string
+      description:
         type: string
       file_size:
         type: integer
@@ -20,6 +24,8 @@ definitions:
       id:
         type: integer
       name:
+        type: string
+      title:
         type: string
       updated_at:
         type: string
@@ -197,6 +203,14 @@ paths:
       - '*/*'
       description: Create an attachment..
       parameters:
+      - description: Title
+        in: formData
+        name: title
+        type: string
+      - description: Description
+        in: formData
+        name: description
+        type: string
       - description: Upload file
         in: formData
         name: file

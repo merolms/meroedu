@@ -8,13 +8,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/meroedu/meroedu/internal/attachment/usecase"
 	"github.com/meroedu/meroedu/internal/domain"
+	"github.com/meroedu/meroedu/internal/domain/mocks"
 	"github.com/meroedu/meroedu/pkg/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-
-	"github.com/meroedu/meroedu/internal/attachment/usecase"
-	"github.com/meroedu/meroedu/internal/domain/mocks"
 )
 
 func createFile(filename string) (*os.File, error) {
@@ -43,14 +42,14 @@ func createFile(filename string) (*os.File, error) {
 	return file, nil
 }
 func TestCreateAttachment(t *testing.T) {
-	mockAttachmentStore := new(mocks.AttachmentStorage)
-	mockAttachmentRepo := new(mocks.AttachmentRepository)
-	mockAttachment := domain.Attachment{
-		ID:   1,
-		Name: "123.md",
-	}
-	filetypes := []string{"image/png", "image/jpg", "text/markdown", "text/html"}
 	t.Run("success", func(t *testing.T) {
+		mockAttachmentStore := new(mocks.AttachmentStorage)
+		mockAttachmentRepo := new(mocks.AttachmentRepository)
+		mockAttachment := domain.Attachment{
+			ID:   1,
+			Name: "123.md",
+		}
+		filetypes := []string{"image/png", "image/jpg", "text/markdown", "text/html", "video/mp4", "image/jpeg"}
 		file, err := createFile("meroedu.png")
 		if err != nil {
 			t.Errorf("Error creating temp file %v", err)
@@ -59,33 +58,66 @@ func TestCreateAttachment(t *testing.T) {
 			mockAttachment.File = file
 			mockAttachment.Type = filetype
 			mockAttachmentStore.On("CreateAttachment", mock.Anything, mock.AnythingOfType("domain.Attachment")).Return(nil).Once()
+			mockAttachmentRepo.On("CreateAttachment", mock.Anything, mock.AnythingOfType("domain.Attachment")).Return(nil).Once()
 			u := usecase.NewAttachmentUseCase(mockAttachmentRepo, mockAttachmentStore, time.Second*2)
 			a, err := u.CreateAttachment(context.TODO(), mockAttachment)
 			assert.NoError(t, err)
 			assert.Equal(t, mockAttachment.ID, a.ID)
 			mockAttachmentStore.AssertExpectations(t)
+			mockAttachmentRepo.AssertExpectations(t)
 		}
 	})
-	t.Run("error-failed", func(t *testing.T) {
-		mockAttachment.Type = "text/xml"
+	t.Run("error-store", func(t *testing.T) {
+		mockAttachmentStore := new(mocks.AttachmentStorage)
+		mockAttachmentRepo := new(mocks.AttachmentRepository)
+		mockAttachment := domain.Attachment{
+			ID:   1,
+			Name: "123.md",
+			Type: "text/xml",
+		}
 		u := usecase.NewAttachmentUseCase(mockAttachmentRepo, mockAttachmentStore, time.Second*2)
 		a, err := u.CreateAttachment(context.TODO(), mockAttachment)
 		assert.Error(t, err)
 		assert.Nil(t, a)
-
 	})
-	t.Run("error-saved", func(t *testing.T) {
-		file, err := createFile("meroedu.html")
-		if err != nil {
-			t.Errorf("Error creating temp file %v", err)
+	t.Run("error-db-saved", func(t *testing.T) {
+		mockAttachmentStore := new(mocks.AttachmentStorage)
+		mockAttachmentRepo := new(mocks.AttachmentRepository)
+		mockAttachment := domain.Attachment{
+			ID:   1,
+			Name: "123.png",
+			Type: "image/png",
 		}
-		mockAttachment.File = file
-		mockAttachment.Type = "text/html"
-		mockAttachmentStore.On("CreateAttachment", mock.Anything, mock.AnythingOfType("domain.Attachment")).Return(errors.New("Error occur while saving file")).Once()
+		mockAttachmentStore.On("CreateAttachment", mock.Anything, mock.AnythingOfType("domain.Attachment")).Return(nil).Once()
+		mockAttachmentRepo.On("CreateAttachment", mock.Anything, mock.AnythingOfType("domain.Attachment")).Return(errors.New("Unexpected to save in database")).Once()
 		u := usecase.NewAttachmentUseCase(mockAttachmentRepo, mockAttachmentStore, time.Second*2)
 		a, err := u.CreateAttachment(context.TODO(), mockAttachment)
 		assert.Error(t, err)
 		assert.Nil(t, a)
 		mockAttachmentStore.AssertExpectations(t)
+		mockAttachmentRepo.AssertExpectations(t)
+
+	})
+	t.Run("error-store-saved", func(t *testing.T) {
+		mockAttachmentStore := new(mocks.AttachmentStorage)
+		mockAttachmentRepo := new(mocks.AttachmentRepository)
+
+		file, err := createFile("meroedu.html")
+		if err != nil {
+			t.Errorf("Error creating temp file %v", err)
+		}
+		mockAttachmentStore.On("CreateAttachment", mock.Anything, mock.AnythingOfType("domain.Attachment")).Return(errors.New("Error occur while saving file")).Once()
+		mockAttachment := domain.Attachment{
+			ID:   1,
+			Name: "123.md",
+			File: file,
+			Type: "text/html",
+		}
+		u := usecase.NewAttachmentUseCase(mockAttachmentRepo, mockAttachmentStore, time.Second*2)
+		a, err := u.CreateAttachment(context.TODO(), mockAttachment)
+		assert.Error(t, err)
+		assert.Nil(t, a)
+		mockAttachmentStore.AssertExpectations(t)
+		mockAttachmentRepo.AssertExpectations(t)
 	})
 }

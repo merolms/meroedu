@@ -70,6 +70,18 @@ var doc = `{
                 "summary": "Create an attachment.",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Title",
+                        "name": "title",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Description",
+                        "name": "description",
+                        "in": "formData"
+                    },
+                    {
                         "type": "file",
                         "description": "Upload file",
                         "name": "file",
@@ -1362,7 +1374,13 @@ var doc = `{
         "domain.Attachment": {
             "type": "object",
             "properties": {
+                "course_id": {
+                    "type": "integer"
+                },
                 "created_at": {
+                    "type": "string"
+                },
+                "description": {
                     "type": "string"
                 },
                 "file_size": {
@@ -1375,6 +1393,9 @@ var doc = `{
                     "type": "integer"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 },
                 "updated_at": {

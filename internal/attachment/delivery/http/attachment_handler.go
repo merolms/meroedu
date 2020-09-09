@@ -32,13 +32,17 @@ func NewAttachmentHandler(e *echo.Echo, us domain.AttachmentUserCase) {
 // @Description Create an attachment..
 // @Tags attachments
 // @Accept */*
-// @Param   file formData file true  "Upload file"
+// @Param title formData string false  "Title"
+// @Param description formData string false  "Description"
+// @Param file formData file true  "Upload file"
 // @Produce json
 // @Success 200 {object} domain.Response
 // @Failure 500 {object} domain.APIResponseError "Internal Server Error"
 // @Router /attachments [post]
 func (a *AttachmentHandler) CreateAttachment(echoContext echo.Context) error {
 	ctx := echoContext.Request().Context()
+	title := echoContext.FormValue("title")
+	description := echoContext.FormValue("description")
 	fileHeader, err := echoContext.FormFile("file")
 	if err != nil {
 		return err
@@ -50,10 +54,12 @@ func (a *AttachmentHandler) CreateAttachment(echoContext echo.Context) error {
 	}
 
 	attachment := domain.Attachment{
-		File:     file,
-		Filename: fileHeader.Filename,
-		Size:     file.(util.Sizer).Size(),
-		Type:     fileHeader.Header.Get("Content-Type"),
+		Title:       title,
+		Description: description,
+		File:        file,
+		Filename:    fileHeader.Filename,
+		Size:        file.(util.Sizer).Size(),
+		Type:        fileHeader.Header.Get("Content-Type"),
 	}
 	response, err := a.AttachmentUseCase.CreateAttachment(ctx, attachment)
 	if err != nil {

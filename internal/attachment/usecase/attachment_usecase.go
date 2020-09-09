@@ -39,6 +39,11 @@ func (usecase *AttachmentUseCase) CreateAttachment(ctx context.Context, attachme
 		log.Errorf("Error occur %v", err)
 		return nil, err
 	}
+	err = usecase.attachmentRepo.CreateAttachment(ctx, attachment)
+	if err != nil {
+		log.Errorf("Error occur %v", err)
+		return nil, err
+	}
 	return &attachment, nil
 }
 func getUUID() string {
@@ -54,7 +59,7 @@ func getFileName(fileType string) *string {
 	case "image/png":
 		filename = getUUID() + ".png"
 		return &filename
-	case "image/jpg":
+	case "image/jpg", "image/jpeg":
 		filename = getUUID() + ".jpg"
 		return &filename
 	case "text/markdown":
@@ -62,6 +67,9 @@ func getFileName(fileType string) *string {
 		return &filename
 	case "text/html":
 		filename = getUUID() + ".html"
+		return &filename
+	case "video/mp4":
+		filename = getUUID() + ".mp4"
 		return &filename
 	}
 	return nil
