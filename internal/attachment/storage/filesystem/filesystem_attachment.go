@@ -31,17 +31,20 @@ func Init() (domain.AttachmentStorage, error) {
 
 func (repo *fileStorage) CreateAttachment(ctx context.Context, attachment domain.Attachment) error {
 	src := attachment.File
+	if src == nil {
+		return domain.ErrFileEmpty
+	}
 	filePath := repo.path + "/" + attachment.Name
 	dst, err := os.Create(filePath)
 	if err != nil {
-		log.Errorf("Error occur while creating filepath: %v, Error: %v", filePath, err)
+		log.Errorf("error occur while creating filepath: %v, error: %v", filePath, err)
 		return err
 	}
 
 	defer dst.Close()
 
 	if _, err = io.Copy(dst, src); err != nil {
-		log.Errorf("Error occur while copying: %v", err)
+		log.Errorf("error occur while copying: %v", err)
 		return err
 	}
 	return nil

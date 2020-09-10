@@ -24,32 +24,55 @@ func NewAttachmentHandler(e *echo.Echo, us domain.AttachmentUseCase) {
 		AttachmentUseCase: us,
 	}
 	// Get Operation
-	e.POST("attachment/upload", handler.Upload)
 	e.GET("attachment/download", handler.Download)
+	// Create Attachment
+	e.POST("attachments", handler.CreateAttachment)
 }
 
-// Upload ...
-func (a *AttachmentHandler) Upload(echoContext echo.Context) error {
+// CreateAttachment godoc
+// @Summary Create an attachment.
+// @Description Create an attachment..
+// @Tags attachments
+// @Accept */*
+// @Param title formData string false  "Title"
+// @Param description formData string false  "Description"
+// @Param file formData file true  "Upload file"
+// @Produce json
+// @Success 200 {object} domain.Response
+// @Failure 500 {object} domain.APIResponseError "Internal Server Error"
+// @Router /attachments [post]
+func (a *AttachmentHandler) CreateAttachment(echoContext echo.Context) error {
 	ctx := echoContext.Request().Context()
+	title := echoContext.FormValue("title")
+	description := echoContext.FormValue("description")
 	fileHeader, err := echoContext.FormFile("file")
 	if err != nil {
-		return err
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
 	file, err := fileHeader.Open()
 	defer file.Close()
 	if err != nil {
 		return err
 	}
-
-	attachment := domain.Attachment{
-		File:     file,
-		Filename: fileHeader.Filename,
-		Size:     file.(util.Sizer).Size(),
-		Type:     fileHeader.Header.Get("Content-Type"),
+	sizer, ok := file.(util.Sizer)
+	if !ok {
+		return echoContext.JSON(http.StatusBadRequest, ResponseError{Message: "invalid size"})
 	}
-	res, err := a.AttachmentUseCase.CreateAttachment(ctx, attachment)
+	attachment := domain.Attachment{
+		Title:       title,
+		Description: description,
+		File:        file,
+		Filename:    fileHeader.Filename,
+		Size:        sizer.Size(),
+		Type:        fileHeader.Header.Get("Content-Type"),
+	}
+	response, err := a.AttachmentUseCase.CreateAttachment(ctx, attachment)
 	if err != nil {
 		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
+	}
+	res := domain.Response{
+		Data:    response,
+		Message: domain.Success,
 	}
 	return echoContext.JSON(http.StatusCreated, res)
 }

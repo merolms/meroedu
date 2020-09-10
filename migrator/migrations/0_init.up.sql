@@ -158,8 +158,10 @@ CREATE TABLE `attachments` (
   `id` bigint(20) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `title` varchar(256),
   `description` longtext,
-  `type` int,
-  `course_id` bigint(20) NOT NULL,
+  `name` varchar(256),
+  `size` int,
+  `type` varchar(60),
+  `course_id` bigint(20) NULL,
   `status` int(1),
   `updated_at` timestamp DEFAULT (now()),
   `created_at` timestamp DEFAULT (now())

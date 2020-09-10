@@ -2,22 +2,23 @@ BINARY=meroedu
 DB_CONFIG_FILE ?= ./migrator/dbconf.yml
 DB_DSN ?= $(shell sed -n 's/^dsn:[[:space:]]*"\(.*\)"/\1/p' $(DB_CONFIG_FILE))
 ##############################################################################
-# Staging
+# Development/Staging
 ##############################################################################
+config:
+	cp config.example.yml config.yml && cd migrator && cp dbconf.example.yml dbconf.yml
+wait-for-db:
+	./scripts/wait-for-db.sh
+	sleep 5
+init-db:
+	docker-compose up -d db
+
+prepare: config init-db wait-for-db migrate
 
 run:
-	docker-compose -f docker-compose.yaml up --build -d
+	docker-compose up --build -d
 stop:
-	docker-compose -f docker-compose.yaml down
-##############################################################################
-# Development
-##############################################################################
-
-run-dev:
-	docker-compose -f docker-compose.dev.yaml up --build
-stop-dev:
-	docker-compose -f docker-compose.dev.yaml down
-
+	docker-compose down
+reset: migrate-down stop
 ##############################################################################
 # Lint
 ###############################################################################
@@ -31,9 +32,6 @@ lint:
 ##############################################################################
 # Test
 ###############################################################################
-
-test-richgo: 
-	richgo test -v -cover -covermode=atomic ./...
 
 test: 
 	go test -v -cover -covermode=atomic ./...
@@ -66,8 +64,8 @@ migrate-down:
 #############################################################################
 # Utility
 #############################################################################
-db-diagram:
-	java -jar ~/Downloads/schema-gui/schemaspy-6.1.0.jar -dp ~/Downloads/mysql-connector-java-6.0.6.jar -t mysql -db course_api -host localhost -u root -p "root" -o ~/Downloads/schema-gui/course_api -s course_api
+build:
+	go build -o ${BINARY}
 build-app: clean-app
 	go build -o ${BINARY}
 
