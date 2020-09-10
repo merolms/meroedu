@@ -21,7 +21,7 @@ import (
 	"github.com/meroedu/meroedu/internal/domain/mocks"
 )
 
-func TestUpload(t *testing.T) {
+func TestCreateAttachment(t *testing.T) {
 	rootDirectory, err := os.Getwd()
 	if err != nil {
 		t.Error(err)

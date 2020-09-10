@@ -30,10 +30,10 @@ func (usecase *AttachmentUseCase) CreateAttachment(ctx context.Context, attachme
 	ctx, cancel := context.WithTimeout(ctx, usecase.contextTimeOut)
 	defer cancel()
 	filename := getFileName(attachment.Type)
-	if filename == nil {
+	if filename == "" {
 		return nil, domain.ErrUnsupportedFileType
 	}
-	attachment.Name = *filename
+	attachment.Name = filename
 	err := usecase.attachmentStore.CreateAttachment(ctx, attachment)
 	if err != nil {
 		log.Errorf("error received from usecase storage %v", err)
@@ -46,31 +46,22 @@ func (usecase *AttachmentUseCase) CreateAttachment(ctx context.Context, attachme
 	}
 	return &attachment, nil
 }
-func getUUID() string {
-	id := uuid.New()
-	return id.String()
-}
 
 // GetFileName will return file name with concating with uniquie id(uuid)
-func getFileName(fileType string) *string {
+func getFileName(fileType string) string {
 	log.Infof("Requested file type:%v", fileType)
-	var filename string = ""
+	var filename string = uuid.New().String()
 	switch fileType {
 	case "image/png":
-		filename = getUUID() + ".png"
-		return &filename
+		return filename + ".png"
 	case "image/jpg", "image/jpeg":
-		filename = getUUID() + ".jpg"
-		return &filename
+		return filename + ".jpg"
 	case "text/markdown":
-		filename = getUUID() + ".md"
-		return &filename
+		return filename + ".md"
 	case "text/html":
-		filename = getUUID() + ".html"
-		return &filename
+		return filename + ".html"
 	case "video/mp4":
-		filename = getUUID() + ".mp4"
-		return &filename
+		return filename + ".mp4"
 	}
-	return nil
+	return ""
 }

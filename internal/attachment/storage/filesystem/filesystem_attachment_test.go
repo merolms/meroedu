@@ -2,7 +2,6 @@ package filesystem_test
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"testing"
 
@@ -19,7 +18,6 @@ func createTempFile(filename string) (*os.File, error) {
 		return nil, err
 	}
 	path := rootDirectory + "/" + filename
-	fmt.Println(path)
 	dst, err := os.Create(path)
 	if err != nil {
 		log.Errorf("error occur while creating file from path: %v, error: %v", path, err)

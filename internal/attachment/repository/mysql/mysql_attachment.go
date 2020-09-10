@@ -9,19 +9,19 @@ import (
 )
 
 type mysqlRepository struct {
-	Conn *sql.DB
+	conn *sql.DB
 }
 
 // Init will create an object that represent the attachment's Repository interface
 func Init(db *sql.DB) domain.AttachmentRepository {
 	return &mysqlRepository{
-		Conn: db,
+		conn: db,
 	}
 }
 
 func (r mysqlRepository) CreateAttachment(ctx context.Context, a domain.Attachment) error {
 	query := `INSERT attachments SET title=?, description=?, name=?, size=?, type=?`
-	stmt, err := r.Conn.PrepareContext(ctx, query)
+	stmt, err := r.conn.PrepareContext(ctx, query)
 	if err != nil {
 		log.Error("error while preparing statement ", err)
 		return err

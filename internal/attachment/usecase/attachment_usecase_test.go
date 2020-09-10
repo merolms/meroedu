@@ -3,7 +3,6 @@ package usecase_test
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -17,30 +16,29 @@ import (
 	"github.com/meroedu/meroedu/pkg/log"
 )
 
-func createFile(filename string) (*os.File, error) {
+func createFile(filename string) (os.File, error) {
 	rootDirectory, err := os.Getwd()
 	if err != nil {
-		return nil, err
+		return os.File{}, err
 	}
 	path := rootDirectory + "/" + filename
-	fmt.Println(path)
 	dst, err := os.Create(path)
 	if err != nil {
 		log.Errorf("error occur while creating file from path: %v, error: %v", path, err)
-		return nil, err
+		return os.File{}, err
 	}
 	defer dst.Close()
 	file, err := os.Open(path)
 	if err != nil {
 		log.Errorf("error while opeing file: %v", err)
-		return nil, err
+		return os.File{}, err
 	}
 	err = os.Remove(path)
 	if err != nil {
 		log.Errorf("error occur while removing aile from path: %v, error: %v", path, err)
 	}
 	defer file.Close()
-	return file, nil
+	return *file, nil
 }
 func TestCreateAttachment(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
@@ -55,8 +53,9 @@ func TestCreateAttachment(t *testing.T) {
 		if err != nil {
 			t.Errorf("error creating temp file %v", err)
 		}
+		defer file.Close()
 		for _, filetype := range filetypes {
-			mockAttachment.File = file
+			mockAttachment.File = &file
 			mockAttachment.Type = filetype
 			mockAttachmentStore.On("CreateAttachment", mock.Anything, mock.AnythingOfType("domain.Attachment")).Return(nil).Once()
 			mockAttachmentRepo.On("CreateAttachment", mock.Anything, mock.AnythingOfType("domain.Attachment")).Return(nil).Once()
@@ -107,11 +106,12 @@ func TestCreateAttachment(t *testing.T) {
 		if err != nil {
 			t.Errorf("error creating temp file %v", err)
 		}
+		defer file.Close()
 		mockAttachmentStore.On("CreateAttachment", mock.Anything, mock.AnythingOfType("domain.Attachment")).Return(errors.New("error occur while saving file")).Once()
 		mockAttachment := domain.Attachment{
 			ID:   1,
 			Name: "123.md",
-			File: file,
+			File: &file,
 			Type: "text/html",
 		}
 		u := usecase.NewAttachmentUseCase(mockAttachmentRepo, mockAttachmentStore, time.Second*2)
