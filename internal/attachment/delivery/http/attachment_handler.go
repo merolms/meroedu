@@ -8,7 +8,7 @@ import (
 	"github.com/meroedu/meroedu/internal/util"
 )
 
-// Response represents the response error struct
+// ResponseError represents the response error struct
 type ResponseError struct {
 	Message string `json:"message"`
 }
