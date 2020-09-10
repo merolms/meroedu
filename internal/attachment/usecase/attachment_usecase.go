@@ -36,12 +36,12 @@ func (usecase *AttachmentUseCase) CreateAttachment(ctx context.Context, attachme
 	attachment.Name = *filename
 	err := usecase.attachmentStore.CreateAttachment(ctx, attachment)
 	if err != nil {
-		log.Errorf("Error occur %v", err)
+		log.Errorf("error received from usecase storage %v", err)
 		return nil, err
 	}
 	err = usecase.attachmentRepo.CreateAttachment(ctx, attachment)
 	if err != nil {
-		log.Errorf("Error occur %v", err)
+		log.Errorf("error received from usecase repository %v", err)
 		return nil, err
 	}
 	return &attachment, nil

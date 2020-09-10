@@ -6,10 +6,11 @@ import (
 	"os"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	filestore "github.com/meroedu/meroedu/internal/attachment/storage/filesystem"
 	"github.com/meroedu/meroedu/internal/domain"
 	"github.com/meroedu/meroedu/pkg/log"
-	"github.com/stretchr/testify/assert"
 )
 
 func createTempFile(filename string) (*os.File, error) {
@@ -21,13 +22,13 @@ func createTempFile(filename string) (*os.File, error) {
 	fmt.Println(path)
 	dst, err := os.Create(path)
 	if err != nil {
-		log.Errorf("Error occur while creating file from path: %v, Error: %v", path, err)
+		log.Errorf("error occur while creating file from path: %v, error: %v", path, err)
 		return nil, err
 	}
 	defer dst.Close()
 	file, err := os.Open(path)
 	if err != nil {
-		log.Errorf("Error while opeing file: %v", err)
+		log.Errorf("error while opening file: %v", err)
 	}
 	return file, nil
 }
@@ -39,7 +40,7 @@ func removeFile(filename string) error {
 	path := rootDirectory + "/" + filename
 	err = os.Remove(path)
 	if err != nil {
-		log.Errorf("Error occur while removing aile from path: %v, Error: %v", path, err)
+		log.Errorf("error occur while removing aile from path: %v, error: %v", path, err)
 		return err
 	}
 	return nil
@@ -56,13 +57,13 @@ func TestCreateAttachment(t *testing.T) {
 	defer file.Close()
 	s, err := filestore.Init()
 	if err != nil {
-		t.Errorf("Error init filestore")
+		t.Errorf("error init filestore")
 	}
 	log.Infof("FileSystem storage: %v %v", s, mockAttachment)
 	t.Run("success", func(t *testing.T) {
 		err = s.CreateAttachment(context.TODO(), mockAttachment)
 		if err != nil {
-			t.Errorf("Error While creating attachment %v", err)
+			t.Errorf("error while creating attachment %v", err)
 		}
 		assert.NoError(t, err)
 	})
@@ -74,6 +75,6 @@ func TestCreateAttachment(t *testing.T) {
 
 	err = removeFile(filename)
 	if err != nil {
-		t.Errorf("Error removing %v", filename)
+		t.Errorf("error removing %v", filename)
 	}
 }

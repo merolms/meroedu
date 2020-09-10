@@ -8,7 +8,7 @@ import (
 	"github.com/meroedu/meroedu/internal/util"
 )
 
-// ResponseError represents the response error struct
+// Response represents the response error struct
 type ResponseError struct {
 	Message string `json:"message"`
 }
@@ -45,20 +45,23 @@ func (a *AttachmentHandler) CreateAttachment(echoContext echo.Context) error {
 	description := echoContext.FormValue("description")
 	fileHeader, err := echoContext.FormFile("file")
 	if err != nil {
-		return err
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
 	file, err := fileHeader.Open()
 	defer file.Close()
 	if err != nil {
 		return err
 	}
-
+	sizer, ok := file.(util.Sizer)
+	if !ok {
+		return echoContext.JSON(http.StatusBadRequest, ResponseError{Message: "invalid size"})
+	}
 	attachment := domain.Attachment{
 		Title:       title,
 		Description: description,
 		File:        file,
 		Filename:    fileHeader.Filename,
-		Size:        file.(util.Sizer).Size(),
+		Size:        sizer.Size(),
 		Type:        fileHeader.Header.Get("Content-Type"),
 	}
 	response, err := a.AttachmentUseCase.CreateAttachment(ctx, attachment)

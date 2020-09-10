@@ -11,14 +11,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/meroedu/meroedu/internal/domain"
-
 	"github.com/labstack/echo/v4"
-	attachmenthttp "github.com/meroedu/meroedu/internal/attachment/delivery/http"
-	"github.com/meroedu/meroedu/internal/domain/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+
+	attachmenthttp "github.com/meroedu/meroedu/internal/attachment/delivery/http"
+	"github.com/meroedu/meroedu/internal/domain"
+	"github.com/meroedu/meroedu/internal/domain/mocks"
 )
 
 func TestUpload(t *testing.T) {
@@ -72,7 +72,7 @@ func TestUpload(t *testing.T) {
 		}
 
 		err = handler.CreateAttachment(c)
-		require.Error(t, err)
+		require.NoError(t, err)
 	})
 	t.Run("unsupported file", func(t *testing.T) {
 		mockUCase := new(mocks.AttachmentUserCase)

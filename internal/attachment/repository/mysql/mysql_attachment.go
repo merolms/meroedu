@@ -20,21 +20,21 @@ func Init(db *sql.DB) domain.AttachmentRepository {
 }
 
 func (r mysqlRepository) CreateAttachment(ctx context.Context, a domain.Attachment) error {
-	query := `INSERT  attachments SET title=?, description=?, name=?, size=?, type=?`
+	query := `INSERT attachments SET title=?, description=?, name=?, size=?, type=?`
 	stmt, err := r.Conn.PrepareContext(ctx, query)
 	if err != nil {
-		log.Error("Error while preparing statement ", err)
+		log.Error("error while preparing statement ", err)
 		return err
 	}
 
 	res, err := stmt.ExecContext(ctx, a.Title, a.Description, a.Name, a.Size, a.Type)
 	if err != nil {
-		log.Error("Error while executing statement ", err)
+		log.Error("error while executing statement ", err)
 		return err
 	}
 	lastID, err := res.LastInsertId()
 	if err != nil {
-		log.Error("Got Error from LastInsertId method: ", err)
+		log.Error("got an error from LastInsertId method: ", err)
 		return err
 	}
 	a.ID = lastID

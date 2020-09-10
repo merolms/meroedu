@@ -4,10 +4,11 @@ import (
 	"context"
 	"testing"
 
-	mysqlrepo "github.com/meroedu/meroedu/internal/attachment/repository/mysql"
-	"github.com/meroedu/meroedu/internal/domain"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
+
+	mysqlrepo "github.com/meroedu/meroedu/internal/attachment/repository/mysql"
+	"github.com/meroedu/meroedu/internal/domain"
 )
 
 func TestCreateAttachment(t *testing.T) {
