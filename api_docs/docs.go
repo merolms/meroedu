@@ -105,6 +105,38 @@ var doc = `{
                 }
             }
         },
+        "/attachments/download": {
+            "get": {
+                "description": "Download an attachment.",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "attachments"
+                ],
+                "summary": "Download an attachment.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "uuid-encoded file name",
+                        "name": "file",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/domain.APIResponseError"
+                        }
+                    }
+                }
+            }
+        },
         "/categories": {
             "get": {
                 "description": "Get All Categories summaries..",

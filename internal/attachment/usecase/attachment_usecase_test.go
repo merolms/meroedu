@@ -122,3 +122,24 @@ func TestCreateAttachment(t *testing.T) {
 		mockAttachmentRepo.AssertExpectations(t)
 	})
 }
+
+func TestDownloadAttachment(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		mockAttachmentStore := new(mocks.AttachmentStorage)
+		mockAttachmentRepo := new(mocks.AttachmentRepository)
+		mockAttachmentStore.On("DownloadAttachment", mock.Anything, mock.AnythingOfType("string")).Return("somepath", nil).Once()
+		u := usecase.NewAttachmentUseCase(mockAttachmentRepo, mockAttachmentStore, time.Second*2)
+		filepath, err := u.DownloadAttachment(context.TODO(), "hello.png")
+		assert.NoError(t, err)
+		assert.NotEmpty(t, filepath)
+	})
+	t.Run("error-store", func(t *testing.T) {
+		mockAttachmentStore := new(mocks.AttachmentStorage)
+		mockAttachmentRepo := new(mocks.AttachmentRepository)
+		mockAttachmentStore.On("DownloadAttachment", mock.Anything, mock.AnythingOfType("string")).Return("", errors.New("unable to get filepath")).Once()
+		u := usecase.NewAttachmentUseCase(mockAttachmentRepo, mockAttachmentStore, time.Second*2)
+		filepath, err := u.DownloadAttachment(context.TODO(), "hello.png")
+		assert.Error(t, err)
+		assert.Empty(t, filepath)
+	})
+}

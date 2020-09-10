@@ -230,6 +230,27 @@ paths:
       summary: Create an attachment.
       tags:
       - attachments
+  /attachments/download:
+    get:
+      consumes:
+      - '*/*'
+      description: Download an attachment.
+      parameters:
+      - description: uuid-encoded file name
+        in: query
+        name: file
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Download an attachment.
+      tags:
+      - attachments
   /categories:
     get:
       consumes:

@@ -4,8 +4,10 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+
 	"github.com/meroedu/meroedu/internal/domain"
 	"github.com/meroedu/meroedu/internal/util"
+	"github.com/meroedu/meroedu/pkg/log"
 )
 
 // ResponseError represents the response error struct
@@ -15,16 +17,20 @@ type ResponseError struct {
 
 // AttachmentHandler ...
 type AttachmentHandler struct {
-	AttachmentUseCase domain.AttachmentUserCase
+	AttachmentUseCase domain.AttachmentUseCase
 }
 
 // NewAttachmentHandler ...
-func NewAttachmentHandler(e *echo.Echo, us domain.AttachmentUserCase) {
+func NewAttachmentHandler(e *echo.Echo, us domain.AttachmentUseCase) {
 	handler := &AttachmentHandler{
 		AttachmentUseCase: us,
 	}
+
 	// Create Attachment
 	e.POST("attachments", handler.CreateAttachment)
+	// Download attachment
+	e.GET("attachments/download", handler.DownloadAttachment)
+
 }
 
 // CreateAttachment godoc
@@ -73,4 +79,24 @@ func (a *AttachmentHandler) CreateAttachment(echoContext echo.Context) error {
 		Message: domain.Success,
 	}
 	return echoContext.JSON(http.StatusCreated, res)
+}
+
+// DownloadAttachment godoc
+// @Summary Download an attachment.
+// @Description Download an attachment.
+// @Tags attachments
+// @Accept */*
+// @Param file query string true "uuid-encoded file name"
+// @Produce json
+// @Failure 500 {object} domain.APIResponseError "Internal Server Error"
+// @Router /attachments/download [get]
+func (a *AttachmentHandler) DownloadAttachment(echoContext echo.Context) error {
+	ctx := echoContext.Request().Context()
+	fileName := echoContext.QueryParam("file")
+	filePath, err := a.AttachmentUseCase.DownloadAttachment(ctx, fileName)
+	if err != nil {
+		log.Errorf("error while getting file path %v", err)
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
+	}
+	return echoContext.File(filePath)
 }

@@ -76,3 +76,32 @@ func TestCreateAttachment(t *testing.T) {
 		t.Errorf("error removing %v", filename)
 	}
 }
+
+func TestDownloadAttachment(t *testing.T) {
+	filename := "attachment.txt"
+	file, err := createTempFile(filename)
+	assert.NoError(t, err)
+	defer file.Close()
+	s, err := filestore.Init()
+	if err != nil {
+		t.Errorf("error init filestore")
+	}
+	t.Run("success", func(t *testing.T) {
+		path, err := s.DownloadAttachment(context.TODO(), filename)
+		if err != nil {
+			t.Errorf("error while creating attachment %v", err)
+		}
+		assert.NoError(t, err)
+		assert.Contains(t, path, filename)
+	})
+	t.Run("error-nil-file", func(t *testing.T) {
+		path, err := s.DownloadAttachment(context.TODO(), "abc.txt")
+		assert.Error(t, err)
+		assert.Empty(t, path)
+	})
+
+	err = removeFile(filename)
+	if err != nil {
+		t.Errorf("error removing %v", filename)
+	}
+}

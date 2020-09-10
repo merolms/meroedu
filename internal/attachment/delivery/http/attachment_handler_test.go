@@ -35,7 +35,7 @@ func TestCreateAttachment(t *testing.T) {
 	defer file.Close()
 
 	t.Run("success", func(t *testing.T) {
-		mockUCase := new(mocks.AttachmentUserCase)
+		mockUCase := new(mocks.AttachmentUseCase)
 		body := new(bytes.Buffer)
 		writer := multipart.NewWriter(body)
 		part, err := writer.CreateFormFile("file", filepath.Base(path))
@@ -61,7 +61,7 @@ func TestCreateAttachment(t *testing.T) {
 		mockUCase.AssertExpectations(t)
 	})
 	t.Run("error with no file", func(t *testing.T) {
-		mockUCase := new(mocks.AttachmentUserCase)
+		mockUCase := new(mocks.AttachmentUseCase)
 		e := echo.New()
 		req, err := http.NewRequest(echo.POST, "attachments", strings.NewReader(""))
 		rec := httptest.NewRecorder()
@@ -75,7 +75,7 @@ func TestCreateAttachment(t *testing.T) {
 		require.NoError(t, err)
 	})
 	t.Run("unsupported file", func(t *testing.T) {
-		mockUCase := new(mocks.AttachmentUserCase)
+		mockUCase := new(mocks.AttachmentUseCase)
 		body := new(bytes.Buffer)
 		writer := multipart.NewWriter(body)
 		part, err := writer.CreateFormFile("file", filepath.Base(path))
@@ -98,6 +98,44 @@ func TestCreateAttachment(t *testing.T) {
 		err = handler.CreateAttachment(c)
 		require.NoError(t, err)
 		assert.Equal(t, http.StatusInternalServerError, rec.Code)
+		mockUCase.AssertExpectations(t)
+	})
+}
+
+func TestDownloadAttachment(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		mockUCase := new(mocks.AttachmentUseCase)
+		rootDirectory, err := os.Getwd()
+		if err != nil {
+			t.Error(err)
+		}
+		path := rootDirectory + "/" + "attachment_handler.go"
+		mockUCase.On("DownloadAttachment", mock.Anything, mock.AnythingOfType("string")).Return(path, nil)
+		e := echo.New()
+		req, err := http.NewRequest(echo.GET, "/attachments/download?file=attachment_handler.go", strings.NewReader(""))
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		handler := attachmenthttp.AttachmentHandler{
+			AttachmentUseCase: mockUCase,
+		}
+		err = handler.DownloadAttachment(c)
+		require.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rec.Code)
+		mockUCase.AssertExpectations(t)
+	})
+	t.Run("error", func(t *testing.T) {
+		mockUCase := new(mocks.AttachmentUseCase)
+		mockUCase.On("DownloadAttachment", mock.Anything, mock.AnythingOfType("string")).Return("", domain.ErrNotFound)
+		e := echo.New()
+		req, err := http.NewRequest(echo.GET, "/attachments/download?file=abc.txt", strings.NewReader(""))
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		handler := attachmenthttp.AttachmentHandler{
+			AttachmentUseCase: mockUCase,
+		}
+		err = handler.DownloadAttachment(c)
+		require.NoError(t, err)
+		assert.Equal(t, http.StatusNotFound, rec.Code)
 		mockUCase.AssertExpectations(t)
 	})
 }

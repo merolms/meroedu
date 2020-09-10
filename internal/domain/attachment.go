@@ -21,9 +21,10 @@ type Attachment struct {
 	CreatedAt   time.Time      `json:"created_at"`
 }
 
-// AttachmentUserCase represents attachments usecase contract
-type AttachmentUserCase interface {
+// AttachmentUseCase represents attachments usecase contract
+type AttachmentUseCase interface {
 	CreateAttachment(ctx context.Context, attachment Attachment) (*Attachment, error)
+	DownloadAttachment(ctx context.Context, fileName string) (string, error)
 }
 
 // AttachmentRepository represent the attachment's repository contract
@@ -34,4 +35,5 @@ type AttachmentRepository interface {
 // AttachmentStorage represent the attachment's storage contract
 type AttachmentStorage interface {
 	CreateAttachment(ctx context.Context, attachment Attachment) error
+	DownloadAttachment(ctx context.Context, fileName string) (string, error)
 }
