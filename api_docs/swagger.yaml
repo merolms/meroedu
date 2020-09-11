@@ -11,12 +11,22 @@ definitions:
     type: object
   domain.Attachment:
     properties:
+      course_id:
+        type: integer
       created_at:
         type: string
-      file:
+      description:
+        type: string
+      file_size:
+        type: integer
+      file_type:
         type: string
       id:
         type: integer
+      name:
+        type: string
+      title:
+        type: string
       updated_at:
         type: string
     type: object
@@ -187,6 +197,60 @@ paths:
       summary: Show the status of server.
       tags:
       - health
+  /attachments:
+    post:
+      consumes:
+      - '*/*'
+      description: Create an attachment..
+      parameters:
+      - description: Title
+        in: formData
+        name: title
+        type: string
+      - description: Description
+        in: formData
+        name: description
+        type: string
+      - description: Upload file
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Create an attachment.
+      tags:
+      - attachments
+  /attachments/download:
+    get:
+      consumes:
+      - '*/*'
+      description: Download an attachment.
+      parameters:
+      - description: uuid-encoded file name
+        in: query
+        name: file
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Download an attachment.
+      tags:
+      - attachments
   /categories:
     get:
       consumes:

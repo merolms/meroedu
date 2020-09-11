@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// Course Status
 const (
 	CourseInDraft   Status = "Draft"
 	CourseArchived  Status = "Archived"
@@ -30,7 +31,6 @@ type Course struct {
 	Duration    uint16       `json:"duration,omitempty"`
 	CategoryID  NullInt64    `json:"category_id,omitempty"`
 	Category    Category     `json:"categories,omitempty"`
-	test        []string     `json:test,omitempty`
 	Tags        []Tag        `json:"tags,omitempty"`
 	AuthorID    NullInt64    `json:"author_id,omitempty"`
 	Author      User         `json:"author,omitempty"`

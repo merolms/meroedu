@@ -16,3 +16,4 @@ coverage.out
 meroedu
 config.yml
 migrator/dbconf.yml
+uploads/

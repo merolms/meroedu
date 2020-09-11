@@ -14,23 +14,16 @@ type AttachmentRepository struct {
 	mock.Mock
 }
 
-// GetByID provides a mock function with given fields: ctx, id
-func (_m *AttachmentRepository) GetByID(ctx context.Context, id int64) (domain.Attachment, error) {
-	ret := _m.Called(ctx, id)
+// CreateAttachment provides a mock function with given fields: ctx, attachment
+func (_m *AttachmentRepository) CreateAttachment(ctx context.Context, attachment domain.Attachment) error {
+	ret := _m.Called(ctx, attachment)
 
-	var r0 domain.Attachment
-	if rf, ok := ret.Get(0).(func(context.Context, int64) domain.Attachment); ok {
-		r0 = rf(ctx, id)
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, domain.Attachment) error); ok {
+		r0 = rf(ctx, attachment)
 	} else {
-		r0 = ret.Get(0).(domain.Attachment)
+		r0 = ret.Error(0)
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, int64) error); ok {
-		r1 = rf(ctx, id)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }

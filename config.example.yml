@@ -4,13 +4,15 @@ server:
   address: ":9090"
 context:
   timeout: 2
+filesystem:
+  relativePath: "uploads"
 database:
   params:
     parseTime: "true"
   host: db
   port: 3306
-  user: user
-  password: password
+  user: root
+  password: mypassword
   dbname: course_api
   allowNativePasswords: true
   max_open_connections: 25

@@ -8,6 +8,16 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
+// Size ...
+const (
+	MB = 1 << 20
+)
+
+// Sizer ...
+type Sizer interface {
+	Size() int64
+}
+
 // GetStatusCode ...
 func GetStatusCode(err error) int {
 	if err == nil {
