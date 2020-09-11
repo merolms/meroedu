@@ -9,7 +9,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	_ "github.com/meroedu/meroedu/api_docs"
+    _ "github.com/meroedu/meroedu/docs"
 	_attachmentHttpDelivery "github.com/meroedu/meroedu/internal/attachment/delivery/http"
 	_attachmentRepo "github.com/meroedu/meroedu/internal/attachment/repository/mysql"
 	_attachmentStore "github.com/meroedu/meroedu/internal/attachment/storage/filesystem"
