@@ -16,7 +16,7 @@ import (
 func TestGetAll(t *testing.T) {
 	mockCourseRepo := new(mocks.CourseRepository)
 	// mockUserRepo := new(mocks.UserRepository)
-	// mockLessonRepo := new(mocks.LessonRepository)
+	mockLessonRepo := new(mocks.LessonRepository)
 	// mockAttachmentRepo:=new(mocks.AttachmentRepository)
 	// mockCategoryRepo:=new(mocks.CategoryRepository)
 	mockListCourse := []domain.Course{
@@ -31,7 +31,7 @@ func TestGetAll(t *testing.T) {
 
 		start := int(0)
 		limit := int(1)
-		u := ucase.NewCourseUseCase(mockCourseRepo, time.Second*2)
+		u := ucase.NewCourseUseCase(mockCourseRepo, mockLessonRepo, time.Second*2)
 		list, err := u.GetAll(context.TODO(), start, limit)
 		assert.NoError(t, err)
 		assert.Len(t, list, len(mockListCourse))
@@ -42,7 +42,7 @@ func TestGetAll(t *testing.T) {
 		mockCourseRepo.On("GetAll", mock.Anything, mock.AnythingOfType("int"),
 			mock.AnythingOfType("int")).Return(nil, errors.New("Unexpexted Error")).Once()
 
-		u := ucase.NewCourseUseCase(mockCourseRepo, time.Second*2)
+		u := ucase.NewCourseUseCase(mockCourseRepo, mockLessonRepo, time.Second*2)
 		start := int(0)
 		limit := int(1)
 		list, err := u.GetAll(context.TODO(), start, limit)
@@ -54,13 +54,16 @@ func TestGetAll(t *testing.T) {
 }
 func TestGetByID(t *testing.T) {
 	mockCourseRepo := new(mocks.CourseRepository)
+	mockLessonRepo := new(mocks.LessonRepository)
 	mockCourse := domain.Course{
 		Title:  "title-1",
 		Author: domain.User{ID: 1}, UpdatedAt: time.Now(), CreatedAt: time.Now(),
 	}
 	t.Run("success", func(t *testing.T) {
 		mockCourseRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(&mockCourse, nil).Once()
-		u := ucase.NewCourseUseCase(mockCourseRepo, time.Second*2)
+		mockLessonRepo.On("GetLessonCountByCourse", mock.Anything, mock.AnythingOfType("int64")).Return(12, nil).Once()
+		mockLessonRepo.On("GetLessonByCourse", mock.Anything, mock.AnythingOfType("int64")).Return([]domain.Lesson{}, nil).Once()
+		u := ucase.NewCourseUseCase(mockCourseRepo, mockLessonRepo, time.Second*2)
 
 		a, err := u.GetByID(context.TODO(), mockCourse.ID)
 
@@ -68,11 +71,11 @@ func TestGetByID(t *testing.T) {
 		assert.NotNil(t, *a)
 
 		mockCourseRepo.AssertExpectations(t)
+		mockLessonRepo.AssertExpectations(t)
 	})
 	t.Run("error-failed", func(t *testing.T) {
 		mockCourseRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(nil, errors.New("Unexpected")).Once()
-
-		u := ucase.NewCourseUseCase(mockCourseRepo, time.Second*2)
+		u := ucase.NewCourseUseCase(mockCourseRepo, mockLessonRepo, time.Second*2)
 
 		a, err := u.GetByID(context.TODO(), mockCourse.ID)
 
@@ -84,13 +87,14 @@ func TestGetByID(t *testing.T) {
 }
 func TestGetByTitle(t *testing.T) {
 	mockCourseRepo := new(mocks.CourseRepository)
+	mockLessonRepo := new(mocks.LessonRepository)
 	mockCourse := domain.Course{
 		Title:  "title-1",
 		Author: domain.User{ID: 1}, UpdatedAt: time.Now(), CreatedAt: time.Now(),
 	}
 	t.Run("success", func(t *testing.T) {
 		mockCourseRepo.On("GetByTitle", mock.Anything, mock.AnythingOfType("string")).Return(&mockCourse, nil).Once()
-		u := ucase.NewCourseUseCase(mockCourseRepo, time.Second*2)
+		u := ucase.NewCourseUseCase(mockCourseRepo, mockLessonRepo, time.Second*2)
 
 		a, err := u.GetByTitle(context.TODO(), mockCourse.Title)
 
@@ -102,7 +106,7 @@ func TestGetByTitle(t *testing.T) {
 	t.Run("error-failed", func(t *testing.T) {
 		mockCourseRepo.On("GetByTitle", mock.Anything, mock.AnythingOfType("string")).Return(nil, errors.New("Unexpected")).Once()
 
-		u := ucase.NewCourseUseCase(mockCourseRepo, time.Second*2)
+		u := ucase.NewCourseUseCase(mockCourseRepo, mockLessonRepo, time.Second*2)
 
 		a, err := u.GetByTitle(context.TODO(), "random")
 
@@ -114,6 +118,7 @@ func TestGetByTitle(t *testing.T) {
 }
 func TestCreateCourse(t *testing.T) {
 	mockCourseRepo := new(mocks.CourseRepository)
+	mockLessonRepo := new(mocks.LessonRepository)
 	mockCourse := domain.Course{
 		Title:       "Hello",
 		Description: "Content",
@@ -124,7 +129,7 @@ func TestCreateCourse(t *testing.T) {
 		tempMockCourse.ID = 1
 		mockCourseRepo.On("GetByTitle", mock.Anything, mock.AnythingOfType("string")).Return(nil, nil).Once()
 		mockCourseRepo.On("CreateCourse", mock.Anything, mock.AnythingOfType("*domain.Course")).Return(nil).Once()
-		u := ucase.NewCourseUseCase(mockCourseRepo, time.Second*2)
+		u := ucase.NewCourseUseCase(mockCourseRepo, mockLessonRepo, time.Second*2)
 
 		err := u.CreateCourse(context.TODO(), &tempMockCourse)
 		assert.NoError(t, err)
@@ -135,7 +140,7 @@ func TestCreateCourse(t *testing.T) {
 		existingCourse := mockCourse
 		mockCourseRepo.On("GetByTitle", mock.Anything, mock.AnythingOfType("string")).Return(&existingCourse, nil).Once()
 		mockCourseRepo.On("CreateCourse", mock.Anything, mock.AnythingOfType("*domain.Course")).Return(domain.ErrConflict).Once()
-		u := ucase.NewCourseUseCase(mockCourseRepo, time.Second*2)
+		u := ucase.NewCourseUseCase(mockCourseRepo, mockLessonRepo, time.Second*2)
 
 		err := u.CreateCourse(context.TODO(), &mockCourse)
 		assert.Error(t, err)
@@ -143,6 +148,7 @@ func TestCreateCourse(t *testing.T) {
 }
 func TestUpdateCourse(t *testing.T) {
 	mockCourseRepo := new(mocks.CourseRepository)
+	mockLessonRepo := new(mocks.LessonRepository)
 	mockCourse := domain.Course{
 		ID:          1,
 		Title:       "Hello",
@@ -153,29 +159,36 @@ func TestUpdateCourse(t *testing.T) {
 		tempMockCourse := mockCourse
 		mockCourseRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(&domain.Course{}, nil).Once()
 		mockCourseRepo.On("UpdateCourse", mock.Anything, mock.AnythingOfType("*domain.Course")).Return(nil).Once()
-		u := ucase.NewCourseUseCase(mockCourseRepo, time.Second*2)
+		mockLessonRepo.On("GetLessonCountByCourse", mock.Anything, mock.AnythingOfType("int64")).Return(0, nil).Once()
+		mockLessonRepo.On("GetLessonByCourse", mock.Anything, mock.AnythingOfType("int64")).Return([]domain.Lesson{}, nil).Once()
+		u := ucase.NewCourseUseCase(mockCourseRepo, mockLessonRepo, time.Second*2)
 
 		err := u.UpdateCourse(context.TODO(), &tempMockCourse, tempMockCourse.ID)
 
 		assert.NoError(t, err)
 		assert.Equal(t, mockCourse.ID, tempMockCourse.ID)
 		mockCourseRepo.AssertExpectations(t)
+		mockLessonRepo.AssertExpectations(t)
 	})
 	t.Run("existing-title", func(t *testing.T) {
 		existingCourse := mockCourse
 		mockCourseRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(&existingCourse, nil).Once()
 		mockCourseRepo.On("UpdateCourse", mock.Anything, mock.AnythingOfType("*domain.Course")).Return(domain.ErrNotFound).Once()
-		u := ucase.NewCourseUseCase(mockCourseRepo, time.Second*2)
+		mockLessonRepo.On("GetLessonCountByCourse", mock.Anything, mock.AnythingOfType("int64")).Return(0, nil).Once()
+		mockLessonRepo.On("GetLessonByCourse", mock.Anything, mock.AnythingOfType("int64")).Return([]domain.Lesson{}, nil).Once()
+		u := ucase.NewCourseUseCase(mockCourseRepo, mockLessonRepo, time.Second*2)
 
 		err := u.UpdateCourse(context.TODO(), &mockCourse, existingCourse.ID)
 
 		assert.Error(t, err)
 		mockCourseRepo.AssertExpectations(t)
+		mockLessonRepo.AssertExpectations(t)
 	})
 }
 
 func TestDeleteCourse(t *testing.T) {
 	mockCourseRepo := new(mocks.CourseRepository)
+	mockLessonRepo := new(mocks.LessonRepository)
 	mockCourse := domain.Course{
 		Title:       "Hello",
 		Description: "Description here",
@@ -183,20 +196,20 @@ func TestDeleteCourse(t *testing.T) {
 
 	t.Run("success", func(t *testing.T) {
 		mockCourseRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(&mockCourse, nil).Once()
-
+		// mockLessonRepo.On("GetLessonCountByCourse", mock.Anything, mock.AnythingOfType("int64")).Return(0, nil).Once()
 		mockCourseRepo.On("DeleteCourse", mock.Anything, mock.AnythingOfType("int64")).Return(nil).Once()
-
-		u := ucase.NewCourseUseCase(mockCourseRepo, time.Second*2)
+		u := ucase.NewCourseUseCase(mockCourseRepo, mockLessonRepo, time.Second*2)
 
 		err := u.DeleteCourse(context.TODO(), mockCourse.ID)
 
 		assert.NoError(t, err)
 		mockCourseRepo.AssertExpectations(t)
+		mockLessonRepo.AssertExpectations(t)
 	})
 	t.Run("course-is-not-exist", func(t *testing.T) {
 		mockCourseRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(nil, nil).Once()
-
-		u := ucase.NewCourseUseCase(mockCourseRepo, time.Second*2)
+		mockLessonRepo.On("GetLessonCountByCourse", mock.Anything, mock.AnythingOfType("int64")).Return(0, nil).Once()
+		u := ucase.NewCourseUseCase(mockCourseRepo, mockLessonRepo, time.Second*2)
 
 		err := u.DeleteCourse(context.TODO(), mockCourse.ID)
 
@@ -205,8 +218,8 @@ func TestDeleteCourse(t *testing.T) {
 	})
 	t.Run("error-happens-in-db", func(t *testing.T) {
 		mockCourseRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(&domain.Course{}, errors.New("Unexpected Error")).Once()
-
-		u := ucase.NewCourseUseCase(mockCourseRepo, time.Second*2)
+		mockLessonRepo.On("GetLessonCountByCourse", mock.Anything, mock.AnythingOfType("int64")).Return(0, nil).Once()
+		u := ucase.NewCourseUseCase(mockCourseRepo, mockLessonRepo, time.Second*2)
 
 		err := u.DeleteCourse(context.TODO(), mockCourse.ID)
 

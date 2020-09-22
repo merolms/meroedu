@@ -24,7 +24,7 @@ func TestGetAll(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "title", "updated_at", "created_at"}).
 		AddRow(mockLessons[0].ID, mockLessons[0].Title, mockLessons[0].UpdatedAt, mockLessons[0].CreatedAt)
 
-	query := `SELECT id,name, updated_at, created_at FROM lessons ORDER BY created_at DESC LIMIT \?,\?`
+	query := `SELECT id,title, updated_at, created_at FROM lessons ORDER BY created_at DESC LIMIT \?,\?`
 	mock.ExpectQuery(query).WillReturnRows(rows)
 	c := mysqlrepo.Init(db)
 	start, limit := 0, 10
@@ -39,10 +39,10 @@ func TestGetByID(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-	row := sqlmock.NewRows([]string{"id", "name", "updated_at", "created_at"}).
+	row := sqlmock.NewRows([]string{"id", "title", "updated_at", "created_at"}).
 		AddRow("1", "testing-2", time.Now(), time.Now())
 
-	query := `SELECT id,name,updated_at,created_at FROM lessons WHERE ID = \?`
+	query := `SELECT id,title,updated_at,created_at FROM lessons WHERE ID = \?`
 	mock.ExpectQuery(query).WillReturnRows(row)
 	c := mysqlrepo.Init(db)
 	lesson, err := c.GetByID(context.TODO(), 1)
@@ -53,6 +53,7 @@ func TestGetByID(t *testing.T) {
 func TestCreateLesson(t *testing.T) {
 	c := &domain.Lesson{
 		Title:     "Programming",
+		CourseID:  1,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -60,9 +61,9 @@ func TestCreateLesson(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error %s was not expected when opening stub database connection", err)
 	}
-	query := `INSERT  lessons SET title=\?,  updated_at=\? , created_at=\?`
+	query := `INSERT  lessons SET title=\?, course_id=\?, updated_at=\? , created_at=\?`
 	prep := mock.ExpectPrepare(query)
-	prep.ExpectExec().WithArgs(c.Title, c.UpdatedAt, c.CreatedAt).WillReturnResult(sqlmock.NewResult(12, 1))
+	prep.ExpectExec().WithArgs(c.Title, c.CourseID, c.UpdatedAt, c.CreatedAt).WillReturnResult(sqlmock.NewResult(12, 1))
 
 	repo := mysqlrepo.Init(db)
 	err = repo.CreateLesson(context.TODO(), c)
@@ -103,4 +104,42 @@ func TestUpdateLesson(t *testing.T) {
 	repo := mysqlrepo.Init(db)
 	err = repo.UpdateLesson(context.TODO(), c)
 	assert.NoError(t, err)
+}
+
+func TestGetLessonCountByCourse(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	row := sqlmock.NewRows([]string{"count"}).
+		AddRow(12)
+
+	query := `SELECT count\(\*\) FROM lessons WHERE course_id = \?`
+	mock.ExpectQuery(query).WillReturnRows(row)
+	c := mysqlrepo.Init(db)
+	count, err := c.GetLessonCountByCourse(context.TODO(), 24)
+	assert.NoError(t, err)
+	assert.Equal(t, 12, count)
+}
+
+func TestGetLessonByCourse(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	mockLessons := []domain.Lesson{
+		domain.Lesson{
+			ID: 1, Title: "IT", UpdatedAt: time.Now(), CreatedAt: time.Now(),
+		},
+	}
+	rows := sqlmock.NewRows([]string{"id", "title", "updated_at", "created_at"}).
+		AddRow(mockLessons[0].ID, mockLessons[0].Title, mockLessons[0].UpdatedAt, mockLessons[0].CreatedAt)
+
+	query := `SELECT id,title,updated_at,created_at FROM lessons WHERE course_id = \?`
+	mock.ExpectQuery(query).WillReturnRows(rows)
+	c := mysqlrepo.Init(db)
+	list, err := c.GetLessonByCourse(context.TODO(), 1)
+	assert.NoError(t, err)
+	assert.Len(t, list, 1)
+
 }

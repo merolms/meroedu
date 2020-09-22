@@ -23,6 +23,9 @@ import (
 	_courseRepo "github.com/meroedu/meroedu/internal/course/repository/mysql"
 	_courseUcase "github.com/meroedu/meroedu/internal/course/usecase"
 	_healthHttpDelivery "github.com/meroedu/meroedu/internal/health/delivery/http"
+	_lessonHttpDelivery "github.com/meroedu/meroedu/internal/lesson/delivery/http"
+	_lessonRepo "github.com/meroedu/meroedu/internal/lesson/repository/mysql"
+	_lessonUcase "github.com/meroedu/meroedu/internal/lesson/usecase"
 	datastore "github.com/meroedu/meroedu/pkg/database"
 	"github.com/meroedu/meroedu/pkg/log"
 	"github.com/spf13/viper"
@@ -76,13 +79,17 @@ func main() {
 
 	// healthcheck
 	_healthHttpDelivery.NewHealthHandler(e)
+	// Lessons
+	lessonRepository := _lessonRepo.Init(db)
+	_lessonHttpDelivery.NewLessonHandler(e, _lessonUcase.NewLessonUseCase(lessonRepository, timeoutContext))
+
 	// Courses
-	courseRepositry := _courseRepo.Init(db)
-	_courseHttpDelivery.NewCourseHandler(e, _courseUcase.NewCourseUseCase(courseRepositry, timeoutContext))
+	courseRepository := _courseRepo.Init(db)
+	_courseHttpDelivery.NewCourseHandler(e, _courseUcase.NewCourseUseCase(courseRepository, lessonRepository, timeoutContext))
 
 	// Categories
 	categoryRepository := _categoryRepo.Init(db)
-	_categoryHttpDelivery.NewCategroyHandler(e, _categoryUcase.NewCategoryUseCase(categoryRepository, timeoutContext))
+	_categoryHttpDelivery.NewCategoryHandler(e, _categoryUcase.NewCategoryUseCase(categoryRepository, timeoutContext))
 
 	// Attachment
 	attachmentRepository := _attachmentRepo.Init(db)

@@ -35,6 +35,7 @@ type Course struct {
 	AuthorID    NullInt64    `json:"author_id,omitempty"`
 	Author      User         `json:"author,omitempty"`
 	Users       []User       `json:"users,omitempty"`
+	LessonCount int          `json:"lesson_count,omitempty"`
 	Lessons     []Lesson     `json:"lessons,omitempty"`
 	Attachments []Attachment `json:"attachments,omitempty"`
 	Status      Status       `json:"status,omitempty"`

@@ -21,8 +21,8 @@ type CategoryHandler struct {
 	CategoryUseCase domain.CategoryUseCase
 }
 
-// NewCategroyHandler ...
-func NewCategroyHandler(e *echo.Echo, us domain.CategoryUseCase) {
+// NewCategoryHandler ...
+func NewCategoryHandler(e *echo.Echo, us domain.CategoryUseCase) {
 	handler := &CategoryHandler{
 		CategoryUseCase: us,
 	}

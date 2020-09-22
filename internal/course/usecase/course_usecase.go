@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/meroedu/meroedu/internal/domain"
+	"github.com/meroedu/meroedu/pkg/log"
 )
 
 // CourseUseCase ...
@@ -20,9 +21,10 @@ type CourseUseCase struct {
 }
 
 // NewCourseUseCase will create new an
-func NewCourseUseCase(c domain.CourseRepository, timeout time.Duration) domain.CourseUseCase {
+func NewCourseUseCase(c domain.CourseRepository, l domain.LessonRepository, timeout time.Duration) domain.CourseUseCase {
 	return &CourseUseCase{
 		courseRepo:     c,
+		lessonRepo:     l,
 		contextTimeOut: timeout,
 	}
 }
@@ -49,6 +51,17 @@ func (usecase *CourseUseCase) GetByID(c context.Context, id int64) (*domain.Cour
 	if err != nil {
 		return nil, err
 	}
+	lessonCount, err := usecase.lessonRepo.GetLessonCountByCourse(ctx, id)
+	if err != nil {
+		log.Error("err")
+	}
+	course.LessonCount = lessonCount
+
+	lessons, err := usecase.lessonRepo.GetLessonByCourse(ctx, id)
+	if err != nil {
+		log.Error("err")
+	}
+	course.Lessons = lessons
 
 	return course, nil
 }

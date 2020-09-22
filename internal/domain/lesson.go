@@ -24,6 +24,8 @@ type LessonUseCase interface {
 	UpdateLesson(ctx context.Context, Lesson *Lesson, id int64) error
 	CreateLesson(ctx context.Context, Lesson *Lesson) error
 	DeleteLesson(ctx context.Context, id int64) error
+	GetLessonCountByCourse(ctx context.Context, courseID int64) (int, error)
+	GetLessonByCourse(ctx context.Context, courseID int64) ([]Lesson, error)
 }
 
 // LessonRepository represent the Lesson's repository
@@ -33,4 +35,6 @@ type LessonRepository interface {
 	UpdateLesson(ctx context.Context, Lesson *Lesson) error
 	CreateLesson(ctx context.Context, Lesson *Lesson) error
 	DeleteLesson(ctx context.Context, id int64) error
+	GetLessonCountByCourse(ctx context.Context, courseID int64) (int, error)
+	GetLessonByCourse(ctx context.Context, courseID int64) ([]Lesson, error)
 }
