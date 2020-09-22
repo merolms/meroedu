@@ -89,7 +89,7 @@ func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (*domain.Course
 }
 
 func (m *mysqlRepository) GetByTitle(ctx context.Context, title string) (*domain.Course, error) {
-	query := `SELECT id,title, description, author_id, category_id,updated_at, created_at FROM courses WHERE title = ?`
+	query := `SELECT id,title, description, duration, image_url, status, author_id, category_id,updated_at, created_at FROM courses WHERE title = ?`
 
 	list, err := m.fetch(ctx, query, title)
 	if err != nil {

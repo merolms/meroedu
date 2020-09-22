@@ -26,10 +26,10 @@ func TestGetAll(t *testing.T) {
 			UpdatedAt:   time.Now(), CreatedAt: time.Now(),
 		},
 	}
-	rows := sqlmock.NewRows([]string{"id", "title", "description", "author_id", "category_id", "updated_at", "created_at"}).
-		AddRow(mockCourses[0].ID, mockCourses[0].Title, mockCourses[0].Description, mockCourses[0].Author.ID, mockCourses[0].Category.ID, mockCourses[0].UpdatedAt, mockCourses[0].CreatedAt)
+	rows := sqlmock.NewRows([]string{"id", "title", "description", "duration", "image_url", "status", "author_id", "category_id", "updated_at", "created_at"}).
+		AddRow(mockCourses[0].ID, mockCourses[0].Title, mockCourses[0].Description, 20, "https://", domain.CourseInDraft, mockCourses[0].Author.ID, mockCourses[0].Category.ID, mockCourses[0].UpdatedAt, mockCourses[0].CreatedAt)
 
-	query := `SELECT id,title, description, author_id, category_id, updated_at, created_at FROM courses ORDER BY created_at DESC LIMIT \?,\?`
+	query := `SELECT id,title, description, duration, image_url, status, author_id, category_id, updated_at, created_at FROM courses ORDER BY created_at DESC LIMIT \?,\?`
 	mock.ExpectQuery(query).WillReturnRows(rows)
 	c := mysqlrepo.Init(db)
 	start, limit := 0, 10
@@ -44,10 +44,10 @@ func TestGetByID(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-	row := sqlmock.NewRows([]string{"id", "title", "description", "author_id", "category_id", "updated_at", "created_at"}).
-		AddRow("1", "testing-2", "description", 0, 0, time.Now(), time.Now())
+	row := sqlmock.NewRows([]string{"id", "title", "description", "duration", "image_url", "status", "author_id", "category_id", "updated_at", "created_at"}).
+		AddRow("1", "testing-2", "description", 20, "https://gogole.com/3432.jpg", domain.CourseInDraft, 0, 0, time.Now(), time.Now())
 
-	query := `SELECT id,title, description, author_id, category_id,updated_at, created_at FROM courses WHERE ID = \?`
+	query := `SELECT id,title, description, duration, image_url, status, author_id, category_id,updated_at, created_at FROM courses WHERE ID = \?`
 	mock.ExpectQuery(query).WillReturnRows(row)
 	c := mysqlrepo.Init(db)
 	course, err := c.GetByID(context.TODO(), 1)
@@ -61,10 +61,10 @@ func TestGetByTitle(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-	row := sqlmock.NewRows([]string{"id", "title", "description", "author_id", "category_id", "updated_at", "created_at"}).
-		AddRow("1", "testing-2", "description", 0, 0, time.Now(), time.Now())
+	row := sqlmock.NewRows([]string{"id", "title", "description", "duration", "image_url", "status", "author_id", "category_id", "updated_at", "created_at"}).
+		AddRow("1", "testing-2", "description", 20, "https://", domain.CourseArchived, 0, 0, time.Now(), time.Now())
 
-	query := `SELECT id,title, description, author_id, category_id,updated_at, created_at FROM courses WHERE title = \?`
+	query := `SELECT id,title, description, duration, image_url, status, author_id, category_id,updated_at, created_at FROM courses WHERE title = \?`
 	mock.ExpectQuery(query).WillReturnRows(row)
 	c := mysqlrepo.Init(db)
 	course, err := c.GetByTitle(context.TODO(), "testing-2")
