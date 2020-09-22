@@ -41,6 +41,9 @@ func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...inter
 			&t.ID,
 			&t.Title,
 			&t.Description,
+			&t.Duration,
+			&t.ImageURL,
+			&t.Status,
 			&t.AuthorID,
 			&t.CategoryID,
 			&t.UpdatedAt,
@@ -60,7 +63,7 @@ func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...inter
 }
 
 func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res []domain.Course, err error) {
-	query := `SELECT id,title, description, author_id, category_id, updated_at, created_at FROM courses ORDER BY created_at DESC LIMIT ?,? `
+	query := `SELECT id,title, description, duration, image_url, status, author_id, category_id, updated_at, created_at FROM courses ORDER BY created_at DESC LIMIT ?,? `
 
 	res, err = m.fetch(ctx, query, start, limit)
 	if err != nil {
@@ -69,7 +72,7 @@ func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res
 	return res, nil
 }
 func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (*domain.Course, error) {
-	query := `SELECT id,title, description, author_id, category_id,updated_at, created_at FROM courses WHERE ID = ?`
+	query := `SELECT id,title, description, duration, image_url, status, author_id, category_id,updated_at, created_at FROM courses WHERE ID = ?`
 
 	list, err := m.fetch(ctx, query, id)
 	if err != nil {
@@ -102,7 +105,7 @@ func (m *mysqlRepository) GetByTitle(ctx context.Context, title string) (*domain
 }
 
 func (m *mysqlRepository) CreateCourse(ctx context.Context, a *domain.Course) (err error) {
-	query := `INSERT  courses SET title=?, description=?, author_id=?, category_id=?`
+	query := `INSERT courses SET title=?, description=?, duration=?, status=?, image_url=?, author_id=?, category_id=?, updated_at=?, created_at=?`
 	stmt, err := m.Conn.PrepareContext(ctx, query)
 	if err != nil {
 		log.Error("Error while preparing statement ", err)
@@ -111,6 +114,9 @@ func (m *mysqlRepository) CreateCourse(ctx context.Context, a *domain.Course) (e
 	var fields []interface{}
 	fields = append(fields, a.Title)
 	fields = append(fields, a.Description)
+	fields = append(fields, a.Duration)
+	fields = append(fields, a.Status)
+	fields = append(fields, a.ImageURL)
 	if a.Author.ID == 0 {
 		fields = append(fields, nil)
 	} else {
@@ -121,6 +127,9 @@ func (m *mysqlRepository) CreateCourse(ctx context.Context, a *domain.Course) (e
 	} else {
 		fields = append(fields, a.Category.ID)
 	}
+
+	fields = append(fields, a.CreatedAt)
+	fields = append(fields, a.UpdatedAt)
 	log.Info(fields...)
 	res, err := stmt.ExecContext(ctx, fields...)
 	if err != nil {

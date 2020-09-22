@@ -7,7 +7,7 @@ import (
 
 // Course Status
 const (
-	CourseInDraft   Status = "Draft"
+	CourseInDraft   Status = "DRAFT"
 	CourseArchived  Status = "Archived"
 	CourseAssigned  Status = "Assigned"
 	CoursePublished Status = "Published"

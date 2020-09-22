@@ -9,10 +9,10 @@ filesystem:
 database:
   params:
     parseTime: "true"
-  host: db
+  host: localhost
   port: 3306
-  user: root
-  password: mypassword
+  user: user
+  password: password
   dbname: course_api
   allowNativePasswords: true
   max_open_connections: 25

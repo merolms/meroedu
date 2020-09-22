@@ -7,7 +7,7 @@ import (
 
 // Lesson ...
 type Lesson struct {
-	ID          int64     `json:"id"`
+	ID          int64     `json:"id,omitempty"`
 	CourseID    int64     `json:"course_id,omitempty"`
 	Title       string    `json:"title,omitempty" validate:"required"`
 	Description string    `json:"description,omitempty"`

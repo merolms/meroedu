@@ -72,6 +72,7 @@ func TestGetByTitle(t *testing.T) {
 	assert.NotNil(t, course)
 }
 func TestCreateCourse(t *testing.T) {
+	date := time.Now()
 	c := &domain.Course{
 		Title:       "Java Programming",
 		Description: "Testing",
@@ -82,14 +83,16 @@ func TestCreateCourse(t *testing.T) {
 			ID:   1,
 			Name: "Nepal kathmandu",
 		},
+		UpdatedAt: date,
+		CreatedAt: date,
 	}
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error %s was not expected when opening stub database connection", err)
 	}
-	query := `INSERT  courses SET title=\?, description=\?, author_id=\?, category_id=\?`
+	query := `INSERT courses SET title=\?, description=\?, duration=\?, status=\?, image_url=\?, author_id=\?, category_id=\?, updated_at=\?, created_at=\?`
 	prep := mock.ExpectPrepare(query)
-	prep.ExpectExec().WithArgs(c.Title, c.Description, c.Author.ID, c.Category.ID).WillReturnResult(sqlmock.NewResult(12, 1))
+	prep.ExpectExec().WithArgs(c.Title, c.Description, c.Duration, c.Status, c.ImageURL, c.Author.ID, c.Category.ID, c.UpdatedAt, c.CreatedAt).WillReturnResult(sqlmock.NewResult(12, 1))
 
 	repo := mysqlrepo.Init(db)
 	err = repo.CreateCourse(context.TODO(), c)

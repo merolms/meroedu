@@ -7,7 +7,7 @@ import (
 
 // Category represent Category Category
 type Category struct {
-	ID        int64     `json:"id"`
+	ID        int64     `json:"id,omitempty"`
 	Name      string    `json:"name,omitempty"`
 	UpdatedAt time.Time `json:"-"`
 	CreatedAt time.Time `json:"-"`
