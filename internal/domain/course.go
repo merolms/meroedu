@@ -29,10 +29,10 @@ type Course struct {
 	Description string       `json:"description,omitempty"`
 	ImageURL    string       `json:"image_url,omitempty"`
 	Duration    uint16       `json:"duration,omitempty"`
-	CategoryID  NullInt64    `json:"category_id,omitempty"`
+	CategoryID  NullInt64    `json:"-,omitempty"`
 	Category    Category     `json:"categories,omitempty"`
 	Tags        []Tag        `json:"tags,omitempty"`
-	AuthorID    NullInt64    `json:"author_id,omitempty"`
+	AuthorID    NullInt64    `json:"-,omitempty"`
 	Author      User         `json:"author,omitempty"`
 	Users       []User       `json:"users,omitempty"`
 	LessonCount int          `json:"lesson_count,omitempty"`

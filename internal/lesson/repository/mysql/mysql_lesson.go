@@ -113,13 +113,13 @@ func (m *mysqlRepository) DeleteLesson(ctx context.Context, id int64) (err error
 		return
 	}
 
-	rowsAfected, err := res.RowsAffected()
+	rowsAffected, err := res.RowsAffected()
 	if err != nil {
 		return
 	}
 
-	if rowsAfected != 1 {
-		err = fmt.Errorf("Weird  Behavior. Total Affected: %d", rowsAfected)
+	if rowsAffected != 1 {
+		err = fmt.Errorf("Weird  Behavior. Total Affected: %d", rowsAffected)
 		return
 	}
 

@@ -13,7 +13,7 @@ type LessonUseCase struct {
 	contextTimeOut time.Duration
 }
 
-// NewLessonUseCase will creae new an
+// NewLessonUseCase will create new an
 func NewLessonUseCase(c domain.LessonRepository, timeout time.Duration) domain.LessonUseCase {
 	return &LessonUseCase{
 		lessonRepo:     c,
