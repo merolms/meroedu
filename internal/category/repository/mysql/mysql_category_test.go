@@ -24,7 +24,7 @@ func TestGetAll(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "name", "updated_at", "created_at"}).
 		AddRow(mockCategories[0].ID, mockCategories[0].Name, mockCategories[0].UpdatedAt, mockCategories[0].CreatedAt)
 
-	query := `SELECT id,name, updated_at, created_at FROM categories ORDER BY created_at DESC LIMIT \?,\?`
+	query := `SELECT id,name,updated_at,created_at FROM categories ORDER BY created_at DESC LIMIT \?,\?`
 	mock.ExpectQuery(query).WillReturnRows(rows)
 	c := mysqlrepo.Init(db)
 	start, limit := 0, 10
@@ -76,7 +76,7 @@ func TestCreateCategory(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error %s was not expected when opening stub database connection", err)
 	}
-	query := `INSERT  categories SET name=\?,  updated_at=\? , created_at=\?`
+	query := `INSERT categories SET name=\?,updated_at=\?,created_at=\?`
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(c.Name, c.UpdatedAt, c.CreatedAt).WillReturnResult(sqlmock.NewResult(12, 1))
 
@@ -112,7 +112,7 @@ func TestUpdateCategory(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error %s was not expected when opening stub database connection", err)
 	}
-	query := `UPDATE categories set name=\?, updated_at=\? WHERE ID = \?`
+	query := `UPDATE categories set name=\?,updated_at=\? WHERE ID = \?`
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(c.Name, c.UpdatedAt, c.ID).WillReturnResult(sqlmock.NewResult(12, 1))
 

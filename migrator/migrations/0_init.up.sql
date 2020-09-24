@@ -150,7 +150,7 @@ CREATE TABLE `contents` (
   `title` varchar(256),
   `description` longtext,
   `content` longtext,
-  `type` int,
+  `type` varchar(60),
   `lesson_id` bigint(20) NOT NULL,
   `status` int(1),
   `updated_at` bigint(20) NOT NULL,

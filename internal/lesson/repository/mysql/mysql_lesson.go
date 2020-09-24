@@ -54,7 +54,7 @@ func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...inter
 }
 
 func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res []domain.Lesson, err error) {
-	query := `SELECT id,title, updated_at, created_at FROM lessons ORDER BY created_at DESC LIMIT ?,?`
+	query := `SELECT id,title,updated_at,created_at FROM lessons ORDER BY created_at DESC LIMIT ?,?`
 
 	res, err = m.fetch(ctx, query, start, limit)
 	if err != nil {
@@ -126,7 +126,7 @@ func (m *mysqlRepository) DeleteLesson(ctx context.Context, id int64) (err error
 	return
 }
 func (m *mysqlRepository) UpdateLesson(ctx context.Context, ar *domain.Lesson) (err error) {
-	query := `UPDATE lessons set title=?, updated_at=? WHERE ID = ?`
+	query := `UPDATE lessons set title=?,updated_at=? WHERE ID = ?`
 
 	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {

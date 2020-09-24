@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -38,11 +39,18 @@ func TestCreateAttachment(t *testing.T) {
 		mockUCase := new(mocks.AttachmentUseCase)
 		body := new(bytes.Buffer)
 		writer := multipart.NewWriter(body)
+		write, err := writer.CreateFormField("course_id")
+		if err != nil {
+			writer.Close()
+			t.Error(err)
+		}
+		write.Write([]byte(strconv.Itoa(1)))
 		part, err := writer.CreateFormFile("file", filepath.Base(path))
 		if err != nil {
 			writer.Close()
 			t.Error(err)
 		}
+
 		io.Copy(part, file)
 		writer.Close()
 		mockUCase.On("CreateAttachment", mock.Anything, mock.AnythingOfType("domain.Attachment")).Return(nil, nil)
@@ -63,7 +71,15 @@ func TestCreateAttachment(t *testing.T) {
 	t.Run("error with no file", func(t *testing.T) {
 		mockUCase := new(mocks.AttachmentUseCase)
 		e := echo.New()
-		req, err := http.NewRequest(echo.POST, "attachments", strings.NewReader(""))
+		body := new(bytes.Buffer)
+		writer := multipart.NewWriter(body)
+		write, err := writer.CreateFormField("course_id")
+		if err != nil {
+			writer.Close()
+			t.Error(err)
+		}
+		write.Write([]byte(strconv.Itoa(1)))
+		req, err := http.NewRequest(echo.POST, "attachments", body)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 		c.SetPath("/attachments")
@@ -78,6 +94,12 @@ func TestCreateAttachment(t *testing.T) {
 		mockUCase := new(mocks.AttachmentUseCase)
 		body := new(bytes.Buffer)
 		writer := multipart.NewWriter(body)
+		write, err := writer.CreateFormField("course_id")
+		if err != nil {
+			writer.Close()
+			t.Error(err)
+		}
+		write.Write([]byte(strconv.Itoa(1)))
 		part, err := writer.CreateFormFile("file", filepath.Base(path))
 		if err != nil {
 			writer.Close()

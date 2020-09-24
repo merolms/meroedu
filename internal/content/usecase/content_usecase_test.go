@@ -35,7 +35,7 @@ func TestGetAll(t *testing.T) {
 	})
 	t.Run("error-failed", func(t *testing.T) {
 		mockContentRepo.On("GetAll", mock.Anything, mock.AnythingOfType("int"),
-			mock.AnythingOfType("int")).Return(nil, errors.New("Unexpexted Error")).Once()
+			mock.AnythingOfType("int")).Return(nil, errors.New("Unexpected Error")).Once()
 
 		u := ucase.NewContentUseCase(mockContentRepo, time.Second*2)
 		start := int(0)

@@ -36,6 +36,6 @@ func (m *mysqlUserRepo) getOne(ctx context.Context, query string, args ...interf
 }
 
 func (m *mysqlUserRepo) GetByID(ctx context.Context, id int64) (domain.User, error) {
-	query := `SELECT id, name, created_at, updated_at FROM user WHERE id=?`
+	query := `SELECT id,name,created_at,updated_at FROM user WHERE id=?`
 	return m.getOne(ctx, query, id)
 }

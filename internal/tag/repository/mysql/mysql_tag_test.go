@@ -24,7 +24,7 @@ func TestGetAll(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "name", "updated_at", "created_at"}).
 		AddRow(mockTags[0].ID, mockTags[0].Name, mockTags[0].UpdatedAt, mockTags[0].CreatedAt)
 
-	query := `SELECT id,name, updated_at, created_at FROM tags ORDER BY created_at DESC LIMIT \?,\?`
+	query := `SELECT id,name,updated_at,created_at FROM tags ORDER BY created_at DESC LIMIT \?,\?`
 	mock.ExpectQuery(query).WillReturnRows(rows)
 	c := mysqlrepo.Init(db)
 	start, limit := 0, 10
@@ -74,7 +74,7 @@ func TestCreateTag(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error %s was not expected when opening stub database connection", err)
 	}
-	query := `INSERT  tags SET name=\?,  updated_at=\? , created_at=\?`
+	query := `INSERT tags SET name=\?,updated_at=\?,created_at=\?`
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(c.Name, c.UpdatedAt, c.CreatedAt).WillReturnResult(sqlmock.NewResult(12, 1))
 
@@ -110,7 +110,7 @@ func TestUpdateTag(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error %s was not expected when opening stub database connection", err)
 	}
-	query := `UPDATE tags set name=\?, updated_at=\? WHERE ID = \?`
+	query := `UPDATE tags set name=\?,updated_at=\? WHERE ID = \?`
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(c.Name, c.UpdatedAt, c.ID).WillReturnResult(sqlmock.NewResult(12, 1))
 

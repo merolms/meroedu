@@ -39,6 +39,7 @@ func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...inter
 		err = rows.Scan(
 			&t.ID,
 			&t.Title,
+			&t.Description,
 			&t.UpdatedAt,
 			&t.CreatedAt,
 		)
@@ -54,7 +55,7 @@ func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...inter
 }
 
 func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res []domain.Content, err error) {
-	query := `SELECT id,title, updated_at, created_at FROM contents ORDER BY created_at DESC LIMIT ?,?`
+	query := `SELECT id,title,description,updated_at,created_at FROM contents ORDER BY created_at DESC LIMIT ?,?`
 
 	res, err = m.fetch(ctx, query, start, limit)
 	if err != nil {
@@ -63,7 +64,7 @@ func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res
 	return res, nil
 }
 func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (res *domain.Content, err error) {
-	query := `SELECT id,title,updated_at,created_at FROM contents WHERE ID = ?`
+	query := `SELECT id,title,description,updated_at,created_at FROM contents WHERE ID = ?`
 
 	list, err := m.fetch(ctx, query, id)
 	if err != nil {
@@ -80,13 +81,13 @@ func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (res *domain.Co
 }
 
 func (m *mysqlRepository) CreateContent(ctx context.Context, a *domain.Content) (err error) {
-	query := `INSERT  contents SET title=?, updated_at=? , created_at=?`
+	query := `INSERT contents SET title=?,description=?,type=?,lesson_id=?,updated_at=?,created_at=?`
 	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {
 		log.Error("Error while preparing statement ", err)
 		return
 	}
-	res, err := stmt.ExecContext(ctx, a.Title, a.UpdatedAt, a.CreatedAt)
+	res, err := stmt.ExecContext(ctx, a.Title, a.Description, a.Type, a.LessonID, a.UpdatedAt, a.CreatedAt)
 	if err != nil {
 		log.Error("Error while executing statement ", err)
 		return
@@ -113,20 +114,20 @@ func (m *mysqlRepository) DeleteContent(ctx context.Context, id int64) (err erro
 		return
 	}
 
-	rowsAfected, err := res.RowsAffected()
+	rowsAffected, err := res.RowsAffected()
 	if err != nil {
 		return
 	}
 
-	if rowsAfected != 1 {
-		err = fmt.Errorf("Weird  Behavior. Total Affected: %d", rowsAfected)
+	if rowsAffected != 1 {
+		err = fmt.Errorf("Weird  Behavior. Total Affected: %d", rowsAffected)
 		return
 	}
 
 	return
 }
 func (m *mysqlRepository) UpdateContent(ctx context.Context, ar *domain.Content) (err error) {
-	query := `UPDATE contents set title=?, updated_at=? WHERE ID = ?`
+	query := `UPDATE contents set title=?,updated_at=? WHERE ID = ?`
 
 	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {
@@ -147,4 +148,33 @@ func (m *mysqlRepository) UpdateContent(ctx context.Context, ar *domain.Content)
 	}
 
 	return
+}
+
+func (m *mysqlRepository) GetContentCountByLesson(ctx context.Context, lessonID int64) (int, error) {
+	query := `SELECT count(*) FROM contents WHERE lesson_id = ?`
+
+	rows, err := m.conn.QueryContext(ctx, query, lessonID)
+	if err != nil {
+		log.Error(err)
+		return 0, nil
+	}
+	defer rows.Close()
+	var count int
+	for rows.Next() {
+		err := rows.Scan(&count)
+		if err != nil {
+			log.Error(err)
+			return 0, err
+		}
+	}
+	return count, nil
+}
+
+func (m *mysqlRepository) GetContentByLesson(ctx context.Context, lessonID int64) ([]domain.Content, error) {
+	query := `SELECT id,title,description,updated_at,created_at FROM contents WHERE lesson_id = ?`
+	list, err := m.fetch(ctx, query, lessonID)
+	if err != nil {
+		return nil, err
+	}
+	return list, nil
 }

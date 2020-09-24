@@ -10,22 +10,22 @@ import (
 
 // CourseUseCase ...
 type CourseUseCase struct {
-	courseRepo     domain.CourseRepository
-	userRepo       domain.UserRepository
-	lessonRepo     domain.LessonRepository
-	attachmentRepo domain.AttachmentRepository
-	tagRepo        domain.TagRepository
-	categoryRepo   domain.CategoryRepository
-	contextTimeOut time.Duration
+	courseRepo        domain.CourseRepository
+	userRepo          domain.UserRepository
+	lessonUseCase     domain.LessonUseCase
+	attachmentUseCase domain.AttachmentUseCase
+	tagRepo           domain.TagRepository
+	categoryRepo      domain.CategoryRepository
+	contextTimeOut    time.Duration
 }
 
 // NewCourseUseCase will create new an
-func NewCourseUseCase(c domain.CourseRepository, l domain.LessonRepository, a domain.AttachmentRepository, timeout time.Duration) domain.CourseUseCase {
+func NewCourseUseCase(c domain.CourseRepository, l domain.LessonUseCase, a domain.AttachmentUseCase, timeout time.Duration) domain.CourseUseCase {
 	return &CourseUseCase{
-		courseRepo:     c,
-		lessonRepo:     l,
-		attachmentRepo: a,
-		contextTimeOut: timeout,
+		courseRepo:        c,
+		lessonUseCase:     l,
+		attachmentUseCase: a,
+		contextTimeOut:    timeout,
 	}
 }
 
@@ -33,8 +33,7 @@ func NewCourseUseCase(c domain.CourseRepository, l domain.LessonRepository, a do
 func (usecase *CourseUseCase) GetAll(c context.Context, start int, limit int) (res []domain.Course, err error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
-	// count, err := usecase.courseRepo.GetCourseCount(ctx)
-	// log.Info(count)
+
 	res, err = usecase.courseRepo.GetAll(ctx, start, limit)
 	if err != nil {
 		return nil, err
@@ -51,18 +50,18 @@ func (usecase *CourseUseCase) GetByID(c context.Context, id int64) (*domain.Cour
 	if err != nil {
 		return nil, err
 	}
-	lessonCount, err := usecase.lessonRepo.GetLessonCountByCourse(ctx, id)
+	lessonCount, err := usecase.lessonUseCase.GetLessonCountByCourse(ctx, id)
 	if err != nil {
 		log.Error("err")
 	}
 	course.LessonCount = lessonCount
 
-	lessons, err := usecase.lessonRepo.GetLessonByCourse(ctx, id)
+	lessons, err := usecase.lessonUseCase.GetLessonByCourse(ctx, id)
 	if err != nil {
 		log.Error(err)
 	}
 	course.Lessons = lessons
-	attachments, err := usecase.attachmentRepo.GetAttachmentByCourse(ctx, id)
+	attachments, err := usecase.attachmentUseCase.GetAttachmentByCourse(ctx, id)
 	if err != nil {
 		log.Error(err)
 	}

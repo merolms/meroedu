@@ -10,13 +10,15 @@ import (
 // LessonUseCase ...
 type LessonUseCase struct {
 	lessonRepo     domain.LessonRepository
+	contentUseCase domain.ContentUseCase
 	contextTimeOut time.Duration
 }
 
 // NewLessonUseCase will create new an
-func NewLessonUseCase(c domain.LessonRepository, timeout time.Duration) domain.LessonUseCase {
+func NewLessonUseCase(l domain.LessonRepository, c domain.ContentUseCase, timeout time.Duration) domain.LessonUseCase {
 	return &LessonUseCase{
-		lessonRepo:     c,
+		lessonRepo:     l,
+		contentUseCase: c,
 		contextTimeOut: timeout,
 	}
 }
@@ -101,6 +103,13 @@ func (usecase *LessonUseCase) GetLessonByCourse(c context.Context, courseID int6
 	res, err := usecase.lessonRepo.GetLessonByCourse(ctx, courseID)
 	if err != nil {
 		return nil, err
+	}
+	for i := 0; i < len(res); i++ {
+		contents, err := usecase.contentUseCase.GetContentByLesson(ctx, res[i].ID)
+		if err != nil {
+			return nil, err
+		}
+		res[i].Contents = contents
 	}
 
 	return res, nil

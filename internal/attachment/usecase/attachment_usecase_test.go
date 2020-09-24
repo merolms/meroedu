@@ -35,7 +35,7 @@ func createFile(filename string) (os.File, error) {
 	}
 	err = os.Remove(path)
 	if err != nil {
-		log.Errorf("error occur while removing aile from path: %v, error: %v", path, err)
+		log.Errorf("error occur while removing file from path: %v, error: %v", path, err)
 	}
 	defer file.Close()
 	return *file, nil

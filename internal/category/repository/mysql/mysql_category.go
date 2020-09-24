@@ -54,7 +54,7 @@ func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...inter
 }
 
 func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res []domain.Category, err error) {
-	query := `SELECT id,name, updated_at, created_at FROM categories ORDER BY created_at DESC LIMIT ?,?`
+	query := `SELECT id,name,updated_at,created_at FROM categories ORDER BY created_at DESC LIMIT ?,?`
 
 	res, err = m.fetch(ctx, query, start, limit)
 	if err != nil {
@@ -95,7 +95,7 @@ func (m *mysqlRepository) GetByName(ctx context.Context, name string) (res *doma
 }
 
 func (m *mysqlRepository) CreateCategory(ctx context.Context, a *domain.Category) (err error) {
-	query := `INSERT  categories SET name=?, updated_at=? , created_at=?`
+	query := `INSERT categories SET name=?,updated_at=?,created_at=?`
 	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {
 		log.Error("Error while preparing statement ", err)
@@ -128,20 +128,20 @@ func (m *mysqlRepository) DeleteCategory(ctx context.Context, id int64) (err err
 		return
 	}
 
-	rowsAfected, err := res.RowsAffected()
+	rowsAffected, err := res.RowsAffected()
 	if err != nil {
 		return
 	}
 
-	if rowsAfected != 1 {
-		err = fmt.Errorf("Weird  Behavior. Total Affected: %d", rowsAfected)
+	if rowsAffected != 1 {
+		err = fmt.Errorf("Weird  Behavior. Total Affected: %d", rowsAffected)
 		return
 	}
 
 	return
 }
 func (m *mysqlRepository) UpdateCategory(ctx context.Context, ar *domain.Category) (err error) {
-	query := `UPDATE categories set name=?, updated_at=? WHERE ID = ?`
+	query := `UPDATE categories set name=?,updated_at=? WHERE ID = ?`
 
 	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {

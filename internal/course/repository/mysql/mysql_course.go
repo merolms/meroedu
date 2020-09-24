@@ -63,7 +63,7 @@ func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...inter
 }
 
 func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res []domain.Course, err error) {
-	query := `SELECT id,title, description, duration, image_url, status, author_id, category_id, updated_at, created_at FROM courses ORDER BY created_at DESC LIMIT ?,? `
+	query := `SELECT id,title,description,duration,image_url,status,author_id,category_id,updated_at,created_at FROM courses ORDER BY created_at DESC LIMIT ?,? `
 
 	res, err = m.fetch(ctx, query, start, limit)
 	if err != nil {
@@ -72,7 +72,7 @@ func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res
 	return res, nil
 }
 func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (*domain.Course, error) {
-	query := `SELECT id,title, description, duration, image_url, status, author_id, category_id,updated_at, created_at FROM courses WHERE ID = ?`
+	query := `SELECT id,title,description,duration,image_url,status,author_id,category_id,updated_at,created_at FROM courses WHERE ID = ?`
 
 	list, err := m.fetch(ctx, query, id)
 	if err != nil {
@@ -89,7 +89,7 @@ func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (*domain.Course
 }
 
 func (m *mysqlRepository) GetByTitle(ctx context.Context, title string) (*domain.Course, error) {
-	query := `SELECT id,title, description, duration, image_url, status, author_id, category_id,updated_at, created_at FROM courses WHERE title = ?`
+	query := `SELECT id,title,description,duration,image_url,status,author_id,category_id,updated_at,created_at FROM courses WHERE title = ?`
 
 	list, err := m.fetch(ctx, query, title)
 	if err != nil {
@@ -105,7 +105,7 @@ func (m *mysqlRepository) GetByTitle(ctx context.Context, title string) (*domain
 }
 
 func (m *mysqlRepository) CreateCourse(ctx context.Context, a *domain.Course) (err error) {
-	query := `INSERT courses SET title=?, description=?, duration=?, status=?, image_url=?, author_id=?, category_id=?, updated_at=?, created_at=?`
+	query := `INSERT courses SET title=?,description=?,duration=?,status=?,image_url=?,author_id=?,category_id=?,updated_at=?,created_at=?`
 	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {
 		log.Error("Error while preparing statement ", err)
@@ -158,20 +158,20 @@ func (m *mysqlRepository) DeleteCourse(ctx context.Context, id int64) (err error
 		return
 	}
 
-	rowsAfected, err := res.RowsAffected()
+	rowsAffected, err := res.RowsAffected()
 	if err != nil {
 		return
 	}
 
-	if rowsAfected != 1 {
-		err = fmt.Errorf("Weird  Behavior. Total Affected: %d", rowsAfected)
+	if rowsAffected != 1 {
+		err = fmt.Errorf("Weird  Behavior. Total Affected: %d", rowsAffected)
 		return
 	}
 
 	return
 }
 func (m *mysqlRepository) UpdateCourse(ctx context.Context, ar *domain.Course) (err error) {
-	query := `UPDATE courses set title=?, description=?, updated_at=? WHERE ID = ?`
+	query := `UPDATE courses set title=?,description=?,updated_at=? WHERE ID = ?`
 
 	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {

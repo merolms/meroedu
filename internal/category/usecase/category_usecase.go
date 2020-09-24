@@ -13,7 +13,7 @@ type CategoryUseCase struct {
 	contextTimeOut time.Duration
 }
 
-// NewCategoryUseCase will creae new an
+// NewCategoryUseCase will create new an
 func NewCategoryUseCase(c domain.CategoryRepository, timeout time.Duration) domain.CategoryUseCase {
 	return &CategoryUseCase{
 		categoryRepo:   c,

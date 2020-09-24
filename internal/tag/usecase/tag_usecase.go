@@ -13,7 +13,7 @@ type TagUseCase struct {
 	contextTimeOut time.Duration
 }
 
-// NewTagUseCase will creae new an
+// NewTagUseCase will create new an
 func NewTagUseCase(c domain.TagRepository, timeout time.Duration) domain.TagUseCase {
 	return &TagUseCase{
 		tagRepo:        c,

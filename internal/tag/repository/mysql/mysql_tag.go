@@ -54,7 +54,7 @@ func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...inter
 }
 
 func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res []domain.Tag, err error) {
-	query := `SELECT id,name, updated_at, created_at FROM tags ORDER BY created_at DESC LIMIT ?,?`
+	query := `SELECT id,name,updated_at,created_at FROM tags ORDER BY created_at DESC LIMIT ?,?`
 
 	res, err = m.fetch(ctx, query, start, limit)
 	if err != nil {
@@ -95,7 +95,7 @@ func (m *mysqlRepository) GetByName(ctx context.Context, name string) (res *doma
 }
 
 func (m *mysqlRepository) CreateTag(ctx context.Context, a *domain.Tag) (err error) {
-	query := `INSERT  tags SET name=?, updated_at=? , created_at=?`
+	query := `INSERT  tags SET name=?,updated_at=?,created_at=?`
 	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {
 		log.Error("Error while preparing statement ", err)
@@ -128,20 +128,20 @@ func (m *mysqlRepository) DeleteTag(ctx context.Context, id int64) (err error) {
 		return
 	}
 
-	rowsAfected, err := res.RowsAffected()
+	rowsAffected, err := res.RowsAffected()
 	if err != nil {
 		return
 	}
 
-	if rowsAfected != 1 {
-		err = fmt.Errorf("Weird  Behavior. Total Affected: %d", rowsAfected)
+	if rowsAffected != 1 {
+		err = fmt.Errorf("Weird  Behavior. Total Affected: %d", rowsAffected)
 		return
 	}
 
 	return
 }
 func (m *mysqlRepository) UpdateTag(ctx context.Context, ar *domain.Tag) (err error) {
-	query := `UPDATE tags set name=?, updated_at=? WHERE ID = ?`
+	query := `UPDATE tags set name=?,updated_at=? WHERE ID = ?`
 
 	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {

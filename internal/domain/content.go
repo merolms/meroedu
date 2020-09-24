@@ -23,6 +23,7 @@ type ContentUseCase interface {
 	UpdateContent(ctx context.Context, Content *Content, id int64) error
 	CreateContent(ctx context.Context, Content *Content) error
 	DeleteContent(ctx context.Context, id int64) error
+	GetContentByLesson(ctx context.Context, lessonID int64) ([]Content, error)
 }
 
 // ContentRepository represent the Content's repository
@@ -32,4 +33,6 @@ type ContentRepository interface {
 	UpdateContent(ctx context.Context, Content *Content) error
 	CreateContent(ctx context.Context, Content *Content) error
 	DeleteContent(ctx context.Context, id int64) error
+	GetContentCountByLesson(ctx context.Context, lessonID int64) (int, error)
+	GetContentByLesson(ctx context.Context, lessonID int64) ([]Content, error)
 }

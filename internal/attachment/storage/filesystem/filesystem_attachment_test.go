@@ -38,7 +38,7 @@ func removeFile(filename string) error {
 	path := rootDirectory + "/" + filename
 	err = os.Remove(path)
 	if err != nil {
-		log.Errorf("error occur while removing aile from path: %v, error: %v", path, err)
+		log.Errorf("error occur while removing file from path: %v, error: %v", path, err)
 		return err
 	}
 	return nil

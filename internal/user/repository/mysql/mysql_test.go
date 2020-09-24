@@ -20,7 +20,7 @@ func TestGetByID(t *testing.T) {
 	rows := sqlmock.NewRows([]string{"id", "name", "updated_at", "created_at"}).
 		AddRow(1, "Dinesh Katwal", time.Now().Unix(), time.Now().Unix())
 
-	query := "SELECT id, name, created_at, updated_at FROM user WHERE id=\\?"
+	query := "SELECT id,name,created_at,updated_at FROM user WHERE id=\\?"
 
 	prep := mock.ExpectPrepare(query)
 	userID := int64(1)

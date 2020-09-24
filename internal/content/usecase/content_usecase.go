@@ -13,7 +13,7 @@ type ContentUseCase struct {
 	contextTimeOut time.Duration
 }
 
-// NewContentUseCase will creae new an
+// NewContentUseCase will create new an
 func NewContentUseCase(c domain.ContentRepository, timeout time.Duration) domain.ContentUseCase {
 	return &ContentUseCase{
 		contentRepo:    c,
@@ -91,4 +91,16 @@ func (usecase *ContentUseCase) DeleteContent(c context.Context, id int64) (err e
 		return domain.ErrNotFound
 	}
 	return usecase.contentRepo.DeleteContent(ctx, id)
+}
+
+// GetContentByLesson ...
+func (usecase *ContentUseCase) GetContentByLesson(c context.Context, LessonID int64) ([]domain.Content, error) {
+	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
+	defer cancel()
+
+	res, err := usecase.contentRepo.GetContentByLesson(ctx, LessonID)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }

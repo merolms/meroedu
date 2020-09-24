@@ -24,6 +24,7 @@ type Attachment struct {
 type AttachmentUseCase interface {
 	CreateAttachment(ctx context.Context, attachment Attachment) (*Attachment, error)
 	DownloadAttachment(ctx context.Context, fileName string) (string, error)
+	GetAttachmentByCourse(ctx context.Context, courseID int64) ([]Attachment, error)
 }
 
 // AttachmentRepository represent the attachment's repository contract
