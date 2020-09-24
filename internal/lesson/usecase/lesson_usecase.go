@@ -51,8 +51,8 @@ func (usecase *LessonUseCase) GetByID(c context.Context, id int64) (res *domain.
 func (usecase *LessonUseCase) CreateLesson(c context.Context, lesson *domain.Lesson) (err error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
-	lesson.UpdatedAt = time.Now()
-	lesson.CreatedAt = time.Now()
+	lesson.UpdatedAt = time.Now().Unix()
+	lesson.CreatedAt = time.Now().Unix()
 	err = usecase.lessonRepo.CreateLesson(ctx, lesson)
 	if err != nil {
 		return
@@ -70,7 +70,7 @@ func (usecase *LessonUseCase) UpdateLesson(c context.Context, lesson *domain.Les
 		return domain.ErrNotFound
 	}
 	lesson.ID = id
-	lesson.UpdatedAt = time.Now()
+	lesson.UpdatedAt = time.Now().Unix()
 	err = usecase.lessonRepo.UpdateLesson(ctx, lesson)
 	if err != nil {
 		return

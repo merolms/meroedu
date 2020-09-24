@@ -22,7 +22,7 @@ func TestGetAll(t *testing.T) {
 	mockListCourse := []domain.Course{
 		domain.Course{
 			ID: 1, Title: "title-1",
-			Author: domain.User{ID: 1}, UpdatedAt: time.Now(), CreatedAt: time.Now(),
+			Author: domain.User{ID: 1}, UpdatedAt: time.Now().Unix(), CreatedAt: time.Now().Unix(),
 		},
 	}
 	t.Run("success", func(t *testing.T) {
@@ -57,7 +57,7 @@ func TestGetByID(t *testing.T) {
 	mockLessonRepo := new(mocks.LessonRepository)
 	mockCourse := domain.Course{
 		Title:  "title-1",
-		Author: domain.User{ID: 1}, UpdatedAt: time.Now(), CreatedAt: time.Now(),
+		Author: domain.User{ID: 1}, UpdatedAt: time.Now().Unix(), CreatedAt: time.Now().Unix(),
 	}
 	t.Run("success", func(t *testing.T) {
 		mockCourseRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(&mockCourse, nil).Once()
@@ -90,7 +90,7 @@ func TestGetByTitle(t *testing.T) {
 	mockLessonRepo := new(mocks.LessonRepository)
 	mockCourse := domain.Course{
 		Title:  "title-1",
-		Author: domain.User{ID: 1}, UpdatedAt: time.Now(), CreatedAt: time.Now(),
+		Author: domain.User{ID: 1}, UpdatedAt: time.Now().Unix(), CreatedAt: time.Now().Unix(),
 	}
 	t.Run("success", func(t *testing.T) {
 		mockCourseRepo.On("GetByTitle", mock.Anything, mock.AnythingOfType("string")).Return(&mockCourse, nil).Once()

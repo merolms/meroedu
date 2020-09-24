@@ -81,8 +81,8 @@ func TestGetByName(t *testing.T) {
 	mockCategoryRepo := new(mocks.CategoryRepository)
 	mockCategory := domain.Category{
 		Name:      "category-1",
-		UpdatedAt: time.Now(),
-		CreatedAt: time.Now(),
+		UpdatedAt: time.Now().Unix(),
+		CreatedAt: time.Now().Unix(),
 	}
 	t.Run("success", func(t *testing.T) {
 		mockCategoryRepo.On("GetByName", mock.Anything, mock.AnythingOfType("string")).Return(&mockCategory, nil).Once()

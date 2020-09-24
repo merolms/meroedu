@@ -23,7 +23,7 @@ func TestGetAll(t *testing.T) {
 			Description: "tell me nah",
 			Author:      domain.User{ID: 1},
 			Category:    domain.Category{ID: 1},
-			UpdatedAt:   time.Now(), CreatedAt: time.Now(),
+			UpdatedAt:   time.Now().Unix(), CreatedAt: time.Now().Unix(),
 		},
 	}
 	rows := sqlmock.NewRows([]string{"id", "title", "description", "duration", "image_url", "status", "author_id", "category_id", "updated_at", "created_at"}).
@@ -45,7 +45,7 @@ func TestGetByID(t *testing.T) {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	row := sqlmock.NewRows([]string{"id", "title", "description", "duration", "image_url", "status", "author_id", "category_id", "updated_at", "created_at"}).
-		AddRow("1", "testing-2", "description", 20, "https://gogole.com/3432.jpg", domain.CourseInDraft, 0, 0, time.Now(), time.Now())
+		AddRow("1", "testing-2", "description", 20, "https://gogole.com/3432.jpg", domain.CourseInDraft, 0, 0, time.Now().Unix(), time.Now().Unix())
 
 	query := `SELECT id,title, description, duration, image_url, status, author_id, category_id,updated_at, created_at FROM courses WHERE ID = \?`
 	mock.ExpectQuery(query).WillReturnRows(row)
@@ -62,7 +62,7 @@ func TestGetByTitle(t *testing.T) {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	row := sqlmock.NewRows([]string{"id", "title", "description", "duration", "image_url", "status", "author_id", "category_id", "updated_at", "created_at"}).
-		AddRow("1", "testing-2", "description", 20, "https://", domain.CourseArchived, 0, 0, time.Now(), time.Now())
+		AddRow("1", "testing-2", "description", 20, "https://", domain.CourseArchived, 0, 0, time.Now().Unix(), time.Now().Unix())
 
 	query := `SELECT id,title, description, duration, image_url, status, author_id, category_id,updated_at, created_at FROM courses WHERE title = \?`
 	mock.ExpectQuery(query).WillReturnRows(row)
@@ -72,7 +72,7 @@ func TestGetByTitle(t *testing.T) {
 	assert.NotNil(t, course)
 }
 func TestCreateCourse(t *testing.T) {
-	date := time.Now()
+	date := time.Now().Unix()
 	c := &domain.Course{
 		Title:       "Java Programming",
 		Description: "Testing",
@@ -119,8 +119,8 @@ func TestUpdateCourse(t *testing.T) {
 	c := &domain.Course{
 		ID:        12,
 		Title:     "Java Programming",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
 		Category: domain.Category{
 			ID: 1,
 		},

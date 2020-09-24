@@ -10,17 +10,17 @@ import (
 )
 
 type mysqlRepository struct {
-	Conn *sql.DB
+	conn *sql.DB
 }
 
 // Init will create an object that represent the course's Repository interface
 func Init(db *sql.DB) domain.CourseRepository {
 	return &mysqlRepository{
-		Conn: db,
+		conn: db,
 	}
 }
 func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...interface{}) (result []domain.Course, err error) {
-	rows, err := m.Conn.QueryContext(ctx, query, args...)
+	rows, err := m.conn.QueryContext(ctx, query, args...)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -106,7 +106,7 @@ func (m *mysqlRepository) GetByTitle(ctx context.Context, title string) (*domain
 
 func (m *mysqlRepository) CreateCourse(ctx context.Context, a *domain.Course) (err error) {
 	query := `INSERT courses SET title=?, description=?, duration=?, status=?, image_url=?, author_id=?, category_id=?, updated_at=?, created_at=?`
-	stmt, err := m.Conn.PrepareContext(ctx, query)
+	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {
 		log.Error("Error while preparing statement ", err)
 		return
@@ -148,7 +148,7 @@ func (m *mysqlRepository) CreateCourse(ctx context.Context, a *domain.Course) (e
 func (m *mysqlRepository) DeleteCourse(ctx context.Context, id int64) (err error) {
 	query := "DELETE FROM courses WHERE id = ?"
 
-	stmt, err := m.Conn.PrepareContext(ctx, query)
+	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
@@ -173,7 +173,7 @@ func (m *mysqlRepository) DeleteCourse(ctx context.Context, id int64) (err error
 func (m *mysqlRepository) UpdateCourse(ctx context.Context, ar *domain.Course) (err error) {
 	query := `UPDATE courses set title=?, description=?, updated_at=? WHERE ID = ?`
 
-	stmt, err := m.Conn.PrepareContext(ctx, query)
+	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
@@ -197,7 +197,7 @@ func (m *mysqlRepository) UpdateCourse(ctx context.Context, ar *domain.Course) (
 func (m *mysqlRepository) GetCourseCount(ctx context.Context) (count int64, err error) {
 	query := `SELECT count(*) FROM courses`
 
-	rows, err := m.Conn.QueryContext(ctx, query)
+	rows, err := m.conn.QueryContext(ctx, query)
 	defer rows.Close()
 	if err != nil {
 		log.Error(err)

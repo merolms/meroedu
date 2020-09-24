@@ -2,15 +2,14 @@ package domain
 
 import (
 	"context"
-	"time"
 )
 
 // Category represent Category Category
 type Category struct {
-	ID        int64     `json:"id,omitempty"`
-	Name      string    `json:"name,omitempty"`
-	UpdatedAt time.Time `json:"-"`
-	CreatedAt time.Time `json:"-"`
+	ID        int64  `json:"id,omitempty"`
+	Name      string `json:"name,omitempty"`
+	UpdatedAt int64  `json:"-"`
+	CreatedAt int64  `json:"-"`
 }
 
 // CategoryUseCase represent the Category's repository contract

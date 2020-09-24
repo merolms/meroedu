@@ -10,17 +10,17 @@ import (
 )
 
 type mysqlRepository struct {
-	Conn *sql.DB
+	conn *sql.DB
 }
 
 // Init will create an object that represent the tag's Repository interface
 func Init(db *sql.DB) domain.ContentRepository {
 	return &mysqlRepository{
-		Conn: db,
+		conn: db,
 	}
 }
 func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...interface{}) (result []domain.Content, err error) {
-	rows, err := m.Conn.QueryContext(ctx, query, args...)
+	rows, err := m.conn.QueryContext(ctx, query, args...)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -81,7 +81,7 @@ func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (res *domain.Co
 
 func (m *mysqlRepository) CreateContent(ctx context.Context, a *domain.Content) (err error) {
 	query := `INSERT  contents SET title=?, updated_at=? , created_at=?`
-	stmt, err := m.Conn.PrepareContext(ctx, query)
+	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {
 		log.Error("Error while preparing statement ", err)
 		return
@@ -103,7 +103,7 @@ func (m *mysqlRepository) CreateContent(ctx context.Context, a *domain.Content) 
 func (m *mysqlRepository) DeleteContent(ctx context.Context, id int64) (err error) {
 	query := "DELETE FROM contents WHERE id = ?"
 
-	stmt, err := m.Conn.PrepareContext(ctx, query)
+	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
@@ -128,7 +128,7 @@ func (m *mysqlRepository) DeleteContent(ctx context.Context, id int64) (err erro
 func (m *mysqlRepository) UpdateContent(ctx context.Context, ar *domain.Content) (err error) {
 	query := `UPDATE contents set title=?, updated_at=? WHERE ID = ?`
 
-	stmt, err := m.Conn.PrepareContext(ctx, query)
+	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}

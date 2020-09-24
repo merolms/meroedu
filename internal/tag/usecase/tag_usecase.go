@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/meroedu/meroedu/internal/domain"
@@ -67,8 +66,8 @@ func (usecase *TagUseCase) CreateTag(c context.Context, tag *domain.Tag) (err er
 	if existingTag != nil {
 		return domain.ErrConflict
 	}
-	tag.UpdatedAt = time.Now()
-	tag.CreatedAt = time.Now()
+	tag.UpdatedAt = time.Now().Unix()
+	tag.CreatedAt = time.Now().Unix()
 	err = usecase.tagRepo.CreateTag(ctx, tag)
 	if err != nil {
 		return
@@ -86,9 +85,8 @@ func (usecase *TagUseCase) UpdateTag(c context.Context, tag *domain.Tag, id int6
 		return domain.ErrNotFound
 	}
 	tag.ID = id
-	tag.UpdatedAt = time.Now()
+	tag.UpdatedAt = time.Now().Unix()
 	err = usecase.tagRepo.UpdateTag(ctx, tag)
-	fmt.Println("Error came from update mysql: ", err)
 	if err != nil {
 		return err
 	}

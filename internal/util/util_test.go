@@ -45,8 +45,8 @@ func TestIsRequestValid(t *testing.T) {
 	mockCourse = domain.Course{
 		Title:       "Title",
 		Description: "Content",
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+		CreatedAt:   time.Now().Unix(),
+		UpdatedAt:   time.Now().Unix(),
 	}
 	valid, err = util.IsRequestValid(mockCourse)
 	assert.NoError(t, err)

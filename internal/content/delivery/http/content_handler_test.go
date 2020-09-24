@@ -100,8 +100,8 @@ func TestGetByID(t *testing.T) {
 func TestCreateContent(t *testing.T) {
 	mockContent := domain.Content{
 		Title:     "Title",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
 	}
 
 	tempmockContent := mockContent

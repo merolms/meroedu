@@ -18,7 +18,7 @@ func TestGetAll(t *testing.T) {
 	}
 	mockTags := []domain.Tag{
 		domain.Tag{
-			ID: 1, Name: "IT", UpdatedAt: time.Now(), CreatedAt: time.Now(),
+			ID: 1, Name: "IT", UpdatedAt: time.Now().Unix(), CreatedAt: time.Now().Unix(),
 		},
 	}
 	rows := sqlmock.NewRows([]string{"id", "name", "updated_at", "created_at"}).
@@ -40,7 +40,7 @@ func TestGetByID(t *testing.T) {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	row := sqlmock.NewRows([]string{"id", "name", "updated_at", "created_at"}).
-		AddRow("1", "testing-2", time.Now(), time.Now())
+		AddRow("1", "testing-2", time.Now().Unix(), time.Now().Unix())
 
 	query := `SELECT id,name,updated_at,created_at FROM tags WHERE ID = \?`
 	mock.ExpectQuery(query).WillReturnRows(row)
@@ -55,7 +55,7 @@ func TestGetByName(t *testing.T) {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	row := sqlmock.NewRows([]string{"id", "name", "updated_at", "created_at"}).
-		AddRow("1", "testing-2", time.Now(), time.Now())
+		AddRow("1", "testing-2", time.Now().Unix(), time.Now().Unix())
 
 	query := `SELECT id,name,updated_at,created_at FROM tags WHERE name = \?`
 	mock.ExpectQuery(query).WillReturnRows(row)
@@ -67,8 +67,8 @@ func TestGetByName(t *testing.T) {
 func TestCreateTag(t *testing.T) {
 	c := &domain.Tag{
 		Name:      "Programming",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
 	}
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -103,8 +103,8 @@ func TestUpdateTag(t *testing.T) {
 	c := &domain.Tag{
 		ID:        12,
 		Name:      "Programming",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
 	}
 	db, mock, err := sqlmock.New()
 	if err != nil {

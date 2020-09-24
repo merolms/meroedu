@@ -2,7 +2,6 @@ package domain
 
 import (
 	"context"
-	"time"
 )
 
 // Course Status
@@ -39,8 +38,8 @@ type Course struct {
 	Lessons     []Lesson     `json:"lessons,omitempty"`
 	Attachments []Attachment `json:"attachments,omitempty"`
 	Status      Status       `json:"status,omitempty"`
-	UpdatedAt   time.Time    `json:"updated_at,omitempty"`
-	CreatedAt   time.Time    `json:"created_at,omitempty"`
+	UpdatedAt   int64        `json:"updated_at,omitempty"`
+	CreatedAt   int64        `json:"created_at,omitempty"`
 }
 
 // CourseStats is a struct representing the statistics for a single Course

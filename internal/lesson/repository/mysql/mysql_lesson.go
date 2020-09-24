@@ -10,17 +10,17 @@ import (
 )
 
 type mysqlRepository struct {
-	Conn *sql.DB
+	conn *sql.DB
 }
 
 // Init will create an object that represent the lesson's Repository interface
 func Init(db *sql.DB) domain.LessonRepository {
 	return &mysqlRepository{
-		Conn: db,
+		conn: db,
 	}
 }
 func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...interface{}) (result []domain.Lesson, err error) {
-	rows, err := m.Conn.QueryContext(ctx, query, args...)
+	rows, err := m.conn.QueryContext(ctx, query, args...)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -80,13 +80,13 @@ func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (res *domain.Le
 }
 
 func (m *mysqlRepository) CreateLesson(ctx context.Context, a *domain.Lesson) (err error) {
-	query := `INSERT  lessons SET title=?, course_id=?, updated_at=? , created_at=?`
-	stmt, err := m.Conn.PrepareContext(ctx, query)
+	query := `INSERT lessons SET title=?,course_id=?,description=?,updated_at=?,created_at=?`
+	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {
 		log.Error("Error while preparing statement ", err)
 		return
 	}
-	res, err := stmt.ExecContext(ctx, a.Title, a.CourseID, a.UpdatedAt, a.CreatedAt)
+	res, err := stmt.ExecContext(ctx, a.Title, a.CourseID, a.Description, a.UpdatedAt, a.CreatedAt)
 	if err != nil {
 		log.Error("Error while executing statement ", err)
 		return
@@ -103,7 +103,7 @@ func (m *mysqlRepository) CreateLesson(ctx context.Context, a *domain.Lesson) (e
 func (m *mysqlRepository) DeleteLesson(ctx context.Context, id int64) (err error) {
 	query := "DELETE FROM lessons WHERE id = ?"
 
-	stmt, err := m.Conn.PrepareContext(ctx, query)
+	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
@@ -128,7 +128,7 @@ func (m *mysqlRepository) DeleteLesson(ctx context.Context, id int64) (err error
 func (m *mysqlRepository) UpdateLesson(ctx context.Context, ar *domain.Lesson) (err error) {
 	query := `UPDATE lessons set title=?, updated_at=? WHERE ID = ?`
 
-	stmt, err := m.Conn.PrepareContext(ctx, query)
+	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
@@ -152,7 +152,7 @@ func (m *mysqlRepository) UpdateLesson(ctx context.Context, ar *domain.Lesson) (
 func (m *mysqlRepository) GetLessonCountByCourse(ctx context.Context, courseID int64) (int, error) {
 	query := `SELECT count(*) FROM lessons WHERE course_id = ?`
 
-	rows, err := m.Conn.QueryContext(ctx, query, courseID)
+	rows, err := m.conn.QueryContext(ctx, query, courseID)
 	if err != nil {
 		log.Error(err)
 		return 0, nil

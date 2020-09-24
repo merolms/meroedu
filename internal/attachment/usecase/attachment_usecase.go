@@ -59,6 +59,8 @@ func getFileName(fileType string) string {
 		return filename + ".jpg"
 	case "text/markdown":
 		return filename + ".md"
+	case "application/pdf":
+		return filename + ".pdf"
 	case "text/html":
 		return filename + ".html"
 	case "video/mp4":

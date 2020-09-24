@@ -100,8 +100,8 @@ func TestGetByID(t *testing.T) {
 func TestCreateCategory(t *testing.T) {
 	mockCategory := domain.Category{
 		Name:      "Title",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
 	}
 
 	tempmockCategory := mockCategory
@@ -136,8 +136,8 @@ func TestUpdateCategory(t *testing.T) {
 	mockTag := domain.Category{
 		ID:        124,
 		Name:      "category",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
 	}
 
 	tempmockCategory := mockTag

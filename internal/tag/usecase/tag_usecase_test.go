@@ -81,8 +81,8 @@ func TestGetByName(t *testing.T) {
 	mockTagRepo := new(mocks.TagRepository)
 	mockTag := domain.Tag{
 		Name:      "tag-1",
-		UpdatedAt: time.Now(),
-		CreatedAt: time.Now(),
+		UpdatedAt: time.Now().Unix(),
+		CreatedAt: time.Now().Unix(),
 	}
 	t.Run("success", func(t *testing.T) {
 		mockTagRepo.On("GetByName", mock.Anything, mock.AnythingOfType("string")).Return(&mockTag, nil).Once()

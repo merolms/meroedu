@@ -100,8 +100,8 @@ func TestGetByID(t *testing.T) {
 func TestCreateTag(t *testing.T) {
 	mockTag := domain.Tag{
 		Name:      "Title",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
 	}
 
 	tempmockTag := mockTag
@@ -136,8 +136,8 @@ func TestUpdateTag(t *testing.T) {
 	mockTag := domain.Tag{
 		ID:        124,
 		Name:      "tag1",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
 	}
 
 	tempmockTag := mockTag

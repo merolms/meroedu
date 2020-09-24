@@ -100,8 +100,8 @@ func TestGetByID(t *testing.T) {
 func TestCreateLesson(t *testing.T) {
 	mockLesson := domain.Lesson{
 		Title:     "Title",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
 	}
 
 	tempmockLesson := mockLesson
@@ -137,8 +137,8 @@ func TestUpdateLesson(t *testing.T) {
 		ID:          124,
 		Title:       "Title",
 		Description: "Content",
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
+		CreatedAt:   time.Now().Unix(),
+		UpdatedAt:   time.Now().Unix(),
 	}
 
 	tempmockLesson := mockLesson

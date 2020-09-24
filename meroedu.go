@@ -83,10 +83,6 @@ func main() {
 	lessonRepository := _lessonRepo.Init(db)
 	_lessonHttpDelivery.NewLessonHandler(e, _lessonUcase.NewLessonUseCase(lessonRepository, timeoutContext))
 
-	// Courses
-	courseRepository := _courseRepo.Init(db)
-	_courseHttpDelivery.NewCourseHandler(e, _courseUcase.NewCourseUseCase(courseRepository, lessonRepository, timeoutContext))
-
 	// Categories
 	categoryRepository := _categoryRepo.Init(db)
 	_categoryHttpDelivery.NewCategoryHandler(e, _categoryUcase.NewCategoryUseCase(categoryRepository, timeoutContext))
@@ -98,6 +94,10 @@ func main() {
 		log.Fatalf("Error initializing attachment storage: %v", err)
 	}
 	_attachmentHttpDelivery.NewAttachmentHandler(e, _attachmentUcase.NewAttachmentUseCase(attachmentRepository, attachmentStorage, timeoutContext))
+
+	// Courses
+	courseRepository := _courseRepo.Init(db)
+	_courseHttpDelivery.NewCourseHandler(e, _courseUcase.NewCourseUseCase(courseRepository, lessonRepository, attachmentRepository, timeoutContext))
 
 	// Start HTTP Server
 	go func() {

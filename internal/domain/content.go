@@ -2,19 +2,18 @@ package domain
 
 import (
 	"context"
-	"time"
 )
 
 // Content ...
 type Content struct {
-	ID          int64     `json:"id,omitempty"`
-	LessonID    int64     `json:"lesson_id,omitempty"`
-	Title       string    `json:"title" validator:"required"`
-	Description string    `json:"description,omitempty"`
-	Type        string    `json:"type" validator:"required"`
-	Content     string    `json:"content" validator:"required"`
-	UpdatedAt   time.Time `json:"updated_at,omitempty"`
-	CreatedAt   time.Time `json:"created_at,omitempty"`
+	ID          int64  `json:"id,omitempty"`
+	LessonID    int64  `json:"lesson_id,omitempty"`
+	Title       string `json:"title" validator:"required"`
+	Description string `json:"description,omitempty"`
+	Type        string `json:"type" validator:"required"`
+	Content     string `json:"content" validator:"required"`
+	UpdatedAt   int64  `json:"updated_at,omitempty"`
+	CreatedAt   int64  `json:"created_at,omitempty"`
 }
 
 // ContentUseCase represent the Content's repository contract

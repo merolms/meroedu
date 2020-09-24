@@ -7,6 +7,7 @@ import (
 // Status ...
 type Status string
 
+// Success ...
 const (
 	Success Status = "success"
 	Error   Status = "error"

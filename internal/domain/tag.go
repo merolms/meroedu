@@ -2,15 +2,14 @@ package domain
 
 import (
 	"context"
-	"time"
 )
 
 // Tag ...
 type Tag struct {
-	ID        int64     `json:"id,omitempty"`
-	Name      string    `json:"name,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	ID        int64  `json:"id,omitempty"`
+	Name      string `json:"name,omitempty"`
+	UpdatedAt int64  `json:"updated_at,omitempty"`
+	CreatedAt int64  `json:"created_at,omitempty"`
 }
 
 // TagUseCase represent the Tag's repository contract

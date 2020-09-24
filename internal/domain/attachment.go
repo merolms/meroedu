@@ -3,7 +3,6 @@ package domain
 import (
 	"context"
 	"mime/multipart"
-	"time"
 )
 
 // Attachment ...
@@ -17,8 +16,8 @@ type Attachment struct {
 	Type        string         `json:"file_type,omitempty"`
 	Filename    string         `json:"-"`
 	Size        int64          `json:"file_size,omitempty"`
-	UpdatedAt   time.Time      `json:"updated_at,omitempty"`
-	CreatedAt   time.Time      `json:"created_at,omitempty"`
+	UpdatedAt   int64          `json:"updated_at,omitempty"`
+	CreatedAt   int64          `json:"created_at,omitempty"`
 }
 
 // AttachmentUseCase represents attachments usecase contract
@@ -30,6 +29,7 @@ type AttachmentUseCase interface {
 // AttachmentRepository represent the attachment's repository contract
 type AttachmentRepository interface {
 	CreateAttachment(ctx context.Context, attachment Attachment) error
+	GetAttachmentByCourse(ctx context.Context, courseID int64) ([]Attachment, error)
 }
 
 // AttachmentStorage represent the attachment's storage contract

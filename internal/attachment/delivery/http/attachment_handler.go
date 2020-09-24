@@ -2,6 +2,7 @@ package http
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 
@@ -46,10 +47,15 @@ func NewAttachmentHandler(e *echo.Echo, us domain.AttachmentUseCase) {
 // @Failure 500 {object} domain.APIResponseError "Internal Server Error"
 // @Router /attachments [post]
 func (a *AttachmentHandler) CreateAttachment(echoContext echo.Context) error {
+
 	ctx := echoContext.Request().Context()
 	title := echoContext.FormValue("title")
 	description := echoContext.FormValue("description")
 	fileHeader, err := echoContext.FormFile("file")
+	if err != nil {
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
+	}
+	courseID, err := strconv.Atoi(echoContext.FormValue("course_id"))
 	if err != nil {
 		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
@@ -65,6 +71,7 @@ func (a *AttachmentHandler) CreateAttachment(echoContext echo.Context) error {
 	attachment := domain.Attachment{
 		Title:       title,
 		Description: description,
+		CourseID:    int64(courseID),
 		File:        file,
 		Filename:    fileHeader.Filename,
 		Size:        sizer.Size(),

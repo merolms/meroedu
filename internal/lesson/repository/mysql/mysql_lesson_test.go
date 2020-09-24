@@ -18,7 +18,7 @@ func TestGetAll(t *testing.T) {
 	}
 	mockLessons := []domain.Lesson{
 		domain.Lesson{
-			ID: 1, Title: "IT", UpdatedAt: time.Now(), CreatedAt: time.Now(),
+			ID: 1, Title: "IT", UpdatedAt: time.Now().Unix(), CreatedAt: time.Now().Unix(),
 		},
 	}
 	rows := sqlmock.NewRows([]string{"id", "title", "updated_at", "created_at"}).
@@ -40,7 +40,7 @@ func TestGetByID(t *testing.T) {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	row := sqlmock.NewRows([]string{"id", "title", "updated_at", "created_at"}).
-		AddRow("1", "testing-2", time.Now(), time.Now())
+		AddRow("1", "testing-2", time.Now().Unix(), time.Now().Unix())
 
 	query := `SELECT id,title,updated_at,created_at FROM lessons WHERE ID = \?`
 	mock.ExpectQuery(query).WillReturnRows(row)
@@ -54,8 +54,8 @@ func TestCreateLesson(t *testing.T) {
 	c := &domain.Lesson{
 		Title:     "Programming",
 		CourseID:  1,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
 	}
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -90,8 +90,8 @@ func TestUpdateLesson(t *testing.T) {
 	c := &domain.Lesson{
 		ID:        12,
 		Title:     "Programming",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
 	}
 	db, mock, err := sqlmock.New()
 	if err != nil {
@@ -129,7 +129,7 @@ func TestGetLessonByCourse(t *testing.T) {
 	}
 	mockLessons := []domain.Lesson{
 		domain.Lesson{
-			ID: 1, Title: "IT", UpdatedAt: time.Now(), CreatedAt: time.Now(),
+			ID: 1, Title: "IT", UpdatedAt: time.Now().Unix(), CreatedAt: time.Now().Unix(),
 		},
 	}
 	rows := sqlmock.NewRows([]string{"id", "title", "updated_at", "created_at"}).
