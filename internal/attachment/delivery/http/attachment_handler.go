@@ -47,7 +47,6 @@ func NewAttachmentHandler(e *echo.Echo, us domain.AttachmentUseCase) {
 // @Failure 500 {object} domain.APIResponseError "Internal Server Error"
 // @Router /attachments [post]
 func (a *AttachmentHandler) CreateAttachment(echoContext echo.Context) error {
-
 	ctx := echoContext.Request().Context()
 	title := echoContext.FormValue("title")
 	description := echoContext.FormValue("description")

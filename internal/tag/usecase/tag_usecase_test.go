@@ -21,26 +21,26 @@ func TestGetAll(t *testing.T) {
 		},
 	}
 	t.Run("success", func(t *testing.T) {
-		mockTagRepo.On("GetAll", mock.Anything, mock.AnythingOfType("int"),
+		mockTagRepo.On("GetAll", mock.Anything, mock.AnythingOfType("string"), mock.AnythingOfType("int"),
 			mock.AnythingOfType("int")).Return(mockListTag, nil).Once()
 
 		start := int(0)
 		limit := int(1)
 		u := ucase.NewTagUseCase(mockTagRepo, time.Second*2)
-		list, err := u.GetAll(context.TODO(), start, limit)
+		list, err := u.GetAll(context.TODO(), "", start, limit)
 		assert.NoError(t, err)
 		assert.Len(t, list, len(mockListTag))
 		mockTagRepo.AssertExpectations(t)
 
 	})
 	t.Run("error-failed", func(t *testing.T) {
-		mockTagRepo.On("GetAll", mock.Anything, mock.AnythingOfType("int"),
+		mockTagRepo.On("GetAll", mock.Anything, mock.AnythingOfType("string"), mock.AnythingOfType("int"),
 			mock.AnythingOfType("int")).Return(nil, errors.New("Unexpected Error")).Once()
 
 		u := ucase.NewTagUseCase(mockTagRepo, time.Second*2)
 		start := int(0)
 		limit := int(1)
-		list, err := u.GetAll(context.TODO(), start, limit)
+		list, err := u.GetAll(context.TODO(), "", start, limit)
 
 		assert.Error(t, err)
 		assert.Len(t, list, 0)
@@ -130,13 +130,23 @@ func TestCreateTag(t *testing.T) {
 	t.Run("existing-title", func(t *testing.T) {
 		tempmockTag := mockTag
 		mockTagRepo.On("GetByName", mock.Anything, mock.AnythingOfType("string")).Return(&tempmockTag, nil).Once()
-		mockTagRepo.On("CreateTag", mock.Anything, mock.AnythingOfType("*domain.Tag")).Return(domain.ErrConflict).Once()
+		// mockTagRepo.On("CreateTag", mock.Anything, mock.AnythingOfType("*domain.Tag")).Return(domain.ErrConflict).Once()
 		u := ucase.NewTagUseCase(mockTagRepo, time.Second*2)
 
 		err := u.CreateTag(context.TODO(), &mockTag)
 
 		assert.Error(t, err)
-		// mockTagRepo.AssertExpectations(t)
+		mockTagRepo.AssertExpectations(t)
+	})
+	t.Run("error", func(t *testing.T) {
+		mockTagRepo.On("GetByName", mock.Anything, mock.AnythingOfType("string")).Return(nil, nil).Once()
+		mockTagRepo.On("CreateTag", mock.Anything, mock.AnythingOfType("*domain.Tag")).Return(errors.New("Unexpected error occur")).Once()
+		u := ucase.NewTagUseCase(mockTagRepo, time.Second*2)
+
+		err := u.CreateTag(context.TODO(), &mockTag)
+
+		assert.Error(t, err)
+		mockTagRepo.AssertExpectations(t)
 	})
 }
 func TestUpdateTag(t *testing.T) {
@@ -160,6 +170,17 @@ func TestUpdateTag(t *testing.T) {
 	t.Run("tag doesn't exists", func(t *testing.T) {
 		mockTagRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(nil, nil).Once()
 		mockTagRepo.On("UpdateTag", mock.Anything, mock.AnythingOfType("*domain.Tag")).Return(domain.ErrNotFound).Once()
+		u := ucase.NewTagUseCase(mockTagRepo, time.Second*2)
+
+		err := u.UpdateTag(context.TODO(), &mockTag, mockTag.ID)
+
+		assert.Error(t, err)
+		// mockTagRepo.AssertExpectations(t)
+	})
+	t.Run("tag update error", func(t *testing.T) {
+		tempmockTag := mockTag
+		mockTagRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(&tempmockTag, nil).Once()
+		mockTagRepo.On("UpdateTag", mock.Anything, mock.AnythingOfType("*domain.Tag")).Return(errors.New("Unexpected error occur")).Once()
 		u := ucase.NewTagUseCase(mockTagRepo, time.Second*2)
 
 		err := u.UpdateTag(context.TODO(), &mockTag, mockTag.ID)
@@ -207,5 +228,161 @@ func TestDeleteTag(t *testing.T) {
 		assert.Error(t, err)
 		mockTagRepo.AssertExpectations(t)
 	})
+}
+func TestCreateCourseTag(t *testing.T) {
+	mockTagRepo := new(mocks.TagRepository)
+	t.Run("success", func(t *testing.T) {
+		mockTagRepo.On("CreateCourseTag", mock.Anything, mock.AnythingOfType("int64"), mock.AnythingOfType("int64")).Return(nil).Once()
 
+		u := ucase.NewTagUseCase(mockTagRepo, time.Second*2)
+
+		err := u.CreateCourseTag(context.TODO(), 1, 2)
+
+		assert.NoError(t, err)
+		mockTagRepo.AssertExpectations(t)
+	})
+	t.Run("error", func(t *testing.T) {
+		mockTagRepo.On("CreateCourseTag", mock.Anything, mock.AnythingOfType("int64"), mock.AnythingOfType("int64")).Return(errors.New("Unexpected Error")).Once()
+
+		u := ucase.NewTagUseCase(mockTagRepo, time.Second*2)
+
+		err := u.CreateCourseTag(context.TODO(), 1, 2)
+
+		assert.Error(t, err)
+		mockTagRepo.AssertExpectations(t)
+	})
+}
+
+func TestDeleteCourseTag(t *testing.T) {
+	mockTagRepo := new(mocks.TagRepository)
+	t.Run("success", func(t *testing.T) {
+		mockTagRepo.On("DeleteCourseTag", mock.Anything, mock.AnythingOfType("int64"), mock.AnythingOfType("int64")).Return(nil).Once()
+
+		u := ucase.NewTagUseCase(mockTagRepo, time.Second*2)
+
+		err := u.DeleteCourseTag(context.TODO(), 1, 2)
+
+		assert.NoError(t, err)
+		mockTagRepo.AssertExpectations(t)
+	})
+	t.Run("error", func(t *testing.T) {
+		mockTagRepo.On("DeleteCourseTag", mock.Anything, mock.AnythingOfType("int64"), mock.AnythingOfType("int64")).Return(errors.New("Unexpected Error")).Once()
+
+		u := ucase.NewTagUseCase(mockTagRepo, time.Second*2)
+
+		err := u.DeleteCourseTag(context.TODO(), 1, 2)
+
+		assert.Error(t, err)
+		mockTagRepo.AssertExpectations(t)
+	})
+}
+
+func TestGetCourseTags(t *testing.T) {
+	mockTagRepo := new(mocks.TagRepository)
+	mockListTag := []domain.Tag{
+		domain.Tag{
+			ID: 1, Name: "title-1",
+		},
+	}
+	t.Run("success", func(t *testing.T) {
+		mockTagRepo.On("GetCourseTags", mock.Anything, mock.AnythingOfType("int64")).Return(mockListTag, nil).Once()
+
+		u := ucase.NewTagUseCase(mockTagRepo, time.Second*2)
+
+		tags, err := u.GetCourseTags(context.TODO(), 1)
+
+		assert.NoError(t, err)
+		assert.Equal(t, mockListTag, tags)
+		mockTagRepo.AssertExpectations(t)
+	})
+	t.Run("error", func(t *testing.T) {
+		mockTagRepo.On("GetCourseTags", mock.Anything, mock.AnythingOfType("int64")).Return([]domain.Tag{}, errors.New("Unexpected Error")).Once()
+
+		u := ucase.NewTagUseCase(mockTagRepo, time.Second*2)
+
+		tags, err := u.GetCourseTags(context.TODO(), 1)
+
+		assert.Error(t, err)
+		assert.Len(t, tags, 0)
+		mockTagRepo.AssertExpectations(t)
+	})
+}
+
+func TestCreateLessonTag(t *testing.T) {
+	mockTagRepo := new(mocks.TagRepository)
+	t.Run("success", func(t *testing.T) {
+		mockTagRepo.On("CreateLessonTag", mock.Anything, mock.AnythingOfType("int64"), mock.AnythingOfType("int64")).Return(nil).Once()
+
+		u := ucase.NewTagUseCase(mockTagRepo, time.Second*2)
+
+		err := u.CreateLessonTag(context.TODO(), 1, 2)
+
+		assert.NoError(t, err)
+		mockTagRepo.AssertExpectations(t)
+	})
+	t.Run("error", func(t *testing.T) {
+		mockTagRepo.On("CreateLessonTag", mock.Anything, mock.AnythingOfType("int64"), mock.AnythingOfType("int64")).Return(errors.New("Unexpected Error")).Once()
+
+		u := ucase.NewTagUseCase(mockTagRepo, time.Second*2)
+
+		err := u.CreateLessonTag(context.TODO(), 1, 2)
+
+		assert.Error(t, err)
+		mockTagRepo.AssertExpectations(t)
+	})
+}
+
+func TestDeleteLessonTag(t *testing.T) {
+	mockTagRepo := new(mocks.TagRepository)
+	t.Run("success", func(t *testing.T) {
+		mockTagRepo.On("DeleteLessonTag", mock.Anything, mock.AnythingOfType("int64"), mock.AnythingOfType("int64")).Return(nil).Once()
+
+		u := ucase.NewTagUseCase(mockTagRepo, time.Second*2)
+
+		err := u.DeleteLessonTag(context.TODO(), 1, 2)
+
+		assert.NoError(t, err)
+		mockTagRepo.AssertExpectations(t)
+	})
+	t.Run("error", func(t *testing.T) {
+		mockTagRepo.On("DeleteLessonTag", mock.Anything, mock.AnythingOfType("int64"), mock.AnythingOfType("int64")).Return(errors.New("Unexpected Error")).Once()
+
+		u := ucase.NewTagUseCase(mockTagRepo, time.Second*2)
+
+		err := u.DeleteLessonTag(context.TODO(), 1, 2)
+
+		assert.Error(t, err)
+		mockTagRepo.AssertExpectations(t)
+	})
+}
+
+func TestGetLessonTags(t *testing.T) {
+	mockTagRepo := new(mocks.TagRepository)
+	mockListTag := []domain.Tag{
+		domain.Tag{
+			ID: 1, Name: "title-1",
+		},
+	}
+	t.Run("success", func(t *testing.T) {
+		mockTagRepo.On("GetLessonTags", mock.Anything, mock.AnythingOfType("int64")).Return(mockListTag, nil).Once()
+
+		u := ucase.NewTagUseCase(mockTagRepo, time.Second*2)
+
+		tags, err := u.GetLessonTags(context.TODO(), 1)
+
+		assert.NoError(t, err)
+		assert.Equal(t, mockListTag, tags)
+		mockTagRepo.AssertExpectations(t)
+	})
+	t.Run("error", func(t *testing.T) {
+		mockTagRepo.On("GetLessonTags", mock.Anything, mock.AnythingOfType("int64")).Return([]domain.Tag{}, errors.New("Unexpected Error")).Once()
+
+		u := ucase.NewTagUseCase(mockTagRepo, time.Second*2)
+
+		tags, err := u.GetLessonTags(context.TODO(), 1)
+
+		assert.Error(t, err)
+		assert.Len(t, tags, 0)
+		mockTagRepo.AssertExpectations(t)
+	})
 }

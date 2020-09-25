@@ -13,7 +13,7 @@ import (
 	echoSwagger "github.com/swaggo/echo-swagger"
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	_ "github.com/meroedu/meroedu/api_docs"
+	_ "github.com/meroedu/meroedu/docs"
 	_attachmentHttpDelivery "github.com/meroedu/meroedu/internal/attachment/delivery/http"
 	_attachmentRepo "github.com/meroedu/meroedu/internal/attachment/repository/mysql"
 	_attachmentStore "github.com/meroedu/meroedu/internal/attachment/storage/filesystem"

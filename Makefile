@@ -80,7 +80,7 @@ docker:
 
 swagger:
 	go get github.com/swaggo/swag/cmd/swag
-	$$(go env GOPATH)/bin/swag init -g meroedu.go --output ./api_docs
+	$$(go env GOPATH)/bin/swag init -g meroedu.go --output ./docs
 mock:
 	cd internal/domain && mockery --all --keeptree
 db-up:

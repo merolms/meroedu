@@ -22,11 +22,11 @@ func NewTagUseCase(c domain.TagRepository, timeout time.Duration) domain.TagUseC
 }
 
 // GetAll ...
-func (usecase *TagUseCase) GetAll(c context.Context, start int, limit int) (res []domain.Tag, err error) {
+func (usecase *TagUseCase) GetAll(c context.Context, searchQuery string, start int, limit int) (res []domain.Tag, err error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 
-	res, err = usecase.tagRepo.GetAll(ctx, start, limit)
+	res, err = usecase.tagRepo.GetAll(ctx, searchQuery, start, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -106,4 +106,60 @@ func (usecase *TagUseCase) DeleteTag(c context.Context, id int64) (err error) {
 		return domain.ErrNotFound
 	}
 	return usecase.tagRepo.DeleteTag(ctx, id)
+}
+
+// CreateCourseTag ...
+func (usecase *TagUseCase) CreateCourseTag(ctx context.Context, tagID int64, courseID int64) error {
+	ctx, cancel := context.WithTimeout(ctx, usecase.contextTimeOut)
+	defer cancel()
+
+	return usecase.tagRepo.CreateCourseTag(ctx, tagID, courseID)
+}
+
+// DeleteCourseTag ...
+func (usecase *TagUseCase) DeleteCourseTag(ctx context.Context, tagID int64, courseID int64) error {
+	ctx, cancel := context.WithTimeout(ctx, usecase.contextTimeOut)
+	defer cancel()
+	return usecase.tagRepo.DeleteCourseTag(ctx, tagID, courseID)
+}
+
+// GetCourseTags ...
+func (usecase *TagUseCase) GetCourseTags(ctx context.Context, courseID int64) ([]domain.Tag, error) {
+	ctx, cancel := context.WithTimeout(ctx, usecase.contextTimeOut)
+	defer cancel()
+
+	tags, err := usecase.tagRepo.GetCourseTags(ctx, courseID)
+	if err != nil {
+		return nil, err
+	}
+
+	return tags, nil
+}
+
+// CreateLessonTag ...
+func (usecase *TagUseCase) CreateLessonTag(ctx context.Context, tagID int64, lessonID int64) error {
+	ctx, cancel := context.WithTimeout(ctx, usecase.contextTimeOut)
+	defer cancel()
+
+	return usecase.tagRepo.CreateLessonTag(ctx, tagID, lessonID)
+}
+
+// DeleteLessonTag ...
+func (usecase *TagUseCase) DeleteLessonTag(ctx context.Context, tagID int64, lessonID int64) error {
+	ctx, cancel := context.WithTimeout(ctx, usecase.contextTimeOut)
+	defer cancel()
+	return usecase.tagRepo.DeleteLessonTag(ctx, tagID, lessonID)
+}
+
+// GetLessonTags ...
+func (usecase *TagUseCase) GetLessonTags(ctx context.Context, lessonID int64) ([]domain.Tag, error) {
+	ctx, cancel := context.WithTimeout(ctx, usecase.contextTimeOut)
+	defer cancel()
+
+	tags, err := usecase.tagRepo.GetLessonTags(ctx, lessonID)
+	if err != nil {
+		return nil, err
+	}
+
+	return tags, nil
 }
