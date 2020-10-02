@@ -482,6 +482,38 @@ var doc = `{
                 }
             }
         },
+        "/contents/download": {
+            "get": {
+                "description": "Download an attachment.",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "contents"
+                ],
+                "summary": "Download an attachment.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "uuid-encoded file name",
+                        "name": "file",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/domain.APIResponseError"
+                        }
+                    }
+                }
+            }
+        },
         "/contents/{id}": {
             "get": {
                 "description": "Get Specific Content details.",
@@ -1782,11 +1814,17 @@ var doc = `{
                 "description": {
                     "type": "string"
                 },
+                "file_size": {
+                    "type": "integer"
+                },
                 "id": {
                     "type": "integer"
                 },
                 "lesson_id": {
                     "type": "integer"
+                },
+                "name": {
+                    "type": "string"
                 },
                 "title": {
                     "type": "string"

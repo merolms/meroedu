@@ -9,6 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/meroedu/meroedu/internal/domain"
 	"github.com/meroedu/meroedu/internal/util"
+	"github.com/meroedu/meroedu/pkg/log"
 )
 
 // ResponseError represents the response error struct
@@ -30,6 +31,7 @@ func NewContentHandler(e *echo.Echo, us domain.ContentUseCase) {
 	e.GET("/contents", handler.GetAll)
 	e.GET("/contents/:id", handler.GetByID)
 	e.GET("/contents/:id/", handler.GetByID)
+	e.GET("/contents/download", handler.DownloadContent)
 
 	// Create/Add Operation
 	e.POST("/contents", handler.CreateContent)
@@ -213,4 +215,24 @@ func (c *ContentHandler) DeleteContent(echoContext echo.Context) error {
 	}
 
 	return echoContext.NoContent(http.StatusNoContent)
+}
+
+// DownloadContent godoc
+// @Summary Download an attachment.
+// @Description Download an attachment.
+// @Tags contents
+// @Accept */*
+// @Param file query string true "uuid-encoded file name"
+// @Produce json
+// @Failure 500 {object} domain.APIResponseError "Internal Server Error"
+// @Router /contents/download [get]
+func (c *ContentHandler) DownloadContent(echoContext echo.Context) error {
+	ctx := echoContext.Request().Context()
+	fileName := echoContext.QueryParam("file")
+	filePath, err := c.ContentUseCase.DownloadContent(ctx, fileName)
+	if err != nil {
+		log.Errorf("error while getting file path %v", err)
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
+	}
+	return echoContext.File(filePath)
 }

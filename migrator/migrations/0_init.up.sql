@@ -140,6 +140,7 @@ CREATE TABLE `lessons` (
   `title` varchar(256),
   `description` longtext,
   `course_id` bigint(20) NOT NULL,
+  `order` int(3),
   `status` int(1),
   `updated_at` bigint(20) NOT NULL,
   `created_at` bigint(20) NOT NULL
@@ -151,8 +152,12 @@ CREATE TABLE `contents` (
   `description` longtext,
   `content` longtext,
   `type` varchar(60),
+  `embed_url` varchar(256),
+  `image_url` varchar(256),
   `lesson_id` bigint(20) NOT NULL,
-  `status` int(1),
+  `size` int,
+  `caption` varchar(256),
+  `order` int(3),
   `updated_at` bigint(20) NOT NULL,
   `created_at` bigint(20) NOT NULL
 );

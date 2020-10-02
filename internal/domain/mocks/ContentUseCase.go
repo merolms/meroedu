@@ -42,6 +42,27 @@ func (_m *ContentUseCase) DeleteContent(ctx context.Context, id int64) error {
 	return r0
 }
 
+// DownloadContent provides a mock function with given fields: ctx, fileName
+func (_m *ContentUseCase) DownloadContent(ctx context.Context, fileName string) (string, error) {
+	ret := _m.Called(ctx, fileName)
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func(context.Context, string) string); ok {
+		r0 = rf(ctx, fileName)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, fileName)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetAll provides a mock function with given fields: ctx, start, limit
 func (_m *ContentUseCase) GetAll(ctx context.Context, start int, limit int) ([]domain.Content, error) {
 	ret := _m.Called(ctx, start, limit)

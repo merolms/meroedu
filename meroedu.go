@@ -23,6 +23,7 @@ import (
 	_categoryUcase "github.com/meroedu/meroedu/internal/category/usecase"
 	_contentHttpDelivery "github.com/meroedu/meroedu/internal/content/delivery/http"
 	_contentRepo "github.com/meroedu/meroedu/internal/content/repository/mysql"
+	_contentStore "github.com/meroedu/meroedu/internal/content/storage/filesystem"
 	_contentUcase "github.com/meroedu/meroedu/internal/content/usecase"
 	_courseHttpDelivery "github.com/meroedu/meroedu/internal/course/delivery/http"
 	_courseHttpDeliveryMiddleware "github.com/meroedu/meroedu/internal/course/delivery/http/middleware"
@@ -90,7 +91,11 @@ func main() {
 
 	// contents
 	contentRepository := _contentRepo.Init(db)
-	contentUseCase := _contentUcase.NewContentUseCase(contentRepository, timeoutContext)
+	contentStorage, err := _contentStore.Init()
+	if err != nil {
+		log.Fatalf("Error initializing content storage: %v", err)
+	}
+	contentUseCase := _contentUcase.NewContentUseCase(contentRepository, contentStorage, timeoutContext)
 	_contentHttpDelivery.NewContentHandler(e, contentUseCase)
 
 	// tags

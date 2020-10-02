@@ -14,13 +14,13 @@ type fileStorage struct {
 	path string
 }
 
-// Init will create an object that represent the attachment's Repository interface
-func Init() (domain.AttachmentStorage, error) {
+// Init will create an object that represent the content's Repository interface
+func Init() (domain.ContentStorage, error) {
 	rootDirectory, err := os.Getwd()
 	if err != nil {
 		return nil, err
 	}
-	path := rootDirectory + "/" + config.C.Filesystem.RelativePath + "/attachments"
+	path := rootDirectory + "/" + config.C.Filesystem.RelativePath + "/contents"
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		os.Mkdir(path, 0700)
 	}
@@ -29,12 +29,12 @@ func Init() (domain.AttachmentStorage, error) {
 	}, nil
 }
 
-func (repo *fileStorage) CreateAttachment(ctx context.Context, attachment domain.Attachment) error {
-	src := attachment.File
+func (repo *fileStorage) CreateContent(ctx context.Context, content domain.Content) error {
+	src := content.File
 	if src == nil {
 		return domain.ErrFileEmpty
 	}
-	filePath := repo.path + "/" + attachment.Name
+	filePath := repo.path + "/" + content.Name
 	dst, err := os.Create(filePath)
 	if err != nil {
 		log.Errorf("error occur while creating filepath: %v, error: %v", filePath, err)
@@ -50,7 +50,7 @@ func (repo *fileStorage) CreateAttachment(ctx context.Context, attachment domain
 	return nil
 }
 
-func (repo *fileStorage) DownloadAttachment(ctx context.Context, fileName string) (string, error) {
+func (repo *fileStorage) DownloadContent(ctx context.Context, fileName string) (string, error) {
 	filePath := repo.path + "/" + fileName
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		return "", err

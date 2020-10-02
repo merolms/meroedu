@@ -45,10 +45,14 @@ definitions:
         type: integer
       description:
         type: string
+      file_size:
+        type: integer
       id:
         type: integer
       lesson_id:
         type: integer
+      name:
+        type: string
       title:
         type: string
       type:
@@ -577,6 +581,27 @@ paths:
           schema:
             $ref: '#/definitions/domain.APIResponseError'
       summary: Update existing Content
+      tags:
+      - contents
+  /contents/download:
+    get:
+      consumes:
+      - '*/*'
+      description: Download an attachment.
+      parameters:
+      - description: uuid-encoded file name
+        in: query
+        name: file
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Download an attachment.
       tags:
       - contents
   /courses:
