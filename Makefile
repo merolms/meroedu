@@ -18,7 +18,7 @@ run:
 	docker-compose up --build -d
 stop:
 	docker-compose down
-reset: migrate-down
+reset: migrate-down stop
 ##############################################################################
 # Lint
 ###############################################################################
