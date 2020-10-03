@@ -53,33 +53,53 @@ func (usecase *ContentUseCase) GetByID(c context.Context, id int64) (res *domain
 }
 
 // CreateContent ..
-func (usecase *ContentUseCase) CreateContent(c context.Context, content *domain.Content) (err error) {
+func (usecase *ContentUseCase) CreateContent(c context.Context, content *domain.Content) (*domain.Content, error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
+	if content.FileHeader != "" {
+		filename := getFileName(content.FileHeader)
+		if filename == "" {
+			return nil, domain.ErrUnsupportedFileType
+		}
+		content.Name = filename
+		err := usecase.contentStore.CreateContent(ctx, *content)
+		if err != nil {
+			log.Errorf("error received from usecase storage %v", err)
+			return nil, err
+		}
+	}
+
 	content.UpdatedAt = time.Now().Unix()
 	content.CreatedAt = time.Now().Unix()
-	err = usecase.contentRepo.CreateContent(ctx, content)
+	err := usecase.contentRepo.CreateContent(ctx, content)
 	if err != nil {
-		return
+		return nil, err
 	}
-	return
+	return content, err
 }
 
 // UpdateContent ..
-func (usecase *ContentUseCase) UpdateContent(c context.Context, content *domain.Content, id int64) (err error) {
+func (usecase *ContentUseCase) UpdateContent(c context.Context, content *domain.Content, id int64) (*domain.Content, error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 	existingContent, err := usecase.GetByID(ctx, id)
 	if existingContent == nil {
-		return domain.ErrNotFound
+		return nil, domain.ErrNotFound
+	}
+	if content.FileHeader != "" {
+		filename := getFileName(content.FileHeader)
+		if filename == "" {
+			return nil, domain.ErrUnsupportedFileType
+		}
+		content.Name = filename
 	}
 	content.ID = id
 	content.UpdatedAt = time.Now().Unix()
 	err = usecase.contentRepo.UpdateContent(ctx, content)
 	if err != nil {
-		return
+		return nil, err
 	}
-	return
+	return content, nil
 }
 
 // DeleteContent ...

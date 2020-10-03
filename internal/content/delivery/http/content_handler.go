@@ -1,12 +1,15 @@
 package http
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"strings"
 
 	"github.com/labstack/echo/v4"
+
 	"github.com/meroedu/meroedu/internal/domain"
 	"github.com/meroedu/meroedu/internal/util"
 	"github.com/meroedu/meroedu/pkg/log"
@@ -130,21 +133,67 @@ func (c *ContentHandler) GetByID(echoContext echo.Context) error {
 // @Failure 500 {object} domain.APIResponseError "Internal Server Error"
 // @Router /contents [post]
 func (c *ContentHandler) CreateContent(echoContext echo.Context) error {
-	var content domain.Content
-	err := echoContext.Bind(&content)
+	ctx := echoContext.Request().Context()
+	title := echoContext.FormValue("title")
+	description := echoContext.FormValue("description")
+	lessonID, err := strconv.Atoi(echoContext.FormValue("lesson_id"))
 	if err != nil {
-		return echoContext.JSON(http.StatusUnprocessableEntity, err.Error())
+		fmt.Println("Error in lesson Id", err)
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
-	var ok bool
-	if ok, err = util.IsRequestValid(&content); !ok {
+	contentType := domain.ContentType{Type: echoContext.FormValue("content_type")}
+
+	contentEntity := domain.Content{
+		Title:       title,
+		Description: description,
+		LessonID:    int64(lessonID),
+		ContentType: contentType,
+	}
+	switch contentType {
+	case domain.ContentIsFile, domain.ContentIsImage:
+		fileHeader, err := echoContext.FormFile("file")
+		if err != nil {
+			return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
+		}
+		file, err := fileHeader.Open()
+		defer file.Close()
+		if err != nil {
+			log.Info(err)
+			return err
+		}
+		sizer, ok := file.(util.Sizer)
+		if !ok {
+			return echoContext.JSON(http.StatusBadRequest, ResponseError{Message: "invalid size"})
+		}
+		if file == nil {
+			err = errors.New("file is empty: ")
+			return echoContext.JSON(http.StatusBadRequest, ResponseError{Message: err.Error()})
+		}
+		contentEntity.File = file
+		contentEntity.Size = sizer.Size()
+		contentEntity.FileHeader = fileHeader.Header.Get("Content-Type")
+		contentEntity.Caption = fileHeader.Filename
+		break
+	case domain.ContentIsEmbeddedURL:
+		contentEntity.EmbedURL = echoContext.FormValue("embed_url")
+		break
+	case domain.ContentIsFormattedText:
+		contentEntity.Content = echoContext.FormValue("content")
+		break
+	}
+
+	if ok, err := util.IsRequestValid(&contentEntity); !ok {
 		return echoContext.JSON(http.StatusBadRequest, err.Error())
 	}
-	ctx := echoContext.Request().Context()
-	err = c.ContentUseCase.CreateContent(ctx, &content)
+	response, err := c.ContentUseCase.CreateContent(ctx, &contentEntity)
 	if err != nil {
 		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
-	return echoContext.JSON(http.StatusCreated, content)
+	res := domain.Response{
+		Data:    response,
+		Message: domain.Success,
+	}
+	return echoContext.JSON(http.StatusCreated, res)
 
 }
 
@@ -176,12 +225,12 @@ func (c *ContentHandler) UpdateContent(echoContext echo.Context) error {
 		return echoContext.JSON(http.StatusBadRequest, err.Error())
 	}
 	ctx := echoContext.Request().Context()
-	err = c.ContentUseCase.UpdateContent(ctx, &content, int64(idParam))
+	response, err := c.ContentUseCase.UpdateContent(ctx, &content, int64(idParam))
 	if err != nil {
 		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
 	res := domain.Response{
-		Data:    content,
+		Data:    response,
 		Message: domain.Success,
 	}
 	return echoContext.JSON(http.StatusOK, res)

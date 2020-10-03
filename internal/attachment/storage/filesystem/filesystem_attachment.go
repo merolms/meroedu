@@ -20,7 +20,7 @@ func Init() (domain.AttachmentStorage, error) {
 	if err != nil {
 		return nil, err
 	}
-	path := rootDirectory + "/" + config.C.Filesystem.RelativePath + "/attachments"
+	path := rootDirectory + "/" + config.C.Filesystem.RelativePath
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		os.Mkdir(path, 0700)
 	}

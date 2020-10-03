@@ -15,6 +15,7 @@ import (
 
 func TestGetAll(t *testing.T) {
 	mockContentRepo := new(mocks.ContentRepository)
+	mockContentStore := new(mocks.ContentStorage)
 	mockListContent := []domain.Content{
 		domain.Content{
 			ID: 1, Title: "title-1",
@@ -26,7 +27,7 @@ func TestGetAll(t *testing.T) {
 
 		start := int(0)
 		limit := int(1)
-		u := ucase.NewContentUseCase(mockContentRepo, time.Second*2)
+		u := ucase.NewContentUseCase(mockContentRepo, mockContentStore, time.Second*2)
 		list, err := u.GetAll(context.TODO(), start, limit)
 		assert.NoError(t, err)
 		assert.Len(t, list, len(mockListContent))
@@ -37,7 +38,7 @@ func TestGetAll(t *testing.T) {
 		mockContentRepo.On("GetAll", mock.Anything, mock.AnythingOfType("int"),
 			mock.AnythingOfType("int")).Return(nil, errors.New("Unexpected Error")).Once()
 
-		u := ucase.NewContentUseCase(mockContentRepo, time.Second*2)
+		u := ucase.NewContentUseCase(mockContentRepo, mockContentStore, time.Second*2)
 		start := int(0)
 		limit := int(1)
 		list, err := u.GetAll(context.TODO(), start, limit)
@@ -49,12 +50,13 @@ func TestGetAll(t *testing.T) {
 }
 func TestGetByID(t *testing.T) {
 	mockContentRepo := new(mocks.ContentRepository)
+	mockContentStore := new(mocks.ContentStorage)
 	mockContent := domain.Content{
 		Title: "title-1",
 	}
 	t.Run("success", func(t *testing.T) {
 		mockContentRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(&mockContent, nil).Once()
-		u := ucase.NewContentUseCase(mockContentRepo, time.Second*2)
+		u := ucase.NewContentUseCase(mockContentRepo, mockContentStore, time.Second*2)
 
 		a, err := u.GetByID(context.TODO(), mockContent.ID)
 
@@ -66,7 +68,7 @@ func TestGetByID(t *testing.T) {
 	t.Run("error-failed", func(t *testing.T) {
 		mockContentRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(nil, errors.New("Unexpected")).Once()
 
-		u := ucase.NewContentUseCase(mockContentRepo, time.Second*2)
+		u := ucase.NewContentUseCase(mockContentRepo, mockContentStore, time.Second*2)
 
 		a, err := u.GetByID(context.TODO(), mockContent.ID)
 
@@ -78,6 +80,7 @@ func TestGetByID(t *testing.T) {
 
 func TestCreateContent(t *testing.T) {
 	mockContentRepo := new(mocks.ContentRepository)
+	mockContentStore := new(mocks.ContentStorage)
 	mockContent := domain.Content{
 		Title: "Hello",
 	}
@@ -86,26 +89,28 @@ func TestCreateContent(t *testing.T) {
 		tempmockContent := mockContent
 		tempmockContent.ID = 0
 		mockContentRepo.On("CreateContent", mock.Anything, mock.AnythingOfType("*domain.Content")).Return(nil).Once()
-		u := ucase.NewContentUseCase(mockContentRepo, time.Second*2)
+		u := ucase.NewContentUseCase(mockContentRepo, mockContentStore, time.Second*2)
 
-		err := u.CreateContent(context.TODO(), &tempmockContent)
+		content, err := u.CreateContent(context.TODO(), &tempmockContent)
 
 		assert.NoError(t, err)
-		assert.Equal(t, mockContent.Title, tempmockContent.Title)
+		assert.Equal(t, content.Title, tempmockContent.Title)
 		mockContentRepo.AssertExpectations(t)
 	})
 	t.Run("error-failed", func(t *testing.T) {
 		mockContentRepo.On("CreateContent", mock.Anything, mock.AnythingOfType("*domain.Content")).Return(errors.New("unexpected error occur")).Once()
-		u := ucase.NewContentUseCase(mockContentRepo, time.Second*2)
+		u := ucase.NewContentUseCase(mockContentRepo, mockContentStore, time.Second*2)
 
-		err := u.CreateContent(context.TODO(), &mockContent)
+		content, err := u.CreateContent(context.TODO(), &mockContent)
 
 		assert.Error(t, err)
+		assert.Nil(t, content)
 		mockContentRepo.AssertExpectations(t)
 	})
 }
 func TestUpdateContent(t *testing.T) {
 	mockContentRepo := new(mocks.ContentRepository)
+	mockContentStore := new(mocks.ContentStorage)
 	mockContent := domain.Content{
 		ID:    1,
 		Title: "Hello",
@@ -115,28 +120,31 @@ func TestUpdateContent(t *testing.T) {
 		tempmockContent := mockContent
 		mockContentRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(&mockContent, nil).Once()
 		mockContentRepo.On("UpdateContent", mock.Anything, mock.AnythingOfType("*domain.Content")).Return(nil).Once()
-		u := ucase.NewContentUseCase(mockContentRepo, time.Second*2)
+		u := ucase.NewContentUseCase(mockContentRepo, mockContentStore, time.Second*2)
 
-		err := u.UpdateContent(context.TODO(), &tempmockContent, tempmockContent.ID)
+		content, err := u.UpdateContent(context.TODO(), &tempmockContent, tempmockContent.ID)
 
 		assert.NoError(t, err)
 		assert.Equal(t, mockContent.ID, tempmockContent.ID)
+		assert.NotNil(t, content)
 		mockContentRepo.AssertExpectations(t)
 	})
 	t.Run("error-failed", func(t *testing.T) {
 		mockContentRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(nil, nil).Once()
 		mockContentRepo.On("UpdateContent", mock.Anything, mock.AnythingOfType("*domain.Content")).Return(domain.ErrNotFound).Once()
-		u := ucase.NewContentUseCase(mockContentRepo, time.Second*2)
+		u := ucase.NewContentUseCase(mockContentRepo, mockContentStore, time.Second*2)
 
-		err := u.UpdateContent(context.TODO(), &mockContent, mockContent.ID)
+		content, err := u.UpdateContent(context.TODO(), &mockContent, mockContent.ID)
 
 		assert.Error(t, err)
+		assert.Nil(t, content)
 		// mockContentRepo.AssertExpectations(t)
 	})
 }
 
 func TestDeleteContent(t *testing.T) {
 	mockContentRepo := new(mocks.ContentRepository)
+	mockContentStore := new(mocks.ContentStorage)
 	mockContent := domain.Content{
 		Title: "content",
 	}
@@ -146,7 +154,7 @@ func TestDeleteContent(t *testing.T) {
 
 		mockContentRepo.On("DeleteContent", mock.Anything, mock.AnythingOfType("int64")).Return(nil).Once()
 
-		u := ucase.NewContentUseCase(mockContentRepo, time.Second*2)
+		u := ucase.NewContentUseCase(mockContentRepo, mockContentStore, time.Second*2)
 
 		err := u.DeleteContent(context.TODO(), mockContent.ID)
 
@@ -156,7 +164,7 @@ func TestDeleteContent(t *testing.T) {
 	t.Run("content-is-not-exist", func(t *testing.T) {
 		mockContentRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(nil, nil).Once()
 
-		u := ucase.NewContentUseCase(mockContentRepo, time.Second*2)
+		u := ucase.NewContentUseCase(mockContentRepo, mockContentStore, time.Second*2)
 
 		err := u.DeleteContent(context.TODO(), mockContent.ID)
 
@@ -166,7 +174,7 @@ func TestDeleteContent(t *testing.T) {
 	t.Run("error-happens-in-db", func(t *testing.T) {
 		mockContentRepo.On("GetByID", mock.Anything, mock.AnythingOfType("int64")).Return(nil, errors.New("Unexpected Error")).Once()
 
-		u := ucase.NewContentUseCase(mockContentRepo, time.Second*2)
+		u := ucase.NewContentUseCase(mockContentRepo, mockContentStore, time.Second*2)
 
 		err := u.DeleteContent(context.TODO(), mockContent.ID)
 

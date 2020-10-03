@@ -60,9 +60,9 @@ func TestCreateContent(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error %s was not expected when opening stub database connection", err)
 	}
-	query := `INSERT contents SET title=\?,description=\?,type=\?,lesson_id=\?,updated_at=\?,created_at=\?`
+	query := `INSERT contents SET title=\?,description=\?,fileheader=\?,lesson_id=\?,updated_at=\?,created_at=\?`
 	prep := mock.ExpectPrepare(query)
-	prep.ExpectExec().WithArgs(c.Title, c.Description, c.Type, c.LessonID, c.UpdatedAt, c.CreatedAt).WillReturnResult(sqlmock.NewResult(12, 1))
+	prep.ExpectExec().WithArgs(c.Title, c.Description, c.FileHeader, c.LessonID, c.UpdatedAt, c.CreatedAt).WillReturnResult(sqlmock.NewResult(12, 1))
 
 	repo := mysqlrepo.Init(db)
 	err = repo.CreateContent(context.TODO(), c)

@@ -15,17 +15,26 @@ type ContentUseCase struct {
 }
 
 // CreateContent provides a mock function with given fields: ctx, Content
-func (_m *ContentUseCase) CreateContent(ctx context.Context, Content *domain.Content) error {
+func (_m *ContentUseCase) CreateContent(ctx context.Context, Content *domain.Content) (*domain.Content, error) {
 	ret := _m.Called(ctx, Content)
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *domain.Content) error); ok {
+	var r0 *domain.Content
+	if rf, ok := ret.Get(0).(func(context.Context, *domain.Content) *domain.Content); ok {
 		r0 = rf(ctx, Content)
 	} else {
-		r0 = ret.Error(0)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.Content)
+		}
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *domain.Content) error); ok {
+		r1 = rf(ctx, Content)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // DeleteContent provides a mock function with given fields: ctx, id
@@ -133,15 +142,24 @@ func (_m *ContentUseCase) GetContentByLesson(ctx context.Context, lessonID int64
 }
 
 // UpdateContent provides a mock function with given fields: ctx, Content, id
-func (_m *ContentUseCase) UpdateContent(ctx context.Context, Content *domain.Content, id int64) error {
+func (_m *ContentUseCase) UpdateContent(ctx context.Context, Content *domain.Content, id int64) (*domain.Content, error) {
 	ret := _m.Called(ctx, Content, id)
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *domain.Content, int64) error); ok {
+	var r0 *domain.Content
+	if rf, ok := ret.Get(0).(func(context.Context, *domain.Content, int64) *domain.Content); ok {
 		r0 = rf(ctx, Content, id)
 	} else {
-		r0 = ret.Error(0)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.Content)
+		}
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *domain.Content, int64) error); ok {
+		r1 = rf(ctx, Content, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }

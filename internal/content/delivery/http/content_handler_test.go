@@ -1,9 +1,9 @@
 package http_test
 
 import (
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strconv"
 	"strings"
 	"testing"
@@ -98,25 +98,31 @@ func TestGetByID(t *testing.T) {
 }
 
 func TestCreateContent(t *testing.T) {
+	f := make(url.Values)
+	f.Set("title", "simple title")
+	f.Set("description", "description")
+	f.Set("lesson_id", "1")
+	f.Set("content", "Here we go")
+	f.Set("content_type", "formatted-text")
+
 	mockContent := domain.Content{
-		Title:     "Title",
-		CreatedAt: time.Now().Unix(),
-		UpdatedAt: time.Now().Unix(),
+		Title:       "Title",
+		Description: "description",
+		ContentType: domain.ContentIsFormattedText,
+		Content:     "Here we go",
+		LessonID:    1,
+		CreatedAt:   time.Now().Unix(),
+		UpdatedAt:   time.Now().Unix(),
 	}
 
-	tempmockContent := mockContent
-	tempmockContent.ID = 0
 	mockUCase := new(mocks.ContentUseCase)
 
-	j, err := json.Marshal(tempmockContent)
-	assert.NoError(t, err)
-
-	mockUCase.On("CreateContent", mock.Anything, mock.AnythingOfType("*domain.Content")).Return(nil)
+	mockUCase.On("CreateContent", mock.Anything, mock.AnythingOfType("*domain.Content")).Return(&mockContent, nil)
 
 	e := echo.New()
-	req, err := http.NewRequest(echo.POST, "/contents", strings.NewReader(string(j)))
+	req, err := http.NewRequest(echo.POST, "/contents", strings.NewReader(f.Encode()))
 	assert.NoError(t, err)
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
 
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)

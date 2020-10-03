@@ -81,13 +81,13 @@ func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (res *domain.Co
 }
 
 func (m *mysqlRepository) CreateContent(ctx context.Context, a *domain.Content) (err error) {
-	query := `INSERT contents SET title=?,description=?,type=?,lesson_id=?,updated_at=?,created_at=?`
+	query := `INSERT contents SET title=?,description=?,fileheader=?,lesson_id=?,updated_at=?,created_at=?`
 	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {
 		log.Error("Error while preparing statement ", err)
 		return
 	}
-	res, err := stmt.ExecContext(ctx, a.Title, a.Description, a.Type, a.LessonID, a.UpdatedAt, a.CreatedAt)
+	res, err := stmt.ExecContext(ctx, a.Title, a.Description, a.FileHeader, a.LessonID, a.UpdatedAt, a.CreatedAt)
 	if err != nil {
 		log.Error("Error while executing statement ", err)
 		return

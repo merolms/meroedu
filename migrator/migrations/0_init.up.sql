@@ -151,7 +151,7 @@ CREATE TABLE `contents` (
   `title` varchar(256),
   `description` longtext,
   `content` longtext,
-  `type` varchar(60),
+  `fileheader` varchar(60),
   `embed_url` varchar(256),
   `image_url` varchar(256),
   `lesson_id` bigint(20) NOT NULL,
