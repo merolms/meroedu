@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	filestore "github.com/meroedu/meroedu/internal/attachment/storage/filesystem"
+	filestore "github.com/meroedu/meroedu/internal/content/storage/filesystem"
 	"github.com/meroedu/meroedu/internal/domain"
 	"github.com/meroedu/meroedu/pkg/log"
 )
@@ -43,11 +43,11 @@ func removeFile(filename string) error {
 	}
 	return nil
 }
-func TestCreateAttachment(t *testing.T) {
-	filename := "attachment.txt"
+func TestCreateContent(t *testing.T) {
+	filename := "content.txt"
 	file, err := createTempFile(filename)
 	assert.NoError(t, err)
-	mockAttachment := domain.Attachment{
+	mockContent := domain.Content{
 		ID:   1,
 		Name: filename,
 		File: file,
@@ -57,17 +57,17 @@ func TestCreateAttachment(t *testing.T) {
 	if err != nil {
 		t.Errorf("error init filestore")
 	}
-	log.Infof("FileSystem storage: %v %v", s, mockAttachment)
+	log.Infof("FileSystem storage: %v %v", s, mockContent)
 	t.Run("success", func(t *testing.T) {
-		err = s.CreateAttachment(context.TODO(), mockAttachment)
+		err = s.CreateContent(context.TODO(), mockContent)
 		if err != nil {
-			t.Errorf("error while creating attachment %v", err)
+			t.Errorf("error while creating content %v", err)
 		}
 		assert.NoError(t, err)
 	})
 	t.Run("error-nil-file", func(t *testing.T) {
-		mockAttachment.File = nil
-		err = s.CreateAttachment(context.TODO(), mockAttachment)
+		mockContent.File = nil
+		err = s.CreateContent(context.TODO(), mockContent)
 		assert.Error(t, err)
 	})
 
@@ -77,8 +77,8 @@ func TestCreateAttachment(t *testing.T) {
 	}
 }
 
-func TestDownloadAttachment(t *testing.T) {
-	filename := "attachment.txt"
+func TestDownloadContent(t *testing.T) {
+	filename := "content.txt"
 	file, err := createTempFile(filename)
 	assert.NoError(t, err)
 	defer file.Close()
@@ -87,15 +87,15 @@ func TestDownloadAttachment(t *testing.T) {
 		t.Errorf("error init filestore")
 	}
 	t.Run("success", func(t *testing.T) {
-		path, err := s.DownloadAttachment(context.TODO(), filename)
+		path, err := s.DownloadContent(context.TODO(), filename)
 		if err != nil {
-			t.Errorf("error while creating attachment %v", err)
+			t.Errorf("error while creating content %v", err)
 		}
 		assert.NoError(t, err)
 		assert.Contains(t, path, filename)
 	})
 	t.Run("error-nil-file", func(t *testing.T) {
-		path, err := s.DownloadAttachment(context.TODO(), "abc.txt")
+		path, err := s.DownloadContent(context.TODO(), "abc.txt")
 		assert.Error(t, err)
 		assert.Empty(t, path)
 	})

@@ -10,17 +10,17 @@ import (
 )
 
 type mysqlRepository struct {
-	Conn *sql.DB
+	conn *sql.DB
 }
 
 // Init will create an object that represent the category's Repository interface
 func Init(db *sql.DB) domain.CategoryRepository {
 	return &mysqlRepository{
-		Conn: db,
+		conn: db,
 	}
 }
 func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...interface{}) (result []domain.Category, err error) {
-	rows, err := m.Conn.QueryContext(ctx, query, args...)
+	rows, err := m.conn.QueryContext(ctx, query, args...)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -54,7 +54,7 @@ func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...inter
 }
 
 func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res []domain.Category, err error) {
-	query := `SELECT id,name, updated_at, created_at FROM categories ORDER BY created_at DESC LIMIT ?,?`
+	query := `SELECT id,name,updated_at,created_at FROM categories ORDER BY created_at DESC LIMIT ?,?`
 
 	res, err = m.fetch(ctx, query, start, limit)
 	if err != nil {
@@ -95,8 +95,8 @@ func (m *mysqlRepository) GetByName(ctx context.Context, name string) (res *doma
 }
 
 func (m *mysqlRepository) CreateCategory(ctx context.Context, a *domain.Category) (err error) {
-	query := `INSERT  categories SET name=?, updated_at=? , created_at=?`
-	stmt, err := m.Conn.PrepareContext(ctx, query)
+	query := `INSERT categories SET name=?,updated_at=?,created_at=?`
+	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {
 		log.Error("Error while preparing statement ", err)
 		return
@@ -118,7 +118,7 @@ func (m *mysqlRepository) CreateCategory(ctx context.Context, a *domain.Category
 func (m *mysqlRepository) DeleteCategory(ctx context.Context, id int64) (err error) {
 	query := "DELETE FROM categories WHERE id = ?"
 
-	stmt, err := m.Conn.PrepareContext(ctx, query)
+	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
@@ -128,22 +128,22 @@ func (m *mysqlRepository) DeleteCategory(ctx context.Context, id int64) (err err
 		return
 	}
 
-	rowsAfected, err := res.RowsAffected()
+	rowsAffected, err := res.RowsAffected()
 	if err != nil {
 		return
 	}
 
-	if rowsAfected != 1 {
-		err = fmt.Errorf("Weird  Behavior. Total Affected: %d", rowsAfected)
+	if rowsAffected != 1 {
+		err = fmt.Errorf("Weird  Behavior. Total Affected: %d", rowsAffected)
 		return
 	}
 
 	return
 }
 func (m *mysqlRepository) UpdateCategory(ctx context.Context, ar *domain.Category) (err error) {
-	query := `UPDATE categories set name=?, updated_at=? WHERE ID = ?`
+	query := `UPDATE categories set name=?,updated_at=? WHERE ID = ?`
 
-	stmt, err := m.Conn.PrepareContext(ctx, query)
+	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}

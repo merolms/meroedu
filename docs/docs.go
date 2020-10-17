@@ -482,6 +482,38 @@ var doc = `{
                 }
             }
         },
+        "/contents/download": {
+            "get": {
+                "description": "Download an attachment.",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "contents"
+                ],
+                "summary": "Download an attachment.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "uuid-encoded file name",
+                        "name": "file",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/domain.APIResponseError"
+                        }
+                    }
+                }
+            }
+        },
         "/contents/{id}": {
             "get": {
                 "description": "Get Specific Content details.",
@@ -1232,6 +1264,330 @@ var doc = `{
                 }
             }
         },
+        "/tags/course/{course_id}/{tag_id}": {
+            "post": {
+                "description": "Create course tags",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tags"
+                ],
+                "summary": "Create course tags",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "course id",
+                        "name": "course_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "tag id",
+                        "name": "tag_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "We need ID!!",
+                        "schema": {
+                            "$ref": "#/definitions/domain.APIResponseError"
+                        }
+                    },
+                    "404": {
+                        "description": "Can not find ID",
+                        "schema": {
+                            "$ref": "#/definitions/domain.APIResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/domain.APIResponseError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete course tag by CourseID and tagID.",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tags"
+                ],
+                "summary": "Delete course tag by CourseID and tagID.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "course id",
+                        "name": "course_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "tag id",
+                        "name": "tag_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "We need ID!!",
+                        "schema": {
+                            "$ref": "#/definitions/domain.APIResponseError"
+                        }
+                    },
+                    "404": {
+                        "description": "Can not find ID",
+                        "schema": {
+                            "$ref": "#/definitions/domain.APIResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/domain.APIResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/tags/course/{id}": {
+            "get": {
+                "description": "Get all tags specific to course",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tags"
+                ],
+                "summary": "Get tags by CourseID.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "course id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "We need ID!!",
+                        "schema": {
+                            "$ref": "#/definitions/domain.APIResponseError"
+                        }
+                    },
+                    "404": {
+                        "description": "Can not find ID",
+                        "schema": {
+                            "$ref": "#/definitions/domain.APIResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/domain.APIResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/tags/lesson/{id}": {
+            "get": {
+                "description": "Get all tags specific to lesson",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tags"
+                ],
+                "summary": "Get tags by LessonID.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Lesson Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "We need ID!!",
+                        "schema": {
+                            "$ref": "#/definitions/domain.APIResponseError"
+                        }
+                    },
+                    "404": {
+                        "description": "Can not find ID",
+                        "schema": {
+                            "$ref": "#/definitions/domain.APIResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/domain.APIResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/tags/lesson/{lesson_id}/{tag_id}": {
+            "post": {
+                "description": "Create Lesson Tag",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tags"
+                ],
+                "summary": "Create Lesson Tag",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "lesson id",
+                        "name": "lesson_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "tag id",
+                        "name": "tag_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "We need ID!!",
+                        "schema": {
+                            "$ref": "#/definitions/domain.APIResponseError"
+                        }
+                    },
+                    "404": {
+                        "description": "Can not find ID",
+                        "schema": {
+                            "$ref": "#/definitions/domain.APIResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/domain.APIResponseError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete lesson tags by lessonID and tagID",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tags"
+                ],
+                "summary": "Delete lesson tags by lessonID and tagID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "lesson id",
+                        "name": "lesson_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "tag id",
+                        "name": "tag_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "We need ID!!",
+                        "schema": {
+                            "$ref": "#/definitions/domain.APIResponseError"
+                        }
+                    },
+                    "404": {
+                        "description": "Can not find ID",
+                        "schema": {
+                            "$ref": "#/definitions/domain.APIResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/domain.APIResponseError"
+                        }
+                    }
+                }
+            }
+        },
         "/tags/{id}": {
             "get": {
                 "description": "Get Specific tag details.",
@@ -1393,7 +1749,7 @@ var doc = `{
             "type": "object",
             "properties": {
                 "createdAt": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "errorCode": {
                     "type": "integer"
@@ -1410,7 +1766,7 @@ var doc = `{
                     "type": "integer"
                 },
                 "created_at": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "description": {
                     "type": "string"
@@ -1431,7 +1787,7 @@ var doc = `{
                     "type": "string"
                 },
                 "updated_at": {
-                    "type": "string"
+                    "type": "integer"
                 }
             }
         },
@@ -1453,16 +1809,22 @@ var doc = `{
                     "type": "string"
                 },
                 "created_at": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "description": {
                     "type": "string"
+                },
+                "file_size": {
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
                 },
                 "lesson_id": {
                     "type": "integer"
+                },
+                "name": {
+                    "type": "string"
                 },
                 "title": {
                     "type": "string"
@@ -1471,7 +1833,7 @@ var doc = `{
                     "type": "string"
                 },
                 "updated_at": {
-                    "type": "string"
+                    "type": "integer"
                 }
             }
         },
@@ -1491,20 +1853,12 @@ var doc = `{
                     "type": "object",
                     "$ref": "#/definitions/domain.User"
                 },
-                "author_id": {
-                    "type": "object",
-                    "$ref": "#/definitions/domain.NullInt64"
-                },
                 "categories": {
                     "type": "object",
                     "$ref": "#/definitions/domain.Category"
                 },
-                "category_id": {
-                    "type": "object",
-                    "$ref": "#/definitions/domain.NullInt64"
-                },
                 "created_at": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "description": {
                     "type": "string"
@@ -1517,6 +1871,9 @@ var doc = `{
                 },
                 "image_url": {
                     "type": "string"
+                },
+                "lesson_count": {
+                    "type": "integer"
                 },
                 "lessons": {
                     "type": "array",
@@ -1537,7 +1894,7 @@ var doc = `{
                     "type": "string"
                 },
                 "updated_at": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "users": {
                     "type": "array",
@@ -1563,7 +1920,7 @@ var doc = `{
                     "type": "integer"
                 },
                 "created_at": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "description": {
                     "type": "string"
@@ -1581,12 +1938,9 @@ var doc = `{
                     "type": "string"
                 },
                 "updated_at": {
-                    "type": "string"
+                    "type": "integer"
                 }
             }
-        },
-        "domain.NullInt64": {
-            "type": "object"
         },
         "domain.Response": {
             "type": "object",
@@ -1615,9 +1969,12 @@ var doc = `{
         },
         "domain.Tag": {
             "type": "object",
+            "required": [
+                "name"
+            ],
             "properties": {
                 "created_at": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
@@ -1626,7 +1983,7 @@ var doc = `{
                     "type": "string"
                 },
                 "updated_at": {
-                    "type": "string"
+                    "type": "integer"
                 }
             }
         },
@@ -1634,7 +1991,7 @@ var doc = `{
             "type": "object",
             "properties": {
                 "created_at": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
@@ -1643,7 +2000,7 @@ var doc = `{
                     "type": "string"
                 },
                 "updated_at": {
-                    "type": "string"
+                    "type": "integer"
                 }
             }
         }

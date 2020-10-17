@@ -3,7 +3,7 @@ definitions:
   domain.APIResponseError:
     properties:
       createdAt:
-        type: string
+        type: integer
       errorCode:
         type: integer
       errorMessage:
@@ -14,7 +14,7 @@ definitions:
       course_id:
         type: integer
       created_at:
-        type: string
+        type: integer
       description:
         type: string
       file_size:
@@ -28,7 +28,7 @@ definitions:
       title:
         type: string
       updated_at:
-        type: string
+        type: integer
     type: object
   domain.Category:
     properties:
@@ -42,19 +42,23 @@ definitions:
       content:
         type: string
       created_at:
-        type: string
+        type: integer
       description:
         type: string
+      file_size:
+        type: integer
       id:
         type: integer
       lesson_id:
         type: integer
+      name:
+        type: string
       title:
         type: string
       type:
         type: string
       updated_at:
-        type: string
+        type: integer
     type: object
   domain.Course:
     properties:
@@ -65,17 +69,11 @@ definitions:
       author:
         $ref: '#/definitions/domain.User'
         type: object
-      author_id:
-        $ref: '#/definitions/domain.NullInt64'
-        type: object
       categories:
         $ref: '#/definitions/domain.Category'
         type: object
-      category_id:
-        $ref: '#/definitions/domain.NullInt64'
-        type: object
       created_at:
-        type: string
+        type: integer
       description:
         type: string
       duration:
@@ -84,6 +82,8 @@ definitions:
         type: integer
       image_url:
         type: string
+      lesson_count:
+        type: integer
       lessons:
         items:
           $ref: '#/definitions/domain.Lesson'
@@ -97,7 +97,7 @@ definitions:
       title:
         type: string
       updated_at:
-        type: string
+        type: integer
       users:
         items:
           $ref: '#/definitions/domain.User'
@@ -114,7 +114,7 @@ definitions:
       course_id:
         type: integer
       created_at:
-        type: string
+        type: integer
       description:
         type: string
       id:
@@ -126,11 +126,9 @@ definitions:
       title:
         type: string
       updated_at:
-        type: string
+        type: integer
     required:
     - title
-    type: object
-  domain.NullInt64:
     type: object
   domain.Response:
     properties:
@@ -151,24 +149,26 @@ definitions:
   domain.Tag:
     properties:
       created_at:
-        type: string
+        type: integer
       id:
         type: integer
       name:
         type: string
       updated_at:
-        type: string
+        type: integer
+    required:
+    - name
     type: object
   domain.User:
     properties:
       created_at:
-        type: string
+        type: integer
       id:
         type: integer
       name:
         type: string
       updated_at:
-        type: string
+        type: integer
     type: object
 info:
   contact:
@@ -581,6 +581,27 @@ paths:
           schema:
             $ref: '#/definitions/domain.APIResponseError'
       summary: Update existing Content
+      tags:
+      - contents
+  /contents/download:
+    get:
+      consumes:
+      - '*/*'
+      description: Download an attachment.
+      parameters:
+      - description: uuid-encoded file name
+        in: query
+        name: file
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Download an attachment.
       tags:
       - contents
   /courses:
@@ -1079,6 +1100,222 @@ paths:
           schema:
             $ref: '#/definitions/domain.APIResponseError'
       summary: Update existing tag
+      tags:
+      - tags
+  /tags/course/{course_id}/{tag_id}:
+    delete:
+      consumes:
+      - '*/*'
+      description: Delete course tag by CourseID and tagID.
+      parameters:
+      - description: course id
+        in: path
+        name: course_id
+        required: true
+        type: integer
+      - description: tag id
+        in: path
+        name: tag_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: We need ID!!
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Can not find ID
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Delete course tag by CourseID and tagID.
+      tags:
+      - tags
+    post:
+      consumes:
+      - '*/*'
+      description: Create course tags
+      parameters:
+      - description: course id
+        in: path
+        name: course_id
+        required: true
+        type: integer
+      - description: tag id
+        in: path
+        name: tag_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: We need ID!!
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Can not find ID
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Create course tags
+      tags:
+      - tags
+  /tags/course/{id}:
+    get:
+      consumes:
+      - '*/*'
+      description: Get all tags specific to course
+      parameters:
+      - description: course id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: We need ID!!
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Can not find ID
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Get tags by CourseID.
+      tags:
+      - tags
+  /tags/lesson/{id}:
+    get:
+      consumes:
+      - '*/*'
+      description: Get all tags specific to lesson
+      parameters:
+      - description: Lesson Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: We need ID!!
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Can not find ID
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Get tags by LessonID.
+      tags:
+      - tags
+  /tags/lesson/{lesson_id}/{tag_id}:
+    delete:
+      consumes:
+      - '*/*'
+      description: Delete lesson tags by lessonID and tagID
+      parameters:
+      - description: lesson id
+        in: path
+        name: lesson_id
+        required: true
+        type: integer
+      - description: tag id
+        in: path
+        name: tag_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: We need ID!!
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Can not find ID
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Delete lesson tags by lessonID and tagID
+      tags:
+      - tags
+    post:
+      consumes:
+      - '*/*'
+      description: Create Lesson Tag
+      parameters:
+      - description: lesson id
+        in: path
+        name: lesson_id
+        required: true
+        type: integer
+      - description: tag id
+        in: path
+        name: tag_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Response'
+        "400":
+          description: We need ID!!
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "404":
+          description: Can not find ID
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.APIResponseError'
+      summary: Create Lesson Tag
       tags:
       - tags
 swagger: "2.0"

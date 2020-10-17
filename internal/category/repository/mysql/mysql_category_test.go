@@ -18,13 +18,13 @@ func TestGetAll(t *testing.T) {
 	}
 	mockCategories := []domain.Category{
 		domain.Category{
-			ID: 1, Name: "IT", UpdatedAt: time.Now(), CreatedAt: time.Now(),
+			ID: 1, Name: "IT", UpdatedAt: time.Now().Unix(), CreatedAt: time.Now().Unix(),
 		},
 	}
 	rows := sqlmock.NewRows([]string{"id", "name", "updated_at", "created_at"}).
 		AddRow(mockCategories[0].ID, mockCategories[0].Name, mockCategories[0].UpdatedAt, mockCategories[0].CreatedAt)
 
-	query := `SELECT id,name, updated_at, created_at FROM categories ORDER BY created_at DESC LIMIT \?,\?`
+	query := `SELECT id,name,updated_at,created_at FROM categories ORDER BY created_at DESC LIMIT \?,\?`
 	mock.ExpectQuery(query).WillReturnRows(rows)
 	c := mysqlrepo.Init(db)
 	start, limit := 0, 10
@@ -40,7 +40,7 @@ func TestGetByID(t *testing.T) {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	row := sqlmock.NewRows([]string{"id", "name", "updated_at", "created_at"}).
-		AddRow("1", "testing-2", time.Now(), time.Now())
+		AddRow("1", "testing-2", time.Now().Unix(), time.Now().Unix())
 
 	query := `SELECT id,name,updated_at,created_at FROM categories WHERE ID = \?`
 	mock.ExpectQuery(query).WillReturnRows(row)
@@ -56,7 +56,7 @@ func TestGetByName(t *testing.T) {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	row := sqlmock.NewRows([]string{"id", "name", "updated_at", "created_at"}).
-		AddRow("1", "testing-2", time.Now(), time.Now())
+		AddRow("1", "testing-2", time.Now().Unix(), time.Now().Unix())
 
 	query := `SELECT id,name,updated_at,created_at FROM categories WHERE name = \?`
 	mock.ExpectQuery(query).WillReturnRows(row)
@@ -69,14 +69,14 @@ func TestGetByName(t *testing.T) {
 func TestCreateCategory(t *testing.T) {
 	c := &domain.Category{
 		Name:      "Programming",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
 	}
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error %s was not expected when opening stub database connection", err)
 	}
-	query := `INSERT  categories SET name=\?,  updated_at=\? , created_at=\?`
+	query := `INSERT categories SET name=\?,updated_at=\?,created_at=\?`
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(c.Name, c.UpdatedAt, c.CreatedAt).WillReturnResult(sqlmock.NewResult(12, 1))
 
@@ -105,14 +105,14 @@ func TestUpdateCategory(t *testing.T) {
 	c := &domain.Category{
 		ID:        12,
 		Name:      "Programming",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: time.Now().Unix(),
+		UpdatedAt: time.Now().Unix(),
 	}
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error %s was not expected when opening stub database connection", err)
 	}
-	query := `UPDATE categories set name=\?, updated_at=\? WHERE ID = \?`
+	query := `UPDATE categories set name=\?,updated_at=\? WHERE ID = \?`
 	prep := mock.ExpectPrepare(query)
 	prep.ExpectExec().WithArgs(c.Name, c.UpdatedAt, c.ID).WillReturnResult(sqlmock.NewResult(12, 1))
 

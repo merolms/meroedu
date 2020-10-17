@@ -4,19 +4,24 @@ import (
 	"context"
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/meroedu/meroedu/internal/domain"
+	"github.com/meroedu/meroedu/pkg/log"
 )
 
 // ContentUseCase ...
 type ContentUseCase struct {
+	contentStore   domain.ContentStorage
 	contentRepo    domain.ContentRepository
 	contextTimeOut time.Duration
 }
 
-// NewContentUseCase will creae new an
-func NewContentUseCase(c domain.ContentRepository, timeout time.Duration) domain.ContentUseCase {
+// NewContentUseCase will create new an
+func NewContentUseCase(c domain.ContentRepository, s domain.ContentStorage, timeout time.Duration) domain.ContentUseCase {
 	return &ContentUseCase{
 		contentRepo:    c,
+		contentStore:   s,
 		contextTimeOut: timeout,
 	}
 }
@@ -48,35 +53,53 @@ func (usecase *ContentUseCase) GetByID(c context.Context, id int64) (res *domain
 }
 
 // CreateContent ..
-func (usecase *ContentUseCase) CreateContent(c context.Context, content *domain.Content) (err error) {
+func (usecase *ContentUseCase) CreateContent(c context.Context, content *domain.Content) (*domain.Content, error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
-	content.UpdatedAt = time.Now()
-	content.CreatedAt = time.Now()
-	err = usecase.contentRepo.CreateContent(ctx, content)
-	if err != nil {
-		return
+	if content.FileHeader != "" {
+		filename := getFileName(content.FileHeader)
+		if filename == "" {
+			return nil, domain.ErrUnsupportedFileType
+		}
+		content.Name = filename
+		err := usecase.contentStore.CreateContent(ctx, *content)
+		if err != nil {
+			log.Errorf("error received from usecase storage %v", err)
+			return nil, err
+		}
 	}
-	return
 
+	content.UpdatedAt = time.Now().Unix()
+	content.CreatedAt = time.Now().Unix()
+	err := usecase.contentRepo.CreateContent(ctx, content)
+	if err != nil {
+		return nil, err
+	}
+	return content, err
 }
 
 // UpdateContent ..
-func (usecase *ContentUseCase) UpdateContent(c context.Context, content *domain.Content, id int64) (err error) {
+func (usecase *ContentUseCase) UpdateContent(c context.Context, content *domain.Content, id int64) (*domain.Content, error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 	existingContent, err := usecase.GetByID(ctx, id)
 	if existingContent == nil {
-		return domain.ErrNotFound
+		return nil, domain.ErrNotFound
+	}
+	if content.FileHeader != "" {
+		filename := getFileName(content.FileHeader)
+		if filename == "" {
+			return nil, domain.ErrUnsupportedFileType
+		}
+		content.Name = filename
 	}
 	content.ID = id
-	content.UpdatedAt = time.Now()
+	content.UpdatedAt = time.Now().Unix()
 	err = usecase.contentRepo.UpdateContent(ctx, content)
 	if err != nil {
-		return
+		return nil, err
 	}
-	return
-
+	return content, nil
 }
 
 // DeleteContent ...
@@ -91,4 +114,49 @@ func (usecase *ContentUseCase) DeleteContent(c context.Context, id int64) (err e
 		return domain.ErrNotFound
 	}
 	return usecase.contentRepo.DeleteContent(ctx, id)
+}
+
+// GetContentByLesson ...
+func (usecase *ContentUseCase) GetContentByLesson(c context.Context, LessonID int64) ([]domain.Content, error) {
+	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
+	defer cancel()
+
+	res, err := usecase.contentRepo.GetContentByLesson(ctx, LessonID)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+// GetFileName will return file name with concating with unique id(uuid)
+func getFileName(fileType string) string {
+	log.Infof("Requested file type:%v", fileType)
+	var filename string = uuid.New().String()
+	switch fileType {
+	case "image/png":
+		return filename + ".png"
+	case "image/jpg", "image/jpeg":
+		return filename + ".jpg"
+	case "text/markdown":
+		return filename + ".md"
+	case "application/pdf":
+		return filename + ".pdf"
+	case "text/html":
+		return filename + ".html"
+	case "video/mp4":
+		return filename + ".mp4"
+	}
+	return ""
+}
+
+// DownloadContent will return filepath as string
+func (usecase *ContentUseCase) DownloadContent(ctx context.Context, fileName string) (string, error) {
+	ctx, cancel := context.WithTimeout(ctx, usecase.contextTimeOut)
+	defer cancel()
+	filePath, err := usecase.contentStore.DownloadContent(ctx, fileName)
+	if err != nil {
+		log.Errorf("error occur %v", err)
+		return "", err
+	}
+	return filePath, nil
 }

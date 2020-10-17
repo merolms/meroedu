@@ -59,6 +59,7 @@ migrate: migrate-build
 	docker run --network host migrator -path=/migrations/ -database "$(DB_DSN)" up
 
 migrate-down:
+	docker run --network host migrator -path=/migrations/ -database "$(DB_DSN)" force 0
 	docker run --network host migrator -path=/migrations/ -database "$(DB_DSN)" down -all
 	
 #############################################################################

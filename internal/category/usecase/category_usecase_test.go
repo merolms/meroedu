@@ -35,7 +35,7 @@ func TestGetAll(t *testing.T) {
 	})
 	t.Run("error-failed", func(t *testing.T) {
 		mockCategoryRepo.On("GetAll", mock.Anything, mock.AnythingOfType("int"),
-			mock.AnythingOfType("int")).Return(nil, errors.New("Unexpexted Error")).Once()
+			mock.AnythingOfType("int")).Return(nil, errors.New("Unexpected Error")).Once()
 
 		u := ucase.NewCategoryUseCase(mockCategoryRepo, time.Second*2)
 		start := int(0)
@@ -81,8 +81,8 @@ func TestGetByName(t *testing.T) {
 	mockCategoryRepo := new(mocks.CategoryRepository)
 	mockCategory := domain.Category{
 		Name:      "category-1",
-		UpdatedAt: time.Now(),
-		CreatedAt: time.Now(),
+		UpdatedAt: time.Now().Unix(),
+		CreatedAt: time.Now().Unix(),
 	}
 	t.Run("success", func(t *testing.T) {
 		mockCategoryRepo.On("GetByName", mock.Anything, mock.AnythingOfType("string")).Return(&mockCategory, nil).Once()

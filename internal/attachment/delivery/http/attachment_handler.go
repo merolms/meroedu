@@ -2,6 +2,7 @@ package http
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 
@@ -53,6 +54,10 @@ func (a *AttachmentHandler) CreateAttachment(echoContext echo.Context) error {
 	if err != nil {
 		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
+	courseID, err := strconv.Atoi(echoContext.FormValue("course_id"))
+	if err != nil {
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
+	}
 	file, err := fileHeader.Open()
 	defer file.Close()
 	if err != nil {
@@ -65,6 +70,7 @@ func (a *AttachmentHandler) CreateAttachment(echoContext echo.Context) error {
 	attachment := domain.Attachment{
 		Title:       title,
 		Description: description,
+		CourseID:    int64(courseID),
 		File:        file,
 		Filename:    fileHeader.Filename,
 		Size:        sizer.Size(),

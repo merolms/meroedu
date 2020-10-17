@@ -88,6 +88,50 @@ func (_m *LessonUseCase) GetByID(ctx context.Context, id int64) (*domain.Lesson,
 	return r0, r1
 }
 
+// GetLessonByCourse provides a mock function with given fields: ctx, courseID
+func (_m *LessonUseCase) GetLessonByCourse(ctx context.Context, courseID int64) ([]domain.Lesson, error) {
+	ret := _m.Called(ctx, courseID)
+
+	var r0 []domain.Lesson
+	if rf, ok := ret.Get(0).(func(context.Context, int64) []domain.Lesson); ok {
+		r0 = rf(ctx, courseID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.Lesson)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, int64) error); ok {
+		r1 = rf(ctx, courseID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetLessonCountByCourse provides a mock function with given fields: ctx, courseID
+func (_m *LessonUseCase) GetLessonCountByCourse(ctx context.Context, courseID int64) (int, error) {
+	ret := _m.Called(ctx, courseID)
+
+	var r0 int
+	if rf, ok := ret.Get(0).(func(context.Context, int64) int); ok {
+		r0 = rf(ctx, courseID)
+	} else {
+		r0 = ret.Get(0).(int)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, int64) error); ok {
+		r1 = rf(ctx, courseID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // UpdateLesson provides a mock function with given fields: ctx, Lesson, id
 func (_m *LessonUseCase) UpdateLesson(ctx context.Context, Lesson *domain.Lesson, id int64) error {
 	ret := _m.Called(ctx, Lesson, id)

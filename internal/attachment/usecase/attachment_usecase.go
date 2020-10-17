@@ -48,7 +48,7 @@ func (usecase *AttachmentUseCase) CreateAttachment(ctx context.Context, attachme
 	return &attachment, nil
 }
 
-// GetFileName will return file name with concating with uniquie id(uuid)
+// GetFileName will return file name with concating with unique id(uuid)
 func getFileName(fileType string) string {
 	log.Infof("Requested file type:%v", fileType)
 	var filename string = uuid.New().String()
@@ -59,6 +59,8 @@ func getFileName(fileType string) string {
 		return filename + ".jpg"
 	case "text/markdown":
 		return filename + ".md"
+	case "application/pdf":
+		return filename + ".pdf"
 	case "text/html":
 		return filename + ".html"
 	case "video/mp4":
@@ -77,4 +79,16 @@ func (usecase *AttachmentUseCase) DownloadAttachment(ctx context.Context, fileNa
 		return "", err
 	}
 	return filePath, nil
+}
+
+// GetAttachmentByCourse ...
+func (usecase *AttachmentUseCase) GetAttachmentByCourse(c context.Context, courseID int64) ([]domain.Attachment, error) {
+	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
+	defer cancel()
+
+	res, err := usecase.attachmentRepo.GetAttachmentByCourse(ctx, courseID)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }

@@ -2,12 +2,11 @@ package domain
 
 import (
 	"context"
-	"time"
 )
 
 // Course Status
 const (
-	CourseInDraft   Status = "Draft"
+	CourseInDraft   Status = "DRAFT"
 	CourseArchived  Status = "Archived"
 	CourseAssigned  Status = "Assigned"
 	CoursePublished Status = "Published"
@@ -29,17 +28,18 @@ type Course struct {
 	Description string       `json:"description,omitempty"`
 	ImageURL    string       `json:"image_url,omitempty"`
 	Duration    uint16       `json:"duration,omitempty"`
-	CategoryID  NullInt64    `json:"category_id,omitempty"`
+	CategoryID  NullInt64    `json:"-,omitempty"`
 	Category    Category     `json:"categories,omitempty"`
 	Tags        []Tag        `json:"tags,omitempty"`
-	AuthorID    NullInt64    `json:"author_id,omitempty"`
+	AuthorID    NullInt64    `json:"-,omitempty"`
 	Author      User         `json:"author,omitempty"`
 	Users       []User       `json:"users,omitempty"`
+	LessonCount int          `json:"lesson_count,omitempty"`
 	Lessons     []Lesson     `json:"lessons,omitempty"`
 	Attachments []Attachment `json:"attachments,omitempty"`
 	Status      Status       `json:"status,omitempty"`
-	UpdatedAt   time.Time    `json:"updated_at,omitempty"`
-	CreatedAt   time.Time    `json:"created_at,omitempty"`
+	UpdatedAt   int64        `json:"updated_at,omitempty"`
+	CreatedAt   int64        `json:"created_at,omitempty"`
 }
 
 // CourseStats is a struct representing the statistics for a single Course

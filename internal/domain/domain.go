@@ -2,12 +2,12 @@ package domain
 
 import (
 	"database/sql"
-	"time"
 )
 
 // Status ...
 type Status string
 
+// Success ...
 const (
 	Success Status = "success"
 	Error   Status = "error"
@@ -17,7 +17,7 @@ const (
 type APIResponseError struct {
 	ErrorCode    int
 	ErrorMessage string
-	CreatedAt    time.Time
+	CreatedAt    int64
 }
 
 // Response contains the attributes found in an API response

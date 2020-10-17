@@ -2,28 +2,30 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/meroedu/meroedu/internal/domain"
+	"github.com/meroedu/meroedu/pkg/log"
 )
 
 // CourseUseCase ...
 type CourseUseCase struct {
-	courseRepo     domain.CourseRepository
-	userRepo       domain.UserRepository
-	lessonRepo     domain.LessonRepository
-	attachmentRepo domain.AttachmentRepository
-	tagRepo        domain.TagRepository
-	categoryRepo   domain.CategoryRepository
-	contextTimeOut time.Duration
+	courseRepo        domain.CourseRepository
+	userRepo          domain.UserRepository
+	lessonUseCase     domain.LessonUseCase
+	attachmentUseCase domain.AttachmentUseCase
+	tagRepo           domain.TagRepository
+	categoryRepo      domain.CategoryRepository
+	contextTimeOut    time.Duration
 }
 
 // NewCourseUseCase will create new an
-func NewCourseUseCase(c domain.CourseRepository, timeout time.Duration) domain.CourseUseCase {
+func NewCourseUseCase(c domain.CourseRepository, l domain.LessonUseCase, a domain.AttachmentUseCase, timeout time.Duration) domain.CourseUseCase {
 	return &CourseUseCase{
-		courseRepo:     c,
-		contextTimeOut: timeout,
+		courseRepo:        c,
+		lessonUseCase:     l,
+		attachmentUseCase: a,
+		contextTimeOut:    timeout,
 	}
 }
 
@@ -31,8 +33,7 @@ func NewCourseUseCase(c domain.CourseRepository, timeout time.Duration) domain.C
 func (usecase *CourseUseCase) GetAll(c context.Context, start int, limit int) (res []domain.Course, err error) {
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
-	// count, err := usecase.courseRepo.GetCourseCount(ctx)
-	// log.Info(count)
+
 	res, err = usecase.courseRepo.GetAll(ctx, start, limit)
 	if err != nil {
 		return nil, err
@@ -49,7 +50,22 @@ func (usecase *CourseUseCase) GetByID(c context.Context, id int64) (*domain.Cour
 	if err != nil {
 		return nil, err
 	}
+	lessonCount, err := usecase.lessonUseCase.GetLessonCountByCourse(ctx, id)
+	if err != nil {
+		log.Error("err")
+	}
+	course.LessonCount = lessonCount
 
+	lessons, err := usecase.lessonUseCase.GetLessonByCourse(ctx, id)
+	if err != nil {
+		log.Error(err)
+	}
+	course.Lessons = lessons
+	attachments, err := usecase.attachmentUseCase.GetAttachmentByCourse(ctx, id)
+	if err != nil {
+		log.Error(err)
+	}
+	course.Attachments = attachments
 	return course, nil
 }
 
@@ -69,12 +85,11 @@ func (usecase *CourseUseCase) CreateCourse(c context.Context, course *domain.Cou
 	ctx, cancel := context.WithTimeout(c, usecase.contextTimeOut)
 	defer cancel()
 	existedCourse, err := usecase.GetByTitle(ctx, course.Title)
-	fmt.Println(existedCourse)
 	if existedCourse != nil {
 		return domain.ErrConflict
 	}
-	course.UpdatedAt = time.Now()
-	course.CreatedAt = time.Now()
+	course.UpdatedAt = time.Now().Unix()
+	course.CreatedAt = time.Now().Unix()
 	err = usecase.courseRepo.CreateCourse(ctx, course)
 	if err != nil {
 		return
@@ -92,7 +107,7 @@ func (usecase *CourseUseCase) UpdateCourse(c context.Context, course *domain.Cou
 		return domain.ErrNotFound
 	}
 	course.ID = id
-	course.UpdatedAt = time.Now()
+	course.UpdatedAt = time.Now().Unix()
 	err = usecase.courseRepo.UpdateCourse(ctx, course)
 	if err != nil {
 		return

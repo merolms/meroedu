@@ -9,7 +9,11 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-    _ "github.com/meroedu/meroedu/docs"
+	"github.com/spf13/viper"
+	echoSwagger "github.com/swaggo/echo-swagger"
+	"gopkg.in/alecthomas/kingpin.v2"
+
+	_ "github.com/meroedu/meroedu/docs"
 	_attachmentHttpDelivery "github.com/meroedu/meroedu/internal/attachment/delivery/http"
 	_attachmentRepo "github.com/meroedu/meroedu/internal/attachment/repository/mysql"
 	_attachmentStore "github.com/meroedu/meroedu/internal/attachment/storage/filesystem"
@@ -17,17 +21,25 @@ import (
 	_categoryHttpDelivery "github.com/meroedu/meroedu/internal/category/delivery/http"
 	_categoryRepo "github.com/meroedu/meroedu/internal/category/repository/mysql"
 	_categoryUcase "github.com/meroedu/meroedu/internal/category/usecase"
-	"github.com/meroedu/meroedu/internal/config"
+	_contentHttpDelivery "github.com/meroedu/meroedu/internal/content/delivery/http"
+	_contentRepo "github.com/meroedu/meroedu/internal/content/repository/mysql"
+	_contentStore "github.com/meroedu/meroedu/internal/content/storage/filesystem"
+	_contentUcase "github.com/meroedu/meroedu/internal/content/usecase"
 	_courseHttpDelivery "github.com/meroedu/meroedu/internal/course/delivery/http"
 	_courseHttpDeliveryMiddleware "github.com/meroedu/meroedu/internal/course/delivery/http/middleware"
 	_courseRepo "github.com/meroedu/meroedu/internal/course/repository/mysql"
 	_courseUcase "github.com/meroedu/meroedu/internal/course/usecase"
 	_healthHttpDelivery "github.com/meroedu/meroedu/internal/health/delivery/http"
+	_lessonHttpDelivery "github.com/meroedu/meroedu/internal/lesson/delivery/http"
+	_lessonRepo "github.com/meroedu/meroedu/internal/lesson/repository/mysql"
+	_lessonUcase "github.com/meroedu/meroedu/internal/lesson/usecase"
+	_tagHttpDelivery "github.com/meroedu/meroedu/internal/tag/delivery/http"
+	_tagRepo "github.com/meroedu/meroedu/internal/tag/repository/mysql"
+	_tagUcase "github.com/meroedu/meroedu/internal/tag/usecase"
 	datastore "github.com/meroedu/meroedu/pkg/database"
+
+	"github.com/meroedu/meroedu/internal/config"
 	"github.com/meroedu/meroedu/pkg/log"
-	"github.com/spf13/viper"
-	echoSwagger "github.com/swaggo/echo-swagger"
-	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 var (
@@ -76,13 +88,23 @@ func main() {
 
 	// healthcheck
 	_healthHttpDelivery.NewHealthHandler(e)
-	// Courses
-	courseRepositry := _courseRepo.Init(db)
-	_courseHttpDelivery.NewCourseHandler(e, _courseUcase.NewCourseUseCase(courseRepositry, timeoutContext))
+
+	// contents
+	contentRepository := _contentRepo.Init(db)
+	contentStorage, err := _contentStore.Init()
+	if err != nil {
+		log.Fatalf("Error initializing content storage: %v", err)
+	}
+	contentUseCase := _contentUcase.NewContentUseCase(contentRepository, contentStorage, timeoutContext)
+	_contentHttpDelivery.NewContentHandler(e, contentUseCase)
+
+	// tags
+	tagRepository := _tagRepo.Init(db)
+	_tagHttpDelivery.NewTagHandler(e, _tagUcase.NewTagUseCase(tagRepository, timeoutContext))
 
 	// Categories
 	categoryRepository := _categoryRepo.Init(db)
-	_categoryHttpDelivery.NewCategroyHandler(e, _categoryUcase.NewCategoryUseCase(categoryRepository, timeoutContext))
+	_categoryHttpDelivery.NewCategoryHandler(e, _categoryUcase.NewCategoryUseCase(categoryRepository, timeoutContext))
 
 	// Attachment
 	attachmentRepository := _attachmentRepo.Init(db)
@@ -90,7 +112,17 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error initializing attachment storage: %v", err)
 	}
-	_attachmentHttpDelivery.NewAttachmentHandler(e, _attachmentUcase.NewAttachmentUseCase(attachmentRepository, attachmentStorage, timeoutContext))
+	attachmentUseCase := _attachmentUcase.NewAttachmentUseCase(attachmentRepository, attachmentStorage, timeoutContext)
+	_attachmentHttpDelivery.NewAttachmentHandler(e, attachmentUseCase)
+
+	// Lessons
+	lessonRepository := _lessonRepo.Init(db)
+	lessonUseCase := _lessonUcase.NewLessonUseCase(lessonRepository, contentUseCase, timeoutContext)
+	_lessonHttpDelivery.NewLessonHandler(e, lessonUseCase)
+
+	// Courses
+	courseRepository := _courseRepo.Init(db)
+	_courseHttpDelivery.NewCourseHandler(e, _courseUcase.NewCourseUseCase(courseRepository, lessonUseCase, attachmentUseCase, timeoutContext))
 
 	// Start HTTP Server
 	go func() {

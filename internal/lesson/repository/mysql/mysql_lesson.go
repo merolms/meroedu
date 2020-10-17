@@ -10,17 +10,17 @@ import (
 )
 
 type mysqlRepository struct {
-	Conn *sql.DB
+	conn *sql.DB
 }
 
 // Init will create an object that represent the lesson's Repository interface
 func Init(db *sql.DB) domain.LessonRepository {
 	return &mysqlRepository{
-		Conn: db,
+		conn: db,
 	}
 }
 func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...interface{}) (result []domain.Lesson, err error) {
-	rows, err := m.Conn.QueryContext(ctx, query, args...)
+	rows, err := m.conn.QueryContext(ctx, query, args...)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -54,7 +54,7 @@ func (m *mysqlRepository) fetch(ctx context.Context, query string, args ...inter
 }
 
 func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res []domain.Lesson, err error) {
-	query := `SELECT id,name, updated_at, created_at FROM lessons ORDER BY created_at DESC LIMIT ?,?`
+	query := `SELECT id,title,updated_at,created_at FROM lessons ORDER BY created_at DESC LIMIT ?,?`
 
 	res, err = m.fetch(ctx, query, start, limit)
 	if err != nil {
@@ -63,7 +63,7 @@ func (m *mysqlRepository) GetAll(ctx context.Context, start int, limit int) (res
 	return res, nil
 }
 func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (res *domain.Lesson, err error) {
-	query := `SELECT id,name,updated_at,created_at FROM lessons WHERE ID = ?`
+	query := `SELECT id,title,updated_at,created_at FROM lessons WHERE ID = ?`
 
 	list, err := m.fetch(ctx, query, id)
 	if err != nil {
@@ -80,13 +80,13 @@ func (m *mysqlRepository) GetByID(ctx context.Context, id int64) (res *domain.Le
 }
 
 func (m *mysqlRepository) CreateLesson(ctx context.Context, a *domain.Lesson) (err error) {
-	query := `INSERT  lessons SET title=?, updated_at=? , created_at=?`
-	stmt, err := m.Conn.PrepareContext(ctx, query)
+	query := `INSERT lessons SET title=?,course_id=?,description=?,updated_at=?,created_at=?`
+	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {
 		log.Error("Error while preparing statement ", err)
 		return
 	}
-	res, err := stmt.ExecContext(ctx, a.Title, a.UpdatedAt, a.CreatedAt)
+	res, err := stmt.ExecContext(ctx, a.Title, a.CourseID, a.Description, a.UpdatedAt, a.CreatedAt)
 	if err != nil {
 		log.Error("Error while executing statement ", err)
 		return
@@ -103,7 +103,7 @@ func (m *mysqlRepository) CreateLesson(ctx context.Context, a *domain.Lesson) (e
 func (m *mysqlRepository) DeleteLesson(ctx context.Context, id int64) (err error) {
 	query := "DELETE FROM lessons WHERE id = ?"
 
-	stmt, err := m.Conn.PrepareContext(ctx, query)
+	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
@@ -113,22 +113,22 @@ func (m *mysqlRepository) DeleteLesson(ctx context.Context, id int64) (err error
 		return
 	}
 
-	rowsAfected, err := res.RowsAffected()
+	rowsAffected, err := res.RowsAffected()
 	if err != nil {
 		return
 	}
 
-	if rowsAfected != 1 {
-		err = fmt.Errorf("Weird  Behavior. Total Affected: %d", rowsAfected)
+	if rowsAffected != 1 {
+		err = fmt.Errorf("Weird  Behavior. Total Affected: %d", rowsAffected)
 		return
 	}
 
 	return
 }
 func (m *mysqlRepository) UpdateLesson(ctx context.Context, ar *domain.Lesson) (err error) {
-	query := `UPDATE lessons set title=?, updated_at=? WHERE ID = ?`
+	query := `UPDATE lessons set title=?,updated_at=? WHERE ID = ?`
 
-	stmt, err := m.Conn.PrepareContext(ctx, query)
+	stmt, err := m.conn.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
@@ -147,4 +147,33 @@ func (m *mysqlRepository) UpdateLesson(ctx context.Context, ar *domain.Lesson) (
 	}
 
 	return
+}
+
+func (m *mysqlRepository) GetLessonCountByCourse(ctx context.Context, courseID int64) (int, error) {
+	query := `SELECT count(*) FROM lessons WHERE course_id = ?`
+
+	rows, err := m.conn.QueryContext(ctx, query, courseID)
+	if err != nil {
+		log.Error(err)
+		return 0, nil
+	}
+	defer rows.Close()
+	var count int
+	for rows.Next() {
+		err := rows.Scan(&count)
+		if err != nil {
+			log.Error(err)
+			return 0, err
+		}
+	}
+	return count, nil
+}
+
+func (m *mysqlRepository) GetLessonByCourse(ctx context.Context, courseID int64) ([]domain.Lesson, error) {
+	query := `SELECT id,title,updated_at,created_at FROM lessons WHERE course_id = ?`
+	list, err := m.fetch(ctx, query, courseID)
+	if err != nil {
+		return nil, err
+	}
+	return list, nil
 }

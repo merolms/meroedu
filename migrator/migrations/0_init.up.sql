@@ -13,7 +13,7 @@ CREATE TABLE `roles` (
   `code` VARCHAR(50) UNIQUE NOT NULL,
   `name` VARCHAR(100) NOT NULL,
   `description` VARCHAR(255),
-  `created_at` timestamp DEFAULT (now()),
+  `created_at` bigint(20) NOT NULL,
   `createdBy` bigint(20) NOT NULL
 );
 
@@ -26,8 +26,8 @@ CREATE TABLE `organizations` (
   `address2` VARCHAR(255),
   `country_id` bigint(20) NOT NULL,
   `status` int(1),
-  `updated_at` timestamp,
-  `created_at` timestamp DEFAULT (now())
+  `updated_at` bigint(20) NOT NULL,
+  `created_at` bigint(20) NOT NULL
 );
 
 CREATE TABLE `users` (
@@ -41,63 +41,66 @@ CREATE TABLE `users` (
   `organization_id` bigint(20) NOT NULL,
   `country_id` bigint(20) NOT NULL,
   `role_id` bigint(20) NOT NULL,
-  `joinedDate` timestamp DEFAULT (now()),
-  `lastOnline` timestamp,
+  `joinedDate` bigint(20) NOT NULL,
+  `lastOnline` bigint(20) NOT NULL,
   `address1` VARCHAR(255),
   `address2` VARCHAR(255),
   `profileUrl` VARCHAR(255),
   `status` int(1),
   `inviteBy` bigint(20) NOT NULL,
-  `updated_at` timestamp,
-  `created_at` timestamp DEFAULT (now())
+  `updated_at` bigint(20) NOT NULL,
+  `created_at` bigint(20) NOT NULL
 );
 
 CREATE TABLE `teams` (
   `id` bigint(20) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(150) NOT NULL,
   `description` VARCHAR(255),
-  `cover_image_url` VARCHAR(255),
+  `mage_url` VARCHAR(255),
   `role_id` bigint(20) NOT NULL,
   `organization_id` bigint(20) NOT NULL,
   `status` int(1),
-  `updated_at` timestamp,
-  `created_at` timestamp DEFAULT (now())
+  `updated_at` bigint(20) NOT NULL,
+  `created_at` bigint(20) NOT NULL
 );
 
 CREATE TABLE `teams_users` (
   `id` bigint(20) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `team_id` bigint(20) NOT NULL,
   `user_id` bigint(20) NOT NULL,
-  `created_at` timestamp DEFAULT (now())
+  `created_at` bigint(20) NOT NULL
 );
 
 CREATE TABLE `categories` (
   `id` bigint(20) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(150) NOT NULL,
   `description` VARCHAR(255),
-  `updated_at` timestamp DEFAULT (now()),
-  `created_at` timestamp DEFAULT (now())
+  `updated_at` bigint(20) NOT NULL,
+  `created_at` bigint(20) NOT NULL
 );
 
 CREATE TABLE `tags` (
   `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
   `name` VARCHAR(150) NOT NULL,
   `description` VARCHAR(255),
-  `updated_at` timestamp DEFAULT (now()),
-  `created_at` timestamp DEFAULT (now())
+  `updated_at` bigint(20) NOT NULL,
+  `created_at` bigint(20) NOT NULL
 );
 
 CREATE TABLE `courses` (
   `id` bigint(20) PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `title` varchar(256),
-  `description` longtext,
-  `cover_image_url` VARCHAR(255),
-  `duration` int(20),
-  `author_id` bigint(20),
+  `title` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` longtext COLLATE utf8mb4_unicode_ci,
+  `long_description` longtext COLLATE utf8mb4_unicode_ci,
+  `image_url` mediumtext COLLATE utf8mb4_unicode_ci,
+  `duration` bigint(20) NOT NULL DEFAULT '0',
+  `author_id` bigint(20), /* TODO: Make it not null */
   `category_id` bigint(20),
-  `status` int(1),
-  `updated_at` timestamp DEFAULT (now()),
-  `created_at` timestamp DEFAULT (now())
+  `published_at` bigint(20) DEFAULT NULL,
+  `organization_id` bigint(20), /* TODO: Make it not null */
+  `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'DRAFT',
+  `updated_at` bigint(20) NOT NULL,
+  `created_at` bigint(20) NOT NULL
 );
 
 CREATE TABLE `enrollments` (
@@ -122,14 +125,14 @@ CREATE TABLE `courses_tags` (
   `id` bigint(20) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `course_id` bigint(20) NOT NULL,
   `tag_id` bigint(20) NOT NULL,
-  `created_at` timestamp DEFAULT (now())
+  `created_at` bigint(20) NOT NULL
 );
 
 CREATE TABLE `lessons_tags` (
   `id` bigint(20) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `lesson_id` bigint(20) NOT NULL,
   `tag_id` bigint(20) NOT NULL,
-  `created_at` timestamp DEFAULT (now())
+  `created_at` bigint(20) NOT NULL
 );
 
 CREATE TABLE `lessons` (
@@ -137,9 +140,10 @@ CREATE TABLE `lessons` (
   `title` varchar(256),
   `description` longtext,
   `course_id` bigint(20) NOT NULL,
+  `order` int(3),
   `status` int(1),
-  `updated_at` timestamp DEFAULT (now()),
-  `created_at` timestamp DEFAULT (now())
+  `updated_at` bigint(20) NOT NULL,
+  `created_at` bigint(20) NOT NULL
 );
 
 CREATE TABLE `contents` (
@@ -147,11 +151,15 @@ CREATE TABLE `contents` (
   `title` varchar(256),
   `description` longtext,
   `content` longtext,
-  `type` int,
+  `fileheader` varchar(60),
+  `embed_url` varchar(256),
+  `image_url` varchar(256),
   `lesson_id` bigint(20) NOT NULL,
-  `status` int(1),
-  `updated_at` timestamp DEFAULT (now()),
-  `created_at` timestamp DEFAULT (now())
+  `size` int,
+  `caption` varchar(256),
+  `order` int(3),
+  `updated_at` bigint(20) NOT NULL,
+  `created_at` bigint(20) NOT NULL
 );
 
 CREATE TABLE `attachments` (
@@ -163,8 +171,8 @@ CREATE TABLE `attachments` (
   `type` varchar(60),
   `course_id` bigint(20) NULL,
   `status` int(1),
-  `updated_at` timestamp DEFAULT (now()),
-  `created_at` timestamp DEFAULT (now())
+  `updated_at` bigint(20) NOT NULL,
+  `created_at` bigint(20) NOT NULL
 );
 
 ALTER TABLE `users` ADD FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE;

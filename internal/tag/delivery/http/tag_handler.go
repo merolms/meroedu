@@ -29,10 +29,13 @@ func NewTagHandler(e *echo.Echo, us domain.TagUseCase) {
 	// Get Operation
 	e.GET("/tags", handler.GetAll)
 	e.GET("/tags/:id", handler.GetByID)
-	e.GET("/tags/:id/", handler.GetByID)
+	e.GET("/tags/course/:id", handler.GetCourseTags)
+	e.GET("/tags/lesson/:id", handler.GetLessonTags)
 
 	// Create/Add Operation
 	e.POST("/tags", handler.CreateTag)
+	e.POST("/tags/course/:course_id/:tag_id", handler.CreateCourseTag)
+	e.POST("/tags/lesson/:lesson_id/:tag_id", handler.CreateLessonTag)
 
 	// Update Operation
 	e.PUT("/tags/:id", handler.UpdateTag)
@@ -40,6 +43,9 @@ func NewTagHandler(e *echo.Echo, us domain.TagUseCase) {
 
 	// Remove/Delete Operation
 	e.DELETE("/tags/:id", handler.DeleteTag)
+	e.DELETE("/tags/course/:course_id/:tag_id", handler.DeleteCourseTag)
+	e.DELETE("/tags/lesson/:lesson_id/:tag_id", handler.DeleteLessonTag)
+
 }
 
 // GetAll godoc
@@ -56,6 +62,7 @@ func NewTagHandler(e *echo.Echo, us domain.TagUseCase) {
 func (c *TagHandler) GetAll(echoContext echo.Context) error {
 	ctx := echoContext.Request().Context()
 	start, limit := 0, 10
+	searchQuery := echoContext.QueryParam("q")
 	var err error
 	for k, v := range echoContext.QueryParams() {
 		switch k {
@@ -72,7 +79,7 @@ func (c *TagHandler) GetAll(echoContext echo.Context) error {
 		}
 	}
 
-	list, err := c.TagUseCase.GetAll(ctx, start, limit)
+	list, err := c.TagUseCase.GetAll(ctx, searchQuery, start, limit)
 	if err != nil {
 		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
 	}
@@ -216,4 +223,195 @@ func (c *TagHandler) DeleteTag(echoContext echo.Context) error {
 	}
 
 	return echoContext.NoContent(http.StatusNoContent)
+}
+
+// GetCourseTags godoc
+// @Summary Get tags by CourseID.
+// @Description Get all tags specific to course
+// @Tags tags
+// @Accept */*
+// @Produce json
+// @Param id path int true "course id"
+// @Success 200 {object} domain.Response
+// @Failure 400 {object} domain.APIResponseError "We need ID!!"
+// @Failure 404 {object} domain.APIResponseError "Can not find ID"
+// @Failure 500 {object} domain.APIResponseError "Internal Server Error"
+// @Router /tags/course/{id} [get]
+func (c *TagHandler) GetCourseTags(echoContext echo.Context) error {
+	idParam, err := strconv.Atoi(echoContext.Param("id"))
+	if err != nil {
+		return echoContext.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
+	}
+	ctx := echoContext.Request().Context()
+
+	tags, err := c.TagUseCase.GetCourseTags(ctx, int64(idParam))
+	if err != nil {
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
+	}
+	res := domain.Summaries{
+		Response: domain.Response{
+			Message: domain.Success,
+			Data:    tags,
+		},
+	}
+	return echoContext.JSON(http.StatusOK, res)
+}
+
+// CreateCourseTag godoc
+// @Summary Create course tags
+// @Description Create course tags
+// @Tags tags
+// @Accept */*
+// @Produce json
+// @Param course_id path int true "course id"
+// @Param tag_id path int true "tag id"
+// @Success 200 {object} domain.Response
+// @Failure 400 {object} domain.APIResponseError "We need ID!!"
+// @Failure 404 {object} domain.APIResponseError "Can not find ID"
+// @Failure 500 {object} domain.APIResponseError "Internal Server Error"
+// @Router /tags/course/{course_id}/{tag_id} [post]
+func (c *TagHandler) CreateCourseTag(echoContext echo.Context) error {
+	ctx := echoContext.Request().Context()
+	courseID, err := strconv.Atoi(echoContext.Param("course_id"))
+	if err != nil {
+		return echoContext.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
+	}
+	tagID, err := strconv.Atoi(echoContext.Param("tag_id"))
+	if err != nil {
+		return echoContext.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
+	}
+	err = c.TagUseCase.CreateCourseTag(ctx, int64(tagID), int64(courseID))
+	if err != nil {
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
+	}
+
+	return echoContext.NoContent(http.StatusCreated)
+}
+
+// DeleteCourseTag godoc
+// @Summary Delete course tag by CourseID and tagID.
+// @Description Delete course tag by CourseID and tagID.
+// @Tags tags
+// @Accept */*
+// @Produce json
+// @Param course_id path int true "course id"
+// @Param tag_id path int true "tag id"
+// @Success 200 {object} domain.Response
+// @Failure 400 {object} domain.APIResponseError "We need ID!!"
+// @Failure 404 {object} domain.APIResponseError "Can not find ID"
+// @Failure 500 {object} domain.APIResponseError "Internal Server Error"
+// @Router /tags/course/{course_id}/{tag_id} [delete]
+func (c *TagHandler) DeleteCourseTag(echoContext echo.Context) error {
+	ctx := echoContext.Request().Context()
+	courseID, err := strconv.Atoi(echoContext.Param("course_id"))
+	if err != nil {
+		return echoContext.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
+	}
+	tagID, err := strconv.Atoi(echoContext.Param("tag_id"))
+	if err != nil {
+		return echoContext.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
+	}
+
+	err = c.TagUseCase.DeleteCourseTag(ctx, int64(tagID), int64(courseID))
+	if err != nil {
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
+	}
+
+	return echoContext.NoContent(http.StatusOK)
+}
+
+// CreateLessonTag godoc
+// @Summary Create Lesson Tag
+// @Description Create Lesson Tag
+// @Tags tags
+// @Accept */*
+// @Produce json
+// @Param lesson_id path int true  "lesson id"
+// @Param tag_id path int true  "tag id"
+// @Success 200 {object} domain.Response
+// @Failure 400 {object} domain.APIResponseError "We need ID!!"
+// @Failure 404 {object} domain.APIResponseError "Can not find ID"
+// @Failure 500 {object} domain.APIResponseError "Internal Server Error"
+// @Router /tags/lesson/{lesson_id}/{tag_id} [post]
+func (c *TagHandler) CreateLessonTag(echoContext echo.Context) error {
+	lessonID, err := strconv.Atoi(echoContext.Param("lesson_id"))
+	if err != nil {
+		return echoContext.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
+	}
+	tagID, err := strconv.Atoi(echoContext.Param("tag_id"))
+	if err != nil {
+		return echoContext.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
+	}
+	ctx := echoContext.Request().Context()
+
+	err = c.TagUseCase.CreateLessonTag(ctx, int64(tagID), int64(lessonID))
+	if err != nil {
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
+	}
+
+	return echoContext.NoContent(http.StatusCreated)
+}
+
+// DeleteLessonTag godoc
+// @Summary Delete lesson tags by lessonID and tagID
+// @Description Delete lesson tags by lessonID and tagID
+// @Tags tags
+// @Accept */*
+// @Produce json
+// @Param lesson_id path int true  "lesson id"
+// @Param tag_id path int true  "tag id"
+// @Success 200 {object} domain.Response
+// @Failure 400 {object} domain.APIResponseError "We need ID!!"
+// @Failure 404 {object} domain.APIResponseError "Can not find ID"
+// @Failure 500 {object} domain.APIResponseError "Internal Server Error"
+// @Router /tags/lesson/{lesson_id}/{tag_id} [delete]
+func (c *TagHandler) DeleteLessonTag(echoContext echo.Context) error {
+	lessonID, err := strconv.Atoi(echoContext.Param("lesson_id"))
+	if err != nil {
+		return echoContext.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
+	}
+	tagID, err := strconv.Atoi(echoContext.Param("tag_id"))
+	if err != nil {
+		return echoContext.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
+	}
+	ctx := echoContext.Request().Context()
+
+	err = c.TagUseCase.DeleteLessonTag(ctx, int64(tagID), int64(lessonID))
+	if err != nil {
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
+	}
+
+	return echoContext.NoContent(http.StatusOK)
+}
+
+// GetLessonTags godoc
+// @Summary Get tags by LessonID.
+// @Description Get all tags specific to lesson
+// @Tags tags
+// @Accept */*
+// @Produce json
+// @Param id path int true "Lesson Id"
+// @Success 200 {object} domain.Response
+// @Failure 400 {object} domain.APIResponseError "We need ID!!"
+// @Failure 404 {object} domain.APIResponseError "Can not find ID"
+// @Failure 500 {object} domain.APIResponseError "Internal Server Error"
+// @Router /tags/lesson/{id} [get]
+func (c *TagHandler) GetLessonTags(echoContext echo.Context) error {
+	idParam, err := strconv.Atoi(echoContext.Param("id"))
+	if err != nil {
+		return echoContext.JSON(http.StatusNotFound, domain.ErrNotFound.Error())
+	}
+	ctx := echoContext.Request().Context()
+
+	tags, err := c.TagUseCase.GetLessonTags(ctx, int64(idParam))
+	if err != nil {
+		return echoContext.JSON(util.GetStatusCode(err), ResponseError{Message: err.Error()})
+	}
+	res := domain.Summaries{
+		Response: domain.Response{
+			Message: domain.Success,
+			Data:    tags,
+		},
+	}
+	return echoContext.JSON(http.StatusOK, res)
 }

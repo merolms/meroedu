@@ -13,7 +13,7 @@ type CategoryUseCase struct {
 	contextTimeOut time.Duration
 }
 
-// NewCategoryUseCase will creae new an
+// NewCategoryUseCase will create new an
 func NewCategoryUseCase(c domain.CategoryRepository, timeout time.Duration) domain.CategoryUseCase {
 	return &CategoryUseCase{
 		categoryRepo:   c,
@@ -66,8 +66,8 @@ func (usecase *CategoryUseCase) CreateCategory(c context.Context, category *doma
 	if existingCategory != nil {
 		return domain.ErrConflict
 	}
-	category.UpdatedAt = time.Now()
-	category.CreatedAt = time.Now()
+	category.UpdatedAt = time.Now().Unix()
+	category.CreatedAt = time.Now().Unix()
 	err = usecase.categoryRepo.CreateCategory(ctx, category)
 	if err != nil {
 		return err
@@ -85,7 +85,7 @@ func (usecase *CategoryUseCase) UpdateCategory(c context.Context, category *doma
 		return domain.ErrNotFound
 	}
 	category.ID = id
-	category.UpdatedAt = time.Now()
+	category.UpdatedAt = time.Now().Unix()
 	err = usecase.categoryRepo.UpdateCategory(ctx, category)
 	if err != nil {
 		return
