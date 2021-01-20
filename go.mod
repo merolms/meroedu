@@ -8,7 +8,7 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-sql-driver/mysql v1.5.0
-	github.com/google/uuid v1.1.2
+	github.com/google/uuid v1.1.5
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/kr/pty v1.1.5 // indirect
 	github.com/labstack/echo/v4 v4.1.16
@@ -18,11 +18,9 @@ require (
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/viper v1.7.1
-	github.com/stretchr/objx v0.2.0 // indirect
-	github.com/stretchr/testify v1.6.1
-	github.com/swaggo/echo-swagger v1.1.0
-	github.com/swaggo/gin-swagger v1.2.0 // indirect
-	github.com/swaggo/swag v1.7.0
+	github.com/stretchr/testify v1.7.0
+	github.com/swaggo/echo-swagger v1.0.0
+	github.com/swaggo/swag v1.6.7
 	github.com/valyala/fasttemplate v1.2.1 // indirect
 	golang.org/x/crypto v0.0.0-20200728195943-123391ffb6de // indirect
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0
